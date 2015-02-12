@@ -1,0 +1,29 @@
+body {
+  font-family: "Helvetica Neue";
+}
+
+h3 {
+  color: #BF616A;
+}
+
+.togglable {
+  color: blue;
+  cursor: pointer;
+}
+
+.dot {
+    font-size: 20px;
+    position: relative;
+    top: -3px;
+    margin-right: 5px;
+    float: left;
+}
+
+.text {
+    cursor: text;
+    overflow: auto;
+}
+
+ul, li {
+    list-style-type: none;
+}
