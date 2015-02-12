@@ -12,6 +12,9 @@ var TreeNode = React.createClass({
   },
   componentDidUpdate: function(prevProps, prevState) {
       console.log('did update', this.props.node.title, this.props.node.selected);
+      if (this.props.node.selected) {
+        $(this.getDOMNode()).children('h5').children('div').focus();
+      }
   },
   render: function() {
     var childNodes;
@@ -79,10 +82,22 @@ renderAll();
 
 var selectNextNode = function(tree) {
     var found = findSelectedAndNext(tree);
-    if (found.selected) {
-        delete found.selected.selected;
+    if (found.next) {
+        if (found.selected) {
+            delete found.selected.selected;
+        }
+        found.next.selected = true;
     }
-    found.next.selected = true;
+};
+
+var selectPreviousNode = function(tree) {
+    var found = findSelectedAndNextReverse(tree);
+    if (found.next) {
+        if (found.selected) {
+            delete found.selected.selected;
+        }
+        found.next.selected = true;
+    }
 };
 
 var findSelectedAndNext = function(tree) {
@@ -294,10 +309,15 @@ $('#tree').keydown(function(e) {
         console.log('left');
     } else if (e.keyCode === 38) {
         console.log('up');
+        selectPreviousNode(tree);
+        renderAll();
     } else if (e.keyCode === 39) {
         console.log('right');
     } else if (e.keyCode === 40) {
         console.log('down');
+        selectNextNode(tree);
+        renderAll();
+        console.log('tree now', tree);
     }
 });
 
