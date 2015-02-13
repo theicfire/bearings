@@ -128,6 +128,13 @@ var findSelectedAndNext = function(tree) {
     return {};
 };
 
+var findDeepest = function(tree) {
+    if (tree.childNodes && tree.childNodes.length > 0) {
+        return findDeepest(tree.childNodes[tree.childNodes.length - 1]);
+    }
+    return tree;
+};
+
 var findSelectedAndNextReverse = function(tree) {
     if (tree.selected) {
         return {selected: tree, next: null};
@@ -145,7 +152,7 @@ var findSelectedAndNextReverse = function(tree) {
         // see if there's a sibling, otherwise go up in the tree
         if (!found.next) {
             if (i - 1 >= 0) {
-                return {selected: found.selected, next: tree.childNodes[i - 1]};
+                return {selected: found.selected, next: findDeepest(tree.childNodes[i - 1])};
             } else {
                 return {selected: found.selected, next: tree};
             }
@@ -298,6 +305,22 @@ var testSelectAndNextReverse = function() {
     pair = findSelectedAndNextReverse(treeNext2);
     console.assert(pair.selected.title === 'howdy');
     console.assert(pair.next === null);
+
+    var treeNext2 = {
+      title: "howdy",
+      childNodes: [
+        {title: "bobby"},
+        {title: "suzie", childNodes: [
+          {title: "puppy", childNodes: [
+            {title: "dog"}
+          ]},
+          {title: "cherry", selected: true,}
+        ]}
+      ]
+    };
+    pair = findSelectedAndNextReverse(treeNext2);
+    console.assert(pair.selected.title === 'cherry');
+    console.assert(pair.next.title === 'dog');
 };
 
 console.log('ready');
