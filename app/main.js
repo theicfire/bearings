@@ -44,10 +44,6 @@ define(function (require) {
     testTree(Tree);
 });
 
-
-
-
-
 var testTree = function(Tree) {
     var testSelectAndNext = function() {
         var selected, next;

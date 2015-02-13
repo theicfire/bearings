@@ -15,7 +15,7 @@ requirejs.config({
 
 // Start loading the main app file. Put all of
 // your application logic in there.
-requirejs(['jsx!app/main']);
+requirejs(['app/main']);
 
 //require(['jsx!app/all'], function (Timer) {
         //console.log('hi');
