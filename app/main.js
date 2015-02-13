@@ -55,8 +55,20 @@ define(function (require) {
             Tree.newLineAtCursor(tree);
             selected = Tree.findSelected(tree);
             Render(tree);
+            console.log('tree now', tree);
             return false;
+        } else if (e.keyCode === 8) {
+            var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
+            selected.caretLoc = caretLoc;
+            console.log('backspace', caretLoc);
+            if (selected.caretLoc === 0) {
+                Tree.backspaceAtBeginning(tree);
+                selected = Tree.findSelected(tree);
+                Render(tree);
+                return false;
+            }
         } else {
+            //console.log(e.keyCode);
         }
     });
     $('#tree').keyup(function(e) {
@@ -89,6 +101,27 @@ function getCaretCharacterOffsetWithin(element) {
     return caretOffset;
 }
 
+var testRemoveNode = function(Tree) {
+    (function() {
+        var tree;
+        tree = Tree.makeTree(
+            {title: "suzie", childNodes: [
+              {title: "puppy", childNodes: [
+                {title: 'dog', selected: true, caretLoc: 0}
+              ]},
+              {title: "cherry"}
+          ]});
+        newTree = Tree.makeTree(
+            {title: "suzie", childNodes: [
+              {title: "puppydog", selected: true, caretLoc: "puppy".length, childNodes: []},
+              {title: "cherry"}
+          ]});
+        Tree.backspaceAtBeginning(tree);
+        console.log('try compare', tree, newTree);
+        console.assert(_.isEqual(tree, newTree));
+    })();
+
+};
 var testAddChild = function(Tree) {
     (function() {
         var tree;
@@ -349,4 +382,5 @@ var testTree = function(Tree) {
     testSelectAndNextReverse(Tree);
     testSelectNextNode(Tree);
     testAddChild(Tree);
+    testRemoveNode(Tree);
 }
