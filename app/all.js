@@ -60,9 +60,15 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
     //  },
     });
 
+    var renderAll = function(tree) {
+        React.renderComponent(
+          <TreeNode node={tree} />,
+          document.getElementById("tree")
+        );
+    };
 
     //testSelectNext();
-    return TreeNode;
+    return renderAll;
 });
 
 

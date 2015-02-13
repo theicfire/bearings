@@ -3,7 +3,7 @@ define(function (require) {
     var _ = require('underscore');
     var $ = require('jquery');
     var React = require('react');
-    var TreeNode = require('jsx!app/all');
+    var Render = require('jsx!app/all');
 
     var tree = Tree.makeTree({
       title: "howdy",
@@ -18,13 +18,7 @@ define(function (require) {
       ]
     });
 
-    var renderAll = function() {
-        React.renderComponent(
-          <TreeNode node={tree} />,
-          document.getElementById("tree")
-        );
-    };
-    renderAll();
+    Render(tree);
     $('#tree').keydown(function(e) {
         if (e.keyCode === 37) {
             console.log('left');
@@ -32,7 +26,7 @@ define(function (require) {
         } else if (e.keyCode === 38) {
             console.log('up');
             Tree.selectPreviousNode(tree);
-            renderAll();
+            Render(tree);
             return false;
         } else if (e.keyCode === 39) {
             console.log('right');
@@ -40,7 +34,7 @@ define(function (require) {
         } else if (e.keyCode === 40) {
             console.log('down');
             Tree.selectNextNode(tree);
-            renderAll();
+            Render(tree);
             console.log('tree now', tree);
             return false;
         } else if (e.keyCode === 13) {
