@@ -5,13 +5,13 @@ var TreeNode = React.createClass({
     };
   },
   componentDidMount: function() {
-      console.log('mounted', this.props.node.title, this.props.node.selected);
+      //console.log('mounted', this.props.node.title, this.props.node.selected);
       if (this.props.node.selected) {
         $(this.getDOMNode()).children('h5').children('div').focus();
       }
   },
   componentDidUpdate: function(prevProps, prevState) {
-      console.log('did update', this.props.node.title, this.props.node.selected);
+      //console.log('did update', this.props.node.title, this.props.node.selected);
       if (this.props.node.selected) {
         $(this.getDOMNode()).children('h5').children('div').focus();
       }
@@ -59,74 +59,32 @@ var TreeNode = React.createClass({
 //  },
 });
 
-var tree = {
-  title: "howdy",
-  childNodes: [
-    {title: "bobby", selected: "true"},
-    {title: "suzie", childNodes: [
-      {title: "puppy", childNodes: [
-        {title: "dog house"}
-      ]},
-      {title: "cherry thing"}
-    ]}
-  ]
-};
-
-var renderAll = function() {
-    React.renderComponent(
-      <TreeNode node={tree} />,
-      document.getElementById("tree")
-    );
-};
-renderAll();
-
 var selectNextNode = function(tree) {
-    var found = findSelectedAndNext(tree);
-    if (found.next) {
-        if (found.selected) {
-            delete found.selected.selected;
+    var selected = findSelected(tree);
+    var next = findNextNode(selected);
+    if (next) {
+        if (selected) {
+            selected.selected = undefined;
         }
-        found.next.selected = true;
+        next.selected = true;
     }
 };
 
 var selectPreviousNode = function(tree) {
-    var found = findSelectedAndNextReverse(tree);
-    if (found.next) {
-        if (found.selected) {
-            delete found.selected.selected;
+    var selected = findSelected(tree);
+    var previous = findPreviousNode(selected);
+    if (previous) {
+        if (previous) {
+            selected.selected = undefined;
         }
-        found.next.selected = true;
+        previous.selected = true;
     }
 };
 
-var findSelectedAndNext = function(tree) {
-    if (tree.selected) {
-        if (tree.childNodes && tree.childNodes.length > 0) {
-            return {selected: tree, next: tree.childNodes[0]};
-        }
-        return {selected: tree, next: null};
-    }
-    var found = {};
-    if (tree.childNodes) {
-        for (var i = 0; i < tree.childNodes.length; i++) {
-            found = findSelectedAndNext(tree.childNodes[i]);
-            if (found.selected) {
-                break;
-            }
-        }
-    }
-    if (found.selected) {
-        // see if there's a sibling, otherwise go up in the tree
-        if (!found.next) {
-            if (i + 1 < tree.childNodes.length) {
-                return {selected: found.selected, next: tree.childNodes[i + 1]};
-            }
-        }
-        return found;
-    }
-    return {};
-};
+// Add a child at "selected"
+var addChild = function(tree) {
+
+}
 
 var findDeepest = function(tree) {
     if (tree.childNodes && tree.childNodes.length > 0) {
@@ -135,34 +93,8 @@ var findDeepest = function(tree) {
     return tree;
 };
 
-var findSelectedAndNextReverse = function(tree) {
-    if (tree.selected) {
-        return {selected: tree, next: null};
-    }
-    var found = {};
-    if (tree.childNodes) {
-        for (var i = tree.childNodes.length - 1; i >= 0; i--) {
-            found = findSelectedAndNextReverse(tree.childNodes[i]);
-            if (found.selected) {
-                break;
-            }
-        }
-    }
-    if (found.selected) {
-        // see if there's a sibling, otherwise go up in the tree
-        if (!found.next) {
-            if (i - 1 >= 0) {
-                return {selected: found.selected, next: findDeepest(tree.childNodes[i - 1])};
-            } else {
-                return {selected: found.selected, next: tree};
-            }
-        }
-        return found;
-    }
-    return {};
-};
-
 var testSelectAndNext = function() {
+    var selected, next;
     var tree = {
       title: "howdy",
       childNodes: [
@@ -175,9 +107,10 @@ var testSelectAndNext = function() {
         ]}
       ]
     };
-    var pair = findSelectedAndNext(tree);
-    console.assert(pair.selected.title === 'bobby');
-    console.assert(pair.next.title === 'suzie');
+    selected = findSelected(makeTree(tree));
+    next = findNextNode(selected);
+    console.assert(selected.title === 'bobby');
+    console.assert(next.title === 'suzie');
 
     var treeNext = {
       title: "howdy",
@@ -191,9 +124,10 @@ var testSelectAndNext = function() {
         ]}
       ]
     };
-    pair = findSelectedAndNext(treeNext);
-    console.assert(pair.selected.title === 'suzie');
-    console.assert(pair.next.title === 'puppy');
+    selected = findSelected(makeTree(treeNext));
+    next = findNextNode(selected);
+    console.assert(selected.title === 'suzie');
+    console.assert(next.title === 'puppy');
 
     var treeNext2 = {
       title: "howdy",
@@ -207,9 +141,10 @@ var testSelectAndNext = function() {
         ]}
       ]
     };
-    pair = findSelectedAndNext(treeNext2);
-    console.assert(pair.selected.title === 'dog');
-    console.assert(pair.next.title === 'cherry');
+    selected = findSelected(makeTree(treeNext2));
+    next = findNextNode(selected);
+    console.assert(selected.title === 'dog');
+    console.assert(next.title === 'cherry');
 
     var treeNext3 = {
       title: "howdy",
@@ -223,13 +158,14 @@ var testSelectAndNext = function() {
         ]}
       ]
     };
-    pair = findSelectedAndNext(treeNext3);
-    console.assert(pair.selected.title === 'cherry');
-    console.assert(pair.next === null);
+    selected = findSelected(makeTree(treeNext3));
+    next = findNextNode(selected);
+    console.assert(selected.title === 'cherry');
+    console.assert(next === null);
 };
 
 var testSelectNextNode = function() {
-    var tree = {
+    var tree = makeTree({
       title: "howdy",
       childNodes: [
         {title: "bobby", selected: "true"},
@@ -240,8 +176,9 @@ var testSelectNextNode = function() {
           {title: "cherry thing"}
         ]}
       ]
-    };
-    var treeNext = {
+    });
+
+    var treeNext = makeTree({
       title: "howdy",
       childNodes: [
         {title: "bobby"},
@@ -252,8 +189,10 @@ var testSelectNextNode = function() {
           {title: "cherry thing"}
         ]}
       ]
-    };
+      });
     selectNextNode(tree);
+    console.log('compare', tree);
+    console.log('compare2', treeNext);
     console.assert(_.isEqual(tree, treeNext));
 };
 
@@ -270,9 +209,10 @@ var testSelectAndNextReverse = function() {
         ]}
       ]
     };
-    var pair = findSelectedAndNextReverse(tree);
-    console.assert(pair.selected.title === 'bobby');
-    console.assert(pair.next.title === 'howdy');
+    selected = findSelected(makeTree(tree));
+    next = findPreviousNode(selected);
+    console.assert(selected.title === 'bobby');
+    console.assert(next.title === 'howdy');
 
     var treeNext = {
       title: "howdy",
@@ -286,9 +226,10 @@ var testSelectAndNextReverse = function() {
         ]}
       ]
     };
-    pair = findSelectedAndNextReverse(treeNext);
-    console.assert(pair.selected.title === 'suzie');
-    console.assert(pair.next.title === 'bobby');
+    selected = findSelected(makeTree(treeNext));
+    next = findPreviousNode(selected);
+    console.assert(selected.title === 'suzie');
+    console.assert(next.title === 'bobby');
 
     var treeNext2 = {
       title: "howdy", selected: true,
@@ -302,11 +243,12 @@ var testSelectAndNextReverse = function() {
         ]}
       ]
     };
-    pair = findSelectedAndNextReverse(treeNext2);
-    console.assert(pair.selected.title === 'howdy');
-    console.assert(pair.next === null);
+    selected = findSelected(makeTree(treeNext2));
+    next = findPreviousNode(selected);
+    console.assert(selected.title === 'howdy');
+    console.assert(next === null);
 
-    var treeNext2 = {
+    var treeNext3 = {
       title: "howdy",
       childNodes: [
         {title: "bobby"},
@@ -318,29 +260,157 @@ var testSelectAndNextReverse = function() {
         ]}
       ]
     };
-    pair = findSelectedAndNextReverse(treeNext2);
-    console.assert(pair.selected.title === 'cherry');
-    console.assert(pair.next.title === 'dog');
+    selected = findSelected(makeTree(treeNext3));
+    next = findPreviousNode(selected);
+    console.assert(selected.title === 'cherry');
+    console.assert(next.title === 'dog');
 };
 
-console.log('ready');
+var testSelectNext = function() {
+    var treeNext2 = {
+      title: "howdy",
+      childNodes: [
+        {title: "bobby"},
+        {title: "suzie", childNodes: [
+          {title: "puppy", childNodes: [
+            {title: "dog", selected: true}
+          ]},
+          {title: "cherry"}
+        ]}
+      ]
+    };
+    var tree = makeTree(treeNext2).childNodes[1].childNodes[0].childNodes[0];
+    console.log('tree tester', tree);
+    var next = findNextNode(tree);
+    console.log('NEXT', next);
+}
+
+var findSelected = function(node) {
+    if (node.selected) {
+        return node;
+    }
+    for (var i = 0; i < node.childNodes.length; i++) {
+        var found = findSelected(node.childNodes[i]);
+        if (found) {
+            return found;
+        }
+    }
+    return null;
+};
+
+var findNextNode = function(tree) {
+    if (tree.childNodes && tree.childNodes.length > 0) {
+        return tree.childNodes[0];
+    }
+    return findNextNodeRec(tree);
+};
+
+var findPreviousNode = function(tree) {
+    if (!tree || !tree.parent) {
+        return null;
+    }
+    var i = 0;
+    for (i = 0; i < tree.parent.childNodes.length; i++) {
+        if (tree.parent.childNodes[i] == tree) {
+            break;
+        }
+    }
+    if (i - 1 >= 0) {
+        return findDeepest(tree.parent.childNodes[i - 1]);
+    }
+    return tree.parent;
+};
+
+var findNextNodeRec = function(tree) {
+    if (!tree || !tree.parent) {
+        return null;
+    }
+    var i = 0;
+    for (i = 0; i < tree.parent.childNodes.length; i++) {
+        if (tree.parent.childNodes[i] == tree) {
+            break;
+        }
+    }
+    if (i + 1 < tree.parent.childNodes.length) {
+        return tree.parent.childNodes[i + 1];
+    }
+    return findNextNodeRec(tree.parent);
+};
+
+
+var findPreviousNodeRec = function(tree) {
+    if (!tree || !tree.parent) {
+        return null;
+    }
+    var i = 0;
+    for (i = 0; i < tree.parent.childNodes.length; i++) {
+        if (tree.parent.childNodes[i] == tree) {
+            break;
+        }
+    }
+    if (i - 1 >= 0) {
+        return tree.parent.childNodes[i - 1];
+    }
+    return findPreviousNodeRec(tree.parent);
+}
+
+var makeTree = function(node, parent) {
+    var me = {title: node.title, selected: node.selected, childNodes: [], parent: parent};
+    if (node.childNodes) {
+        me.childNodes = node.childNodes.map(function (node) {
+            return makeTree(node, me);
+        });
+    }
+    return me;
+};
+
+var tree = makeTree({
+  title: "howdy",
+  childNodes: [
+    {title: "bobby", selected: "true"},
+    {title: "suzie", childNodes: [
+      {title: "puppy", childNodes: [
+        {title: "dog house"}
+      ]},
+      {title: "cherry thing"}
+    ]}
+  ]
+});
+
+var renderAll = function() {
+    React.renderComponent(
+      <TreeNode node={tree} />,
+      document.getElementById("tree")
+    );
+};
+renderAll();
+
+console.log('ready', makeTree(tree));
 testSelectAndNext();
 testSelectAndNextReverse();
 testSelectNextNode();
+//testSelectNext();
 $('#tree').keydown(function(e) {
     if (e.keyCode === 37) {
         console.log('left');
+        return false;
     } else if (e.keyCode === 38) {
         console.log('up');
         selectPreviousNode(tree);
         renderAll();
+        return false;
     } else if (e.keyCode === 39) {
         console.log('right');
+        return false;
     } else if (e.keyCode === 40) {
         console.log('down');
         selectNextNode(tree);
         renderAll();
         console.log('tree now', tree);
+        return false;
+    } else if (e.keyCode === 13) {
+        return false;
+
     }
 });
 
