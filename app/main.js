@@ -25,8 +25,9 @@ define(function (require) {
     $('#tree').keydown(function(e) {
         if (e.keyCode === 37) {
             console.log('left');
-            var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
-            selected.caretLoc = caretLoc;
+            //var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
+            //selected.caretLoc = caretLoc;
+            //console.log('moved cursor', caretLoc);
         } else if (e.keyCode === 38) {
             console.log('up');
             Tree.selectPreviousNode(tree);
@@ -36,8 +37,9 @@ define(function (require) {
             return false;
         } else if (e.keyCode === 39) {
             console.log('right');
-            var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
-            selected.caretLoc = caretLoc;
+            //var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
+            //selected.caretLoc = caretLoc;
+            //console.log('moved cursor', caretLoc);
         } else if (e.keyCode === 40) {
             console.log('down');
             Tree.selectNextNode(tree);
@@ -47,9 +49,18 @@ define(function (require) {
             console.log('tree now', tree);
             return false;
         } else if (e.keyCode === 13) {
+            var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
+            selected.caretLoc = caretLoc;
             console.log('loc', selected.caretLoc);
+            Tree.newLineAtCursor(tree);
+            selected = Tree.findSelected(tree);
+            Render(tree);
             return false;
+        } else {
         }
+    });
+    $('#tree').keyup(function(e) {
+        selected.title = document.activeElement.innerHTML;
     });
     testTree(Tree);
 });
@@ -79,8 +90,6 @@ function getCaretCharacterOffsetWithin(element) {
 }
 
 var testAddChild = function(Tree) {
-    console.log('hi there');
-    console.log(Tree);
     (function() {
         var tree;
         var someTitle = 'dog';
@@ -100,7 +109,6 @@ var testAddChild = function(Tree) {
               {title: "cherry"}
           ]});
         Tree.newLineAtCursor(tree);
-        console.log(tree, newTree);
         console.assert(_.isEqual(tree, newTree));
     })();
 
@@ -123,7 +131,6 @@ var testAddChild = function(Tree) {
               {title: "cherry"}
           ]});
         Tree.newLineAtCursor(tree);
-        console.log(tree, newTree);
         console.assert(_.isEqual(tree, newTree));
     })();
 
@@ -146,7 +153,6 @@ var testAddChild = function(Tree) {
               {title: "cherry"}
           ]});
         Tree.newLineAtCursor(tree);
-        console.log(tree, newTree);
         console.assert(_.isEqual(tree, newTree));
     })();
 };
@@ -336,12 +342,9 @@ var testSelectNext = function(Tree) {
       ]
     };
     var tree = Tree.makeTree(treeNext2).childNodes[1].childNodes[0].childNodes[0];
-    console.log('tree tester', tree);
     var next = Tree.findNextNode(tree);
-    console.log('NEXT', next);
 };
 var testTree = function(Tree) {
-    console.log('do test');
     testSelectAndNext(Tree);
     testSelectAndNextReverse(Tree);
     testSelectNextNode(Tree);
