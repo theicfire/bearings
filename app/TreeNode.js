@@ -13,10 +13,6 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
 
 
 
-
-
-
-
     var setCursorLoc = function(contentEditableElement, caretLoc) {
         return;
         var range,selection;
@@ -49,16 +45,11 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
         };
       },
     handleChange: function(event) {
-        console.log('what i have', event.target.value);
-        //Tree.setCurrentTitle(globalTree, event.target.value);
-    var selected = Tree.findSelected(globalTree);
-    ////console.log('setting title from', selected.title, 'to', event.target.value, 'of', selected);
-    selected.title = event.target.value;
-    selected = Tree.findSelected(globalTree);
-    this.setState({visible: this.state.visible, title: event.target.value});
-    //console.log('NOW selected', selected);
-    //console.log('title', globalTree.childNodes[0].title);
-        //renderAll();
+        var selected = Tree.findSelected(globalTree); // TODO same as changing props... humm
+        selected.title = event.target.value;
+        var caretLoc = getCaretPosition(this.refs.input.getDOMNode());
+        selected.caretLoc = caretLoc;
+        this.setState({visible: this.state.visible, title: event.target.value});
     },
       componentDidMount: function() {
           //console.log('mounted', this.props.node.title, this.props.node.selected);
@@ -66,13 +57,13 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
             var el = $(this.getDOMNode()).children('h5').children('input');
             el.focus();
             //console.log('hi there', this.props.node);
-            setCursorLoc(el.get(0), this.props.node.caretLoc);
+            setCaretPosition(el.get(0), this.props.node.caretLoc);
           }
 
         $(this.refs.input.getDOMNode()).keydown(function(e) {
             if (e.keyCode === 37) {
                 console.log('left');
-                //var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
+                //var caretLoc = getCaretPosition(document.activeElement);
                 //selected.caretLoc = caretLoc;
                 //console.log('moved cursor', caretLoc);
             } else if (e.keyCode === 38) {
@@ -84,9 +75,9 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
                 return false;
             } else if (e.keyCode === 39) {
                 console.log('right');
-                //var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
+                //var caretLoc = getCaretPosition(document.activeElement);
                 //selected.caretLoc = caretLoc;
-                //console.log('moved cursor', caretLoc);
+                //console.log('moved cursor', caretLoc, globalTree);
             } else if (e.keyCode === 40) {
                 console.log('down');
                 Tree.selectNextNode(globalTree);
@@ -96,7 +87,7 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
                 console.log('tree now', globalTree);
                 return false;
             } else if (e.keyCode === 13) {
-                var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
+                var caretLoc = getCaretPosition(document.activeElement);
                 selected.caretLoc = caretLoc;
                 console.log('loc', selected.caretLoc);
                 selected = Tree.findSelected(globalTree);
@@ -108,7 +99,7 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
                 console.log('tree now', globalTree);
                 return false;
             } else if (e.keyCode === 8) {
-                var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
+                var caretLoc = getCaretPosition(document.activeElement);
                 selected.caretLoc = caretLoc;
                 console.log('backspace', caretLoc);
                 if (selected.caretLoc === 0) {
@@ -129,7 +120,8 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
           if (this.props.node.selected) {
             var el = $(this.getDOMNode()).children('h5').children('input');
             el.focus();
-            setCursorLoc(el.get(0), this.props.node.caretLoc);
+            console.log('set position', this.props.node.caretLoc);
+            setCaretPosition(el.get(0), this.props.node.caretLoc);
           }
       },
       componentWillReceiveProps: function(nextProps) {
@@ -191,6 +183,66 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
           document.getElementById("tree")
         );
     };
+    /*
+    ** Returns the caret (cursor) position of the specified text field.
+    ** Return value range is 0-oField.value.length.
+    */
+    function getCaretPosition (oField) {
+
+      // Initialize
+      var iCaretPos = 0;
+
+      // IE Support
+      if (document.selection) {
+
+        // Set focus on the element
+        oField.focus ();
+
+        // To get cursor position, get empty selection range
+        var oSel = document.selection.createRange ();
+
+        // Move selection start to 0 position
+        oSel.moveStart ('character', -oField.value.length);
+
+        // The caret position is selection length
+        iCaretPos = oSel.text.length;
+      }
+
+      // Firefox support
+      else if (oField.selectionStart || oField.selectionStart == '0')
+        iCaretPos = oField.selectionStart;
+
+      // Return results
+      return (iCaretPos);
+    }
+
+    function setCaretPosition (el, loc) {
+        el.setSelectionRange(loc, loc);
+    };
+
+function getCaretCharacterOffsetWithin(element) {
+    var caretOffset = 0;
+    var doc = element.ownerDocument || element.document;
+    var win = doc.defaultView || doc.parentWindow;
+    var sel;
+    if (typeof win.getSelection != "undefined") {
+        sel = win.getSelection();
+        if (sel.rangeCount > 0) {
+            var range = win.getSelection().getRangeAt(0);
+            var preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(element);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            caretOffset = preCaretRange.toString().length;
+        }
+    } else if ( (sel = doc.selection) && sel.type != "Control") {
+        var textRange = sel.createRange();
+        var preCaretTextRange = doc.body.createTextRange();
+        preCaretTextRange.moveToElementText(element);
+        preCaretTextRange.setEndPoint("EndToEnd", textRange);
+        caretOffset = preCaretTextRange.text.length;
+    }
+    return caretOffset;
+}
 
     //testSelectNext();
     return startRender;
