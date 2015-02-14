@@ -1,6 +1,23 @@
 define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree, $, _, Cursor) {
     var globalTree;
 
+    var TreeChildren = React.createClass({
+    render: function() {
+        var childNodes;
+        if (this.props.childNodes != null) {
+            childNodes = this.props.childNodes.map(function(node, index) {
+                return <li key={index}><TreeNode node={node} /></li>
+            });
+        }
+
+        return (
+            <ul style={this.props.style}>
+            {childNodes}
+            </ul>
+        );
+
+    }
+    });
     var TreeNode = React.createClass({
     getInitialState: function() {
         return {
@@ -101,14 +118,8 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
     //},
 
     render: function() {
-        var childNodes;
         var className = "dot";
-        //console.log('render: ', this.props.node);
         if (this.props.node.childNodes != null) {
-            childNodes = this.props.node.childNodes.map(function(node, index) {
-                    return <li key={index}><TreeNode node={node} /></li>
-                });
-
             className = "dot togglable";
             if (this.state.visible) {
                 className += " togglable-down";
@@ -128,9 +139,7 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
             <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
             <input ref="input" type="text" value={this.state.title} onKeyDown={this.handleKeyDown} onChange={this.handleChange}/> {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
             </h5>
-            <ul style={style}>
-            {childNodes}
-            </ul>
+            <TreeChildren style={style} childNodes={this.props.node.childNodes} />
             </div>
         );
     },
@@ -153,7 +162,7 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
         // may be slow.
         var newTree = Tree.clone(globalTree);
         React.renderComponent(
-          <TreeNode node={newTree} />,
+          <TreeChildren style={{}} childNodes={newTree.childNodes} />,
           document.getElementById("tree")
         );
     };

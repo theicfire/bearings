@@ -6,16 +6,18 @@ define(function (require) {
     var StartRender = require('jsx!app/TreeNode');
 
     var startTree = {
-      title: "howdy",
+      title: "root",
       childNodes: [
-        {title: "bobby", selected: "true"},
-        {title: "suzie", childNodes: [
-          {title: "puppy", childNodes: [
-            {title: "dog house"}
-          ]},
-          {title: "cherry thing"}
-        ]}
-      ]
+          {title: "howdy",
+          childNodes: [
+            {title: "billy", selected: "true"},
+            {title: "suzie", childNodes: [
+              {title: "puppy", childNodes: [
+                {title: "dog house"}
+              ]},
+              {title: "cherry thing"}
+            ]}
+          ]}]
       };
     var tree = Tree.makeTree(startTree);
 
