@@ -2,27 +2,29 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
     var globalTree;
 
     var TreeNode = React.createClass({
-      getInitialState: function() {
+    getInitialState: function() {
         return {
           visible: true,
           title: this.props.node.title
         };
-      },
+    },
+
     handleChange: function(event) {
         this.props.node.title = event.target.value; // TODO EWW
         var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
         this.props.node.caretLoc = caretLoc; // TODO eww
         this.setState({visible: this.state.visible, title: event.target.value});
     },
-      componentDidMount: function() {
-          if (this.props.node.selected) {
+
+    componentDidMount: function() {
+        if (this.props.node.selected) {
             var el = $(this.getDOMNode()).children('h5').children('input');
             el.focus();
             Cursor.setCaretPosition(el.get(0), this.props.node.caretLoc);
-          }
+        }
+    },
 
-      },
-      handleKeyDown: function(e) {
+    handleKeyDown: function(e) {
         if (e.keyCode === 37) {
             console.log('left');
         } else if (e.keyCode === 38) {
@@ -57,67 +59,66 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
         } else {
             console.log(e.keyCode);
         }
+    },
 
-      },
-      componentDidUpdate: function(prevProps, prevState) {
-          if (this.props.node.selected) {
+    componentDidUpdate: function(prevProps, prevState) {
+        if (this.props.node.selected) {
             var el = $(this.getDOMNode()).children('h5').children('input');
             el.focus();
             console.log('set position', this.props.node.caretLoc);
             Cursor.setCaretPosition(el.get(0), this.props.node.caretLoc);
-          }
-      },
-      componentWillReceiveProps: function(nextProps) {
+        }
+    },
+
+    componentWillReceiveProps: function(nextProps) {
         this.setState({visible: this.state.visible, title: nextProps.node.title});
-      },
-      render: function() {
+    },
+
+    render: function() {
         var childNodes;
         var className = "dot";
         //console.log('render: ', this.props.node);
         if (this.props.node.childNodes != null) {
-          childNodes = this.props.node.childNodes.map(function(node, index) {
-            return <li key={index}><TreeNode node={node} /></li>
-          });
+            childNodes = this.props.node.childNodes.map(function(node, index) {
+                    return <li key={index}><TreeNode node={node} /></li>
+                });
 
-          className = "dot togglable";
-          if (this.state.visible) {
-            className += " togglable-down";
-          } else {
-            className += " togglable-up";
-          }
+            className = "dot togglable";
+            if (this.state.visible) {
+                className += " togglable-down";
+            } else {
+                className += " togglable-up";
+            }
         }
 
         var style = {};
         if (!this.state.visible) {
-          style.display = "none";
+            style.display = "none";
         }
 
         return (
-          <div>
+            <div>
             <h5>
-              <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
-              <input ref="input" type="text" value={this.state.title} onKeyDown={this.handleKeyDown} onChange={this.handleChange}/> {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
+            <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
+            <input ref="input" type="text" value={this.state.title} onKeyDown={this.handleKeyDown} onChange={this.handleChange}/> {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
             </h5>
             <ul style={style}>
-              {childNodes}
+            {childNodes}
             </ul>
-          </div>
+            </div>
         );
-      },
-      toggle: function() {
+    },
+
+    toggle: function() {
         this.setState({visible: !this.state.visible, title: this.state.title});
-      }
-    //  textclick: function() {
-    //    console.log('text clicked', this);
-    //    this.getDOMNode().contentEditable = true;
-    //    this.getDOMNode().focus();
-    //  },
+    }
     });
 
-    function startRender(tree) {
+    var startRender = function(tree) {
         globalTree = tree;
         renderAll();
     }
+
     function renderAll() {
         console.log('rendering with', globalTree);
         React.renderComponent(
@@ -126,7 +127,6 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
         );
     };
 
-    //testSelectNext();
     return startRender;
 });
 
