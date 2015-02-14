@@ -57,6 +57,47 @@ var testClone = function(Tree) {
     console.assert(_.isEqual(Tree.clone(tree), tree));
 };
 
+var testIndent = function(Tree) {
+    var tree = Tree.makeTree(
+        {title: "suzie", childNodes: [
+                {title: "puppy", childNodes: [
+                        {title: 'dog'}
+                    ]},
+                {title: "cherry", selected: true, caretLoc: 0}
+            ]});
+
+    var nextTree = Tree.makeTree(
+        {title: "suzie", childNodes: [
+                {title: "puppy", childNodes: [
+                        {title: 'dog'},
+                        {title: "cherry", selected: true, caretLoc: 0}
+                    ]},
+            ]});
+    Tree.indent(tree);
+    console.log('indents', tree, nextTree);
+    console.assert(_.isEqual(tree, nextTree));
+
+    tree = Tree.makeTree(
+        {title: "suzie", childNodes: [
+                {title: "puppy", childNodes: [
+                        {title: 'dog', selected: true, caretLoc: 0}
+                    ]},
+                {title: "cherry"}
+            ]});
+
+    // No change
+    nextTree = Tree.makeTree(
+        {title: "suzie", childNodes: [
+                {title: "puppy", childNodes: [
+                        {title: 'dog', selected: true, caretLoc: 0}
+                    ]},
+                {title: "cherry"}
+            ]});
+    Tree.indent(tree);
+    console.log('indents', tree, nextTree);
+    console.assert(_.isEqual(tree, nextTree));
+};
+
 var testAddChild = function(Tree) {
     (function() {
         var tree;
@@ -319,4 +360,5 @@ var testTree = function(Tree) {
     testAddChild(Tree);
     testRemoveNode(Tree);
     testClone(Tree);
+    testIndent(Tree);
 }

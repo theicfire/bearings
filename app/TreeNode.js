@@ -27,24 +27,25 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
     },
 
     handleKeyDown: function(e) {
-        if (e.keyCode === 37) {
+        var KEYS = {LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40, ENTER: 13, TAB: 9, BACKSPACE: 8};
+        if (e.keyCode === KEYS.LEFT) {
             console.log('left');
-        } else if (e.keyCode === 38) {
+        } else if (e.keyCode === KEYS.UP) {
             console.log('up');
             Tree.selectPreviousNode(globalTree);
             Tree.findSelected(globalTree).caretLoc = 0;
             renderAll();
             e.preventDefault();
-        } else if (e.keyCode === 39) {
+        } else if (e.keyCode === KEYS.RIGHT) {
             console.log('right');
-        } else if (e.keyCode === 40) {
+        } else if (e.keyCode === KEYS.DOWN) {
             console.log('down');
             Tree.selectNextNode(globalTree);
             Tree.findSelected(globalTree).caretLoc = 0;
             renderAll();
             console.log('tree now', globalTree);
             e.preventDefault();
-        } else if (e.keyCode === 13) {
+        } else if (e.keyCode === KEYS.ENTER) {
             var selected = Tree.findSelected(globalTree);
             var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
             selected.caretLoc = caretLoc;
@@ -52,13 +53,22 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
             Tree.newLineAtCursor(globalTree);
             renderAll();
             e.preventDefault();
-        } else if (e.keyCode === 8) {
+        } else if (e.keyCode === KEYS.BACKSPACE) {
             var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
             if (caretLoc === 0) {
                 Tree.backspaceAtBeginning(globalTree);
                 renderAll();
                 e.preventDefault();
             }
+        } else if (e.keyCode === KEYS.TAB) {
+            if (e.shiftKey) {
+                Tree.unindent(globalTree);
+            } else {
+                Tree.indent(globalTree);
+            }
+            renderAll();
+            e.preventDefault();
+
         } else {
             console.log(e.keyCode);
         }
