@@ -128,6 +128,10 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
 
     function renderAll() {
         console.log('rendering with', globalTree);
+        // TODO speedup by removing clone. I might not need to clone. What this does is allow us to
+        // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
+        // changed relative to the other, and we don't have to call render. But, we have to clone, which
+        // may be slow.
         var newTree = Tree.clone(globalTree);
         React.renderComponent(
           <TreeNode node={newTree} />,
