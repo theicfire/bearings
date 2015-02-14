@@ -76,6 +76,11 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
         this.setState({visible: this.state.visible, title: nextProps.node.title, caretLoc: nextProps.node.caretLoc});
     },
 
+    // TODO good for speedups..
+    //shouldComponentUpdate: function(nextProps, nextState) {
+        //return !(_.isEqual(this.state, nextState) && _.isEqual(this.props, nextProps));
+    //},
+
     render: function() {
         var childNodes;
         var className = "dot";

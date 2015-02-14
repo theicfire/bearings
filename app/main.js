@@ -5,7 +5,7 @@ define(function (require) {
     var React = require('react');
     var StartRender = require('jsx!app/TreeNode');
 
-    var tree = Tree.makeTree({
+    var startTree = {
       title: "howdy",
       childNodes: [
         {title: "bobby", selected: "true"},
@@ -16,7 +16,8 @@ define(function (require) {
           {title: "cherry thing"}
         ]}
       ]
-    });
+      };
+    var tree = Tree.makeTree(startTree);
 
     testTree(Tree);
     StartRender(tree);
