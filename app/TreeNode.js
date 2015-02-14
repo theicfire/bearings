@@ -140,7 +140,7 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
           <div>
             <h5>
               <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
-              <input ref="input" type="text" value={this.state.title} onChange={this.handleChange}/>
+              <input ref="input" type="text" value={this.state.title} onChange={this.handleChange}/> {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
             </h5>
             <ul style={style}>
               {childNodes}
