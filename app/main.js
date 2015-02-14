@@ -18,8 +18,8 @@ define(function (require) {
       ]
     });
 
-    StartRender(tree);
     testTree(Tree);
+    StartRender(tree);
 });
 
 
@@ -44,6 +44,18 @@ var testRemoveNode = function(Tree) {
     })();
 
 };
+
+var testClone = function(Tree) {
+    var tree = Tree.makeTree(
+            {title: "suzie", childNodes: [
+              {title: "puppy", childNodes: [
+                {title: 'dog', selected: true, caretLoc: 0}
+              ]},
+              {title: "cherry"}
+          ]});
+    console.assert(_.isEqual(Tree.clone(tree), tree));
+};
+
 var testAddChild = function(Tree) {
     (function() {
         var tree;
@@ -305,4 +317,5 @@ var testTree = function(Tree) {
     testSelectNextNode(Tree);
     testAddChild(Tree);
     testRemoveNode(Tree);
+    testClone(Tree);
 }

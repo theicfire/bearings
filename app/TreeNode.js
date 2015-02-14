@@ -5,22 +5,24 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
     getInitialState: function() {
         return {
           visible: true,
-          title: this.props.node.title
+          title: this.props.node.title,
+          caretLoc: this.props.node.caretLoc
         };
     },
 
     handleChange: function(event) {
-        this.props.node.title = event.target.value; // TODO EWW
+        var selected = Tree.findSelected(globalTree);
+        selected.title = event.target.value;
         var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
-        this.props.node.caretLoc = caretLoc; // TODO eww
-        this.setState({visible: this.state.visible, title: event.target.value});
+        selected.caretLoc = caretLoc;
+        this.setState({visible: this.state.visible, title: event.target.value, caretLoc: caretLoc});
     },
 
     componentDidMount: function() {
         if (this.props.node.selected) {
             var el = $(this.getDOMNode()).children('h5').children('input');
             el.focus();
-            Cursor.setCaretPosition(el.get(0), this.props.node.caretLoc);
+            Cursor.setCaretPosition(el.get(0), this.state.caretLoc);
         }
     },
 
@@ -43,8 +45,9 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
             console.log('tree now', globalTree);
             e.preventDefault();
         } else if (e.keyCode === 13) {
+            var selected = Tree.findSelected(globalTree);
             var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
-            this.props.node.caretLoc = caretLoc; // TODO ewww
+            selected.caretLoc = caretLoc;
             console.log('loc', caretLoc);
             Tree.newLineAtCursor(globalTree);
             renderAll();
@@ -65,13 +68,12 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
         if (this.props.node.selected) {
             var el = $(this.getDOMNode()).children('h5').children('input');
             el.focus();
-            console.log('set position', this.props.node.caretLoc);
-            Cursor.setCaretPosition(el.get(0), this.props.node.caretLoc);
+            Cursor.setCaretPosition(el.get(0), this.state.caretLoc);
         }
     },
 
     componentWillReceiveProps: function(nextProps) {
-        this.setState({visible: this.state.visible, title: nextProps.node.title});
+        this.setState({visible: this.state.visible, title: nextProps.node.title, caretLoc: nextProps.node.caretLoc});
     },
 
     render: function() {
@@ -110,7 +112,7 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
     },
 
     toggle: function() {
-        this.setState({visible: !this.state.visible, title: this.state.title});
+        this.setState({visible: !this.state.visible, title: this.state.title, caretLoc: this.state.caretLoc});
     }
     });
 
@@ -121,8 +123,9 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
 
     function renderAll() {
         console.log('rendering with', globalTree);
+        var newTree = Tree.clone(globalTree);
         React.renderComponent(
-          <TreeNode node={globalTree} />,
+          <TreeNode node={newTree} />,
           document.getElementById("tree")
         );
     };
