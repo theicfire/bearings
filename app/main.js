@@ -3,7 +3,7 @@ define(function (require) {
     var _ = require('underscore');
     var $ = require('jquery');
     var React = require('react');
-    var Render = require('jsx!app/TreeNode');
+    var StartRender = require('jsx!app/TreeNode');
 
     var tree = Tree.makeTree({
       title: "howdy",
@@ -18,88 +18,10 @@ define(function (require) {
       ]
     });
 
-    var selected = Tree.findSelected(tree);
-    selected.caretLoc = 0;
-
-    Render(tree);
-    $('#tree').keydown(function(e) {
-        if (e.keyCode === 37) {
-            console.log('left');
-            //var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
-            //selected.caretLoc = caretLoc;
-            //console.log('moved cursor', caretLoc);
-        } else if (e.keyCode === 38) {
-            console.log('up');
-            Tree.selectPreviousNode(tree);
-            selected = Tree.findSelected(tree);
-            selected.caretLoc = 0;
-            Render(tree);
-            return false;
-        } else if (e.keyCode === 39) {
-            console.log('right');
-            //var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
-            //selected.caretLoc = caretLoc;
-            //console.log('moved cursor', caretLoc);
-        } else if (e.keyCode === 40) {
-            console.log('down');
-            Tree.selectNextNode(tree);
-            selected = Tree.findSelected(tree);
-            selected.caretLoc = 0;
-            Render(tree);
-            console.log('tree now', tree);
-            return false;
-        } else if (e.keyCode === 13) {
-            var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
-            selected.caretLoc = caretLoc;
-            console.log('loc', selected.caretLoc);
-            Tree.newLineAtCursor(tree);
-            selected = Tree.findSelected(tree);
-            Render(tree);
-            console.log('tree now', tree);
-            return false;
-        } else if (e.keyCode === 8) {
-            var caretLoc = getCaretCharacterOffsetWithin(document.activeElement);
-            selected.caretLoc = caretLoc;
-            console.log('backspace', caretLoc);
-            if (selected.caretLoc === 0) {
-                Tree.backspaceAtBeginning(tree);
-                selected = Tree.findSelected(tree);
-                Render(tree);
-                return false;
-            }
-        } else {
-            //console.log(e.keyCode);
-        }
-    });
-    $('#tree').keyup(function(e) {
-        selected.title = document.activeElement.innerHTML;
-    });
+    StartRender(tree);
     testTree(Tree);
 });
 
-function getCaretCharacterOffsetWithin(element) {
-    var caretOffset = 0;
-    var doc = element.ownerDocument || element.document;
-    var win = doc.defaultView || doc.parentWindow;
-    var sel;
-    if (typeof win.getSelection != "undefined") {
-        sel = win.getSelection();
-        if (sel.rangeCount > 0) {
-            var range = win.getSelection().getRangeAt(0);
-            var preCaretRange = range.cloneRange();
-            preCaretRange.selectNodeContents(element);
-            preCaretRange.setEnd(range.endContainer, range.endOffset);
-            caretOffset = preCaretRange.toString().length;
-        }
-    } else if ( (sel = doc.selection) && sel.type != "Control") {
-        var textRange = sel.createRange();
-        var preCaretTextRange = doc.body.createTextRange();
-        preCaretTextRange.moveToElementText(element);
-        preCaretTextRange.setEndPoint("EndToEnd", textRange);
-        caretOffset = preCaretTextRange.text.length;
-    }
-    return caretOffset;
-}
 
 var testRemoveNode = function(Tree) {
     (function() {
