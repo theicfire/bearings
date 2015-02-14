@@ -31,7 +31,7 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
             console.log('up');
             Tree.selectPreviousNode(globalTree);
             Tree.findSelected(globalTree).caretLoc = 0;
-            renderAll(globalTree);
+            renderAll();
             e.preventDefault();
         } else if (e.keyCode === 39) {
             console.log('right');
@@ -39,7 +39,7 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
             console.log('down');
             Tree.selectNextNode(globalTree);
             Tree.findSelected(globalTree).caretLoc = 0;
-            renderAll(globalTree);
+            renderAll();
             console.log('tree now', globalTree);
             e.preventDefault();
         } else if (e.keyCode === 13) {
@@ -47,13 +47,13 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
             this.props.node.caretLoc = caretLoc; // TODO ewww
             console.log('loc', caretLoc);
             Tree.newLineAtCursor(globalTree);
-            renderAll(globalTree);
+            renderAll();
             e.preventDefault();
         } else if (e.keyCode === 8) {
             var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
             if (caretLoc === 0) {
                 Tree.backspaceAtBeginning(globalTree);
-                renderAll(globalTree);
+                renderAll();
                 e.preventDefault();
             }
         } else {
