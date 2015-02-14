@@ -31,17 +31,26 @@ define(['react', 'tree', 'jquery', 'underscore', 'Cursor'], function(React, Tree
         if (e.keyCode === KEYS.LEFT) {
             console.log('left');
         } else if (e.keyCode === KEYS.UP) {
-            console.log('up');
-            Tree.selectPreviousNode(globalTree);
-            Tree.findSelected(globalTree).caretLoc = 0;
+            if (e.shiftKey && e.altKey) {
+                console.log('shift up');
+                Tree.shiftUp(globalTree);
+            } else {
+                console.log('up');
+                Tree.selectPreviousNode(globalTree);
+                Tree.findSelected(globalTree).caretLoc = 0;
+            }
             renderAll();
             e.preventDefault();
         } else if (e.keyCode === KEYS.RIGHT) {
             console.log('right');
         } else if (e.keyCode === KEYS.DOWN) {
-            console.log('down');
-            Tree.selectNextNode(globalTree);
-            Tree.findSelected(globalTree).caretLoc = 0;
+            if (e.shiftKey && e.altKey) {
+                Tree.shiftDown(globalTree);
+            } else {
+                console.log('down');
+                Tree.selectNextNode(globalTree);
+                Tree.findSelected(globalTree).caretLoc = 0;
+            }
             renderAll();
             console.log('tree now', globalTree);
             e.preventDefault();
