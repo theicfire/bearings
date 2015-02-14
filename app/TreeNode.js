@@ -48,12 +48,10 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
             setCaretPosition(el.get(0), this.props.node.caretLoc);
           }
 
+        var that = this;
         $(this.refs.input.getDOMNode()).keydown(function(e) {
             if (e.keyCode === 37) {
                 console.log('left');
-                //var caretLoc = getCaretPosition(document.activeElement);
-                //selected.caretLoc = caretLoc;
-                //console.log('moved cursor', caretLoc);
             } else if (e.keyCode === 38) {
                 console.log('up');
                 Tree.selectPreviousNode(globalTree);
@@ -63,9 +61,6 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
                 return false;
             } else if (e.keyCode === 39) {
                 console.log('right');
-                //var caretLoc = getCaretPosition(document.activeElement);
-                //selected.caretLoc = caretLoc;
-                //console.log('moved cursor', caretLoc, globalTree);
             } else if (e.keyCode === 40) {
                 console.log('down');
                 Tree.selectNextNode(globalTree);
@@ -75,7 +70,7 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
                 console.log('tree now', globalTree);
                 return false;
             } else if (e.keyCode === 13) {
-                var caretLoc = getCaretPosition(document.activeElement);
+                var caretLoc = getCaretPosition(that.refs.input);
                 selected.caretLoc = caretLoc;
                 console.log('loc', selected.caretLoc);
                 selected = Tree.findSelected(globalTree);
@@ -87,7 +82,7 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
                 console.log('tree now', globalTree);
                 return false;
             } else if (e.keyCode === 8) {
-                var caretLoc = getCaretPosition(document.activeElement);
+                var caretLoc = getCaretPosition(that.refs.input);
                 selected.caretLoc = caretLoc;
                 console.log('backspace', caretLoc);
                 if (selected.caretLoc === 0) {
