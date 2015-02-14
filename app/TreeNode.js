@@ -44,57 +44,50 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
           if (this.props.node.selected) {
             var el = $(this.getDOMNode()).children('h5').children('input');
             el.focus();
-            //console.log('hi there', this.props.node);
             setCaretPosition(el.get(0), this.props.node.caretLoc);
           }
 
-        var that = this;
-        $(this.refs.input.getDOMNode()).keydown(function(e) {
-            if (e.keyCode === 37) {
-                console.log('left');
-            } else if (e.keyCode === 38) {
-                console.log('up');
-                Tree.selectPreviousNode(globalTree);
+      },
+      handleKeyDown: function(e) {
+        if (e.keyCode === 37) {
+            console.log('left');
+        } else if (e.keyCode === 38) {
+            console.log('up');
+            Tree.selectPreviousNode(globalTree);
+            selected = Tree.findSelected(globalTree);
+            selected.caretLoc = 0;
+            renderAll(globalTree);
+            e.preventDefault();
+        } else if (e.keyCode === 39) {
+            console.log('right');
+        } else if (e.keyCode === 40) {
+            console.log('down');
+            Tree.selectNextNode(globalTree);
+            selected = Tree.findSelected(globalTree);
+            selected.caretLoc = 0;
+            renderAll(globalTree);
+            console.log('tree now', globalTree);
+            e.preventDefault();
+        } else if (e.keyCode === 13) {
+            var caretLoc = getCaretPosition(this.refs.input.getDOMNode());
+            this.props.node.caretLoc = caretLoc; // TODO ewww
+            console.log('loc', selected.caretLoc);
+            Tree.newLineAtCursor(globalTree);
+            renderAll(globalTree);
+            e.preventDefault();
+        } else if (e.keyCode === 8) {
+            var caretLoc = getCaretPosition(this.refs.input.getDOMNode());
+            selected.caretLoc = caretLoc;
+            console.log('backspace', caretLoc);
+            if (selected.caretLoc === 0) {
+                Tree.backspaceAtBeginning(globalTree);
                 selected = Tree.findSelected(globalTree);
-                selected.caretLoc = 0;
                 renderAll(globalTree);
-                return false;
-            } else if (e.keyCode === 39) {
-                console.log('right');
-            } else if (e.keyCode === 40) {
-                console.log('down');
-                Tree.selectNextNode(globalTree);
-                selected = Tree.findSelected(globalTree);
-                selected.caretLoc = 0;
-                renderAll(globalTree);
-                console.log('tree now', globalTree);
-                return false;
-            } else if (e.keyCode === 13) {
-                var caretLoc = getCaretPosition(that.refs.input);
-                selected.caretLoc = caretLoc;
-                console.log('loc', selected.caretLoc);
-                selected = Tree.findSelected(globalTree);
-                //console.log('selected', selected);
-                Tree.newLineAtCursor(globalTree);
-                selected = Tree.findSelected(globalTree);
-                //console.log('selected', selected);
-                renderAll(globalTree);
-                console.log('tree now', globalTree);
-                return false;
-            } else if (e.keyCode === 8) {
-                var caretLoc = getCaretPosition(that.refs.input);
-                selected.caretLoc = caretLoc;
-                console.log('backspace', caretLoc);
-                if (selected.caretLoc === 0) {
-                    Tree.backspaceAtBeginning(globalTree);
-                    selected = Tree.findSelected(globalTree);
-                    renderAll(globalTree);
-                    return false;
-                }
-            } else {
-                console.log(e.keyCode);
+                e.preventDefault();
             }
-        });
+        } else {
+            console.log(e.keyCode);
+        }
 
       },
       componentDidUpdate: function(prevProps, prevState) {
@@ -135,7 +128,7 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
           <div>
             <h5>
               <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
-              <input ref="input" type="text" value={this.state.title} onChange={this.handleChange}/> {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
+              <input ref="input" type="text" value={this.state.title} onKeyDown={this.handleKeyDown} onChange={this.handleChange}/> {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
             </h5>
             <ul style={style}>
               {childNodes}
