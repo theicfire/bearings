@@ -1,18 +1,6 @@
 define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
     var globalTree;
 
-    var setupEvents = function() {
-        var selected = Tree.findSelected(globalTree);
-        selected.caretLoc = 0;
-
-        $('#tree').keyup(function(e) {
-            //selected.title = e.target.value;
-            //renderAll();
-        });
-    }
-
-
-
     var setCursorLoc = function(contentEditableElement, caretLoc) {
         return;
         var range,selection;
@@ -113,7 +101,6 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
             }
         });
 
-          //console.log('did mount! ', $(this.refs.input.getDOMNode()));
       },
       componentDidUpdate: function(prevProps, prevState) {
           //console.log('did update', this.props.node.title, this.props.node.selected);
@@ -174,7 +161,6 @@ define(['react', 'tree', 'jquery', 'underscore'], function(React, Tree, $, _) {
     function startRender(tree) {
         globalTree = tree;
         renderAll();
-        setupEvents();
     }
     function renderAll() {
         console.log('rendering with', globalTree);
