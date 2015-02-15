@@ -1,32 +1,32 @@
-define(function (require) {
-    var Tree = require('tree');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var React = require('react');
-    var StartRender = require('jsx!app/TreeNode');
+var _ = require('underscore');
+var $ = require('jquery');
+//var React = require('react');
+//var StartRender = require('jsx!app/TreeNode');
+var Tree = require('./lib/tree');
 
-    var startTree = {
-      title: "root",
+var startTree = {
+  title: "root",
+  childNodes: [
+      {title: "howdy",
       childNodes: [
-          {title: "howdy",
-          childNodes: [
-            {title: "billy", selected: "true"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog house"}
-              ]},
-              {title: "cherry thing"}
-            ]}
-          ]}]
-      };
-    var tree = Tree.makeTree(startTree);
+        {title: "billy", selected: "true"},
+        {title: "suzie", childNodes: [
+          {title: "puppy", childNodes: [
+            {title: "dog house"}
+          ]},
+          {title: "cherry thing"}
+        ]}
+      ]}]
+  };
+var tree = Tree.makeTree(startTree);
+console.log('tree oh great', tree);
+console.log($);
 
-    testTree(Tree);
-    StartRender(tree);
-});
+testTree(Tree);
+//StartRender(tree);
 
 
-var testRemoveNode = function(Tree) {
+function testRemoveNode() {
     (function() {
         var tree;
         tree = Tree.makeTree(
@@ -48,7 +48,7 @@ var testRemoveNode = function(Tree) {
 
 };
 
-var testClone = function(Tree) {
+function testClone() {
     var tree = Tree.makeTree(
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
@@ -59,7 +59,7 @@ var testClone = function(Tree) {
     console.assert(_.isEqual(Tree.clone(tree), tree));
 };
 
-var testIndent = function(Tree) {
+function testIndent() {
     var tree = Tree.makeTree(
         {title: "suzie", childNodes: [
                 {title: "puppy", childNodes: [
@@ -100,7 +100,7 @@ var testIndent = function(Tree) {
     console.assert(_.isEqual(tree, nextTree));
 };
 
-var testAddChild = function(Tree) {
+function testAddChild() {
     (function() {
         var tree;
         var someTitle = 'dog';
@@ -168,7 +168,7 @@ var testAddChild = function(Tree) {
     })();
 };
 
-var testSelectAndNext = function(Tree) {
+function testSelectAndNext() {
     var selected, next;
     var tree = {
       title: "howdy",
@@ -239,7 +239,7 @@ var testSelectAndNext = function(Tree) {
     console.assert(next === null);
 };
 
-var testSelectNextNode = function(Tree) {
+function testSelectNextNode() {
     var tree = Tree.makeTree({
       title: "howdy",
       childNodes: [
@@ -269,7 +269,7 @@ var testSelectNextNode = function(Tree) {
     console.assert(_.isEqual(tree, treeNext));
 };
 
-var testSelectAndNextReverse = function() {
+function testSelectAndNextReverse() {
     var tree = {
       title: "howdy",
       childNodes: [
@@ -339,7 +339,7 @@ var testSelectAndNextReverse = function() {
     console.assert(next.title === 'dog');
 };
 
-var testSelectNext = function(Tree) {
+function testSelectNext() {
     var treeNext2 = {
       title: "howdy",
       childNodes: [
@@ -355,12 +355,13 @@ var testSelectNext = function(Tree) {
     var tree = Tree.makeTree(treeNext2).childNodes[1].childNodes[0].childNodes[0];
     var next = Tree.findNextNode(tree);
 };
-var testTree = function(Tree) {
-    testSelectAndNext(Tree);
-    testSelectAndNextReverse(Tree);
-    testSelectNextNode(Tree);
-    testAddChild(Tree);
-    testRemoveNode(Tree);
-    testClone(Tree);
-    testIndent(Tree);
+
+function testTree() {
+    testSelectAndNext();
+    testSelectAndNextReverse();
+    testSelectNextNode();
+    testAddChild();
+    testRemoveNode();
+    testClone();
+    testIndent();
 }
