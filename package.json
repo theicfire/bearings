@@ -4,7 +4,7 @@
   "description": "Workflowy clone",
   "main": "main.js",
   "scripts": {
-    "start": "watchify main.js -o bundle.js -v -d"
+    "start": "watchify js/main.js -o js/bundle.js -v -d"
   },
   "repository": {
     "type": "git",
