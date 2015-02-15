@@ -26,8 +26,7 @@ var TreeNode = React.createClass({
 getInitialState: function() {
     return {
       visible: true,
-      title: this.props.node.title,
-      caretLoc: this.props.node.caretLoc
+      title: this.props.node.title
     };
 },
 
@@ -36,14 +35,14 @@ handleChange: function(event) {
     selected.title = event.target.value;
     var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
     selected.caretLoc = caretLoc;
-    this.setState({visible: this.state.visible, title: event.target.value, caretLoc: caretLoc});
+    this.setState({visible: this.state.visible, title: event.target.value});
 },
 
 componentDidMount: function() {
     if (this.props.node.selected) {
         var el = $(this.getDOMNode()).children('h5').children('input');
         el.focus();
-        Cursor.setCaretPosition(el.get(0), this.state.caretLoc);
+        Cursor.setCaretPosition(el.get(0), this.props.node.caretLoc);
     }
 },
 
@@ -108,12 +107,11 @@ componentDidUpdate: function(prevProps, prevState) {
     if (this.props.node.selected) {
         var el = $(this.getDOMNode()).children('h5').children('input');
         el.focus();
-        Cursor.setCaretPosition(el.get(0), this.state.caretLoc);
     }
 },
 
 componentWillReceiveProps: function(nextProps) {
-    this.setState({visible: this.state.visible, title: nextProps.node.title, caretLoc: nextProps.node.caretLoc});
+    this.setState({visible: this.state.visible, title: nextProps.node.title});
 },
 
 // TODO good for speedups..
@@ -149,7 +147,7 @@ render: function() {
 },
 
 toggle: function() {
-    this.setState({visible: !this.state.visible, title: this.state.title, caretLoc: this.state.caretLoc});
+    this.setState({visible: !this.state.visible, title: this.state.title});
 }
 });
 
