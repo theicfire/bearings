@@ -23,6 +23,27 @@ Tree.selectPreviousNode = function(tree) {
     }
 };
 
+Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
+    if (fromObj[property] === undefined) {
+        if (defaultVal !== undefined) {
+            toObj[property] = defaultVal;
+        }
+        return;
+    }
+    toObj[property] = fromObj[property];
+};
+
+Tree.makeNode = function(args) {
+    var ret = {};
+    Tree.setIfReal(ret, args, 'title');
+    Tree.setIfReal(ret, args, 'childNodes', []);
+    Tree.setIfReal(ret, args, 'parent', null);
+    Tree.setIfReal(ret, args, 'caretLoc');
+    Tree.setIfReal(ret, args, 'selected');
+    Tree.setIfReal(ret, args, 'collapsed');
+    return ret;
+};
+
 Tree.appendSibling = function(tree, title) {
     var i;
     for (i = 0; i < tree.parent.childNodes.length; i++) {
@@ -30,7 +51,7 @@ Tree.appendSibling = function(tree, title) {
             break;
         }
     }
-    var ret = {title: title, childNodes: [], parent: tree.parent};
+    var ret = Tree.makeNode({title: title, parent: tree.parent});
     tree.parent.childNodes.splice(i + 1, 0, ret);
     return ret;
 };
@@ -53,14 +74,12 @@ Tree.newLineAtCursor = function(tree) {
 };
 
 Tree.clone = function(tree) {
-    var ret = {title: tree.title, parent: tree.parent, childNodes: tree.childNodes.map(Tree.clone)};
-    if (tree.caretLoc !== undefined) {
-        ret.caretLoc = tree.caretLoc;
-    }
-    if (tree.selected !== undefined) {
-        ret.selected = tree.selected;
-    }
-    return ret;
+    return Tree.makeNode({
+            title: tree.title,
+            parent: tree.parent,
+            childNodes: tree.childNodes.map(Tree.clone),
+            caretLoc: tree.caretLoc,
+            selected: tree.selected});
 };
 
 Tree.indent = function(tree) {
@@ -90,7 +109,6 @@ Tree.unindent = function(tree) {
 
 Tree.setCurrentTitle = function(tree, title) {
     var selected = Tree.findSelected(tree);
-    console.log('setting title from', selected.title, 'to', title);
     selected.title = title;
 };
 
@@ -241,13 +259,11 @@ Tree.findPreviousNodeRec = function(tree) {
 }
 
 Tree.makeTree = function(node, parent) {
-    var me = {title: node.title, childNodes: [], parent: parent};
-    if (node.selected !== undefined) {
-        me.selected = node.selected;
-    }
-    if (node.caretLoc !== undefined) {
-        me.caretLoc = node.caretLoc;
-    }
+    var me = Tree.makeNode({
+            title: node.title,
+            parent: parent,
+            selected: node.selected,
+            caretLoc: node.caretLoc});
     if (node.childNodes) {
         me.childNodes = node.childNodes.map(function (node) {
             return Tree.makeTree(node, me);
