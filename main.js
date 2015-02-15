@@ -1,7 +1,6 @@
 var _ = require('underscore');
 var $ = require('jquery');
-//var React = require('react');
-//var StartRender = require('jsx!app/TreeNode');
+var StartRender = require('./TreeNode');
 var Tree = require('./lib/tree');
 
 var startTree = {
@@ -18,13 +17,11 @@ var startTree = {
         ]}
       ]}]
   };
+
 var tree = Tree.makeTree(startTree);
-console.log('tree oh great', tree);
-console.log($);
 
 testTree(Tree);
-//StartRender(tree);
-
+StartRender(tree);
 
 function testRemoveNode() {
     (function() {
