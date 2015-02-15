@@ -1,5 +1,5 @@
 var React = require('react');
-var Tree = require('./lib/tree'); // TODO title case here
+var Tree = require('./lib/Tree');
 var $ = require('jquery');
 var Cursor = require('./lib/Cursor');
 

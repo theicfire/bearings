@@ -1,7 +1,7 @@
 var _ = require('underscore');
 var $ = require('jquery');
 var StartRender = require('./TreeNode');
-var Tree = require('./lib/tree');
+var Tree = require('./lib/Tree');
 
 var startTree = {
   title: "root",
