@@ -135,10 +135,8 @@ render: function() {
         className = "dot togglable";
         console.log('collapsed?', this.props.node);
         console.log('title?', this.props.node.title);
-        if (!this.props.node.collapsed) {
-            className += " togglable-down";
-        } else {
-            className += " togglable-up";
+        if (this.props.node.collapsed) {
+            className += " dot-collapsed";
         }
     }
 

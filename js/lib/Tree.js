@@ -185,7 +185,7 @@ Tree.setChildNodes = function(tree, childNodes) {
 }
 
 Tree.findDeepest = function(tree) {
-    if (tree.childNodes && tree.childNodes.length > 0) {
+    if (tree.childNodes && tree.childNodes.length > 0 && !tree.collapsed) {
         return Tree.findDeepest(tree.childNodes[tree.childNodes.length - 1]);
     }
     return tree;
@@ -205,7 +205,7 @@ Tree.findSelected = function(node) {
 };
 
 Tree.findNextNode = function(tree) {
-    if (tree.childNodes && tree.childNodes.length > 0) {
+    if (tree.childNodes && tree.childNodes.length > 0 && !tree.collapsed) {
         return tree.childNodes[0];
     }
     return Tree.findNextNodeRec(tree);

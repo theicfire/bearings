@@ -11,12 +11,17 @@ h3 {
   cursor: pointer;
 }
 
+
 .dot {
     font-size: 20px;
     position: relative;
     top: -3px;
     margin-right: 5px;
     float: left;
+}
+
+.dot-collapsed {
+  font-size: 30px;
 }
 
 .text {
