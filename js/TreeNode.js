@@ -132,8 +132,6 @@ render: function() {
     var className = "dot";
     if (this.props.node.childNodes != null) {
         className = "dot togglable";
-        console.log('collapsed?', this.props.node);
-        console.log('title?', this.props.node.title);
         if (this.props.node.collapsed) {
             className += " dot-collapsed";
         }
@@ -167,7 +165,6 @@ var startRender = function(tree) {
 
 function renderAll() {
     console.log('rendering with', globalTree);
-    console.log('to ', document.getElementById("tree"));
     // TODO speedup by removing clone. I might not need to clone. What this does is allow us to
     // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
