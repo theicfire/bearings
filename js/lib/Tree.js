@@ -224,6 +224,9 @@ Tree.findPreviousNode = function(tree) {
     if (i - 1 >= 0) {
         return Tree.findDeepest(tree.parent.childNodes[i - 1]);
     }
+    if (tree.parent.title === 'root') {
+        return tree;
+    }
     return tree.parent;
 };
 
