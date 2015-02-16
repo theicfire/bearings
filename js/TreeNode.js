@@ -25,7 +25,6 @@ render: function() {
 var TreeNode = React.createClass({
 getInitialState: function() {
     return {
-      visible: true,
       title: this.props.node.title
     };
 },
@@ -35,7 +34,7 @@ handleChange: function(event) {
     selected.title = event.target.value;
     var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
     selected.caretLoc = caretLoc;
-    this.setState({visible: this.state.visible, title: event.target.value});
+    this.setState({title: event.target.value});
 },
 
 componentDidMount: function() {
@@ -47,7 +46,14 @@ componentDidMount: function() {
 },
 
 handleKeyDown: function(e) {
-    var KEYS = {LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40, ENTER: 13, TAB: 9, BACKSPACE: 8};
+    var KEYS = {LEFT: 37,
+        UP: 38,
+        RIGHT: 39,
+        DOWN: 40,
+        ENTER: 13,
+        TAB: 9,
+        BACKSPACE: 8,
+        SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
         console.log('left');
     } else if (e.keyCode === KEYS.UP) {
@@ -98,6 +104,10 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
 
+    } else if (e.keyCode === KEYS.SPACE && e.ctrlKey) {
+        var selected = Tree.findSelected(globalTree);
+        selected.collapsed = !selected.collapsed;
+        renderAll();
     } else {
         console.log(e.keyCode);
     }
@@ -111,7 +121,7 @@ componentDidUpdate: function(prevProps, prevState) {
 },
 
 componentWillReceiveProps: function(nextProps) {
-    this.setState({visible: this.state.visible, title: nextProps.node.title});
+    this.setState({title: nextProps.node.title});
 },
 
 // TODO good for speedups..
@@ -123,7 +133,9 @@ render: function() {
     var className = "dot";
     if (this.props.node.childNodes != null) {
         className = "dot togglable";
-        if (this.state.visible) {
+        console.log('collapsed?', this.props.node);
+        console.log('title?', this.props.node.title);
+        if (!this.props.node.collapsed) {
             className += " togglable-down";
         } else {
             className += " togglable-up";
@@ -131,7 +143,7 @@ render: function() {
     }
 
     var style = {};
-    if (!this.state.visible) {
+    if (this.props.node.collapsed) {
         style.display = "none";
     }
 
@@ -147,7 +159,7 @@ render: function() {
 },
 
 toggle: function() {
-    this.setState({visible: !this.state.visible, title: this.state.title});
+    console.assert(false);
 }
 });
 

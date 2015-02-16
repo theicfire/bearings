@@ -6,9 +6,9 @@ var Tree = require('./lib/Tree');
 var startTree = {
   title: "root",
   childNodes: [
-      {title: "howdy",
+      {title: "howdy", selected: "true",
       childNodes: [
-        {title: "billy", selected: "true"},
+        {title: "billy"},
         {title: "suzie", childNodes: [
           {title: "puppy", childNodes: [
             {title: "dog house"}

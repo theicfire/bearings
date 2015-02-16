@@ -33,16 +33,6 @@ Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
     toObj[property] = fromObj[property];
 };
 
-Tree.makeNode = function(args) {
-    var ret = {};
-    Tree.setIfReal(ret, args, 'title');
-    Tree.setIfReal(ret, args, 'childNodes', []);
-    Tree.setIfReal(ret, args, 'parent', null);
-    Tree.setIfReal(ret, args, 'caretLoc');
-    Tree.setIfReal(ret, args, 'selected');
-    Tree.setIfReal(ret, args, 'collapsed');
-    return ret;
-};
 
 Tree.appendSibling = function(tree, title) {
     var i;
@@ -73,13 +63,25 @@ Tree.newLineAtCursor = function(tree) {
     selected.caretLoc = 0;
 };
 
+Tree.makeNode = function(args) {
+    var ret = {};
+    Tree.setIfReal(ret, args, 'title');
+    Tree.setIfReal(ret, args, 'childNodes', []);
+    Tree.setIfReal(ret, args, 'parent', null);
+    Tree.setIfReal(ret, args, 'caretLoc');
+    Tree.setIfReal(ret, args, 'selected');
+    Tree.setIfReal(ret, args, 'collapsed');
+    return ret;
+};
+
 Tree.clone = function(tree) {
     return Tree.makeNode({
             title: tree.title,
             parent: tree.parent,
             childNodes: tree.childNodes.map(Tree.clone),
             caretLoc: tree.caretLoc,
-            selected: tree.selected});
+            selected: tree.selected,
+            collapsed: tree.collapsed});
 };
 
 Tree.indent = function(tree) {
