@@ -1,7 +1,8 @@
-var React = require('react');
+var React = require('react/addons');
 var Tree = require('./lib/Tree');
 var $ = require('jquery');
 var Cursor = require('./lib/Cursor');
+var _ = require('underscore');
 
 var globalTree;
 
@@ -31,17 +32,15 @@ getInitialState: function() {
 
 handleChange: function(event) {
     var selected = Tree.findSelected(globalTree);
-    selected.title = event.target.value;
-    var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
-    selected.caretLoc = caretLoc;
-    this.setState({title: event.target.value});
+    selected.title = event.target.innerHTML;
+    selected.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
 },
 
 componentDidMount: function() {
     if (this.props.node.selected) {
-        var el = $(this.getDOMNode()).children('h5').children('input');
+        var el = $(this.refs.input.getDOMNode());
         el.focus();
-        Cursor.setCaretPosition(el.get(0), this.props.node.caretLoc);
+        Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
     }
 },
 
@@ -82,14 +81,14 @@ handleKeyDown: function(e) {
         e.preventDefault();
     } else if (e.keyCode === KEYS.ENTER) {
         var selected = Tree.findSelected(globalTree);
-        var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
+        var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
         selected.caretLoc = caretLoc;
         console.log('loc', caretLoc);
         Tree.newLineAtCursor(globalTree);
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.BACKSPACE) {
-        var caretLoc = Cursor.getCaretPosition(this.refs.input.getDOMNode());
+        var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
         if (caretLoc === 0) {
             Tree.backspaceAtBeginning(globalTree);
             renderAll();
@@ -114,19 +113,16 @@ handleKeyDown: function(e) {
 
 componentDidUpdate: function(prevProps, prevState) {
     if (this.props.node.selected) {
-        var el = $(this.getDOMNode()).children('h5').children('input');
+        var el = $(this.refs.input.getDOMNode());
         el.focus();
+        Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
     }
 },
 
-componentWillReceiveProps: function(nextProps) {
-    this.setState({title: nextProps.node.title});
-},
-
 // TODO good for speedups..
-//shouldComponentUpdate: function(nextProps, nextState) {
-    //return !(_.isEqual(this.state, nextState) && _.isEqual(this.props, nextProps));
-//},
+shouldComponentUpdate: function(nextProps, nextState) {
+    return !_.isEqual(this.props, nextProps);
+},
 
 render: function() {
     var className = "dot";
@@ -146,7 +142,7 @@ render: function() {
         <div>
         <h5>
         <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
-        <input ref="input" type="text" value={this.state.title} onKeyDown={this.handleKeyDown} onChange={this.handleChange}/> {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
+        <div contentEditable={!!this.props.node.selected} ref="input" onKeyDown={this.handleKeyDown} onInput={this.handleChange}>{this.props.node.title}</div>{this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
         </h5>
         <TreeChildren style={style} childNodes={this.props.node.childNodes} />
         </div>
@@ -170,7 +166,7 @@ function renderAll() {
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
     // may be slow.
     var newTree = Tree.clone(globalTree);
-    React.renderComponent(
+    React.render(
       <TreeChildren style={{}} childNodes={newTree.childNodes} />,
       document.getElementById("tree")
     );

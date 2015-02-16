@@ -63,7 +63,6 @@ Cursor.getCaretCharacterOffsetWithin = function(element) {
 
 // For contentEditable
 Cursor.setCursorLoc = function(contentEditableElement, caretLoc) {
-    return;
     var range,selection;
     if(document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
     {

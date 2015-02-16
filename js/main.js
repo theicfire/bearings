@@ -17,6 +17,10 @@ var startTree = {
         ]}
       ]}]
   };
+  //for (var i = 0; i < 10000; i++) {
+      //startTree.childNodes.push({title: "oh baby"});
+  //}
+  startTree.childNodes.push({title: "the end"});
 
 var tree = Tree.makeTree(startTree);
 
