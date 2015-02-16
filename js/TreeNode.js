@@ -105,8 +105,7 @@ handleKeyDown: function(e) {
         e.preventDefault();
 
     } else if (e.keyCode === KEYS.SPACE && e.ctrlKey) {
-        var selected = Tree.findSelected(globalTree);
-        selected.collapsed = !selected.collapsed;
+        Tree.collapseCurrent(globalTree);
         renderAll();
     } else {
         console.log(e.keyCode);

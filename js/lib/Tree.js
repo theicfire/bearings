@@ -211,6 +211,13 @@ Tree.findNextNode = function(tree) {
     return Tree.findNextNodeRec(tree);
 };
 
+Tree.collapseCurrent = function(tree) {
+    var selected = Tree.findSelected(tree);
+    if (selected.childNodes && selected.childNodes.length > 0) {
+        selected.collapsed = !selected.collapsed;
+    }
+};
+
 Tree.findPreviousNode = function(tree) {
     if (!tree || !tree.parent) {
         return null;
