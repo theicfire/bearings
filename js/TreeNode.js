@@ -174,28 +174,24 @@ var startRender = function(tree) {
 }
 
 function renderAll() {
-    console.log('rendering with', Tree.toString(globalTree));
     // TODO speedup by removing clone. I might not need to clone. What this does is allow us to
     // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
     // may be slow.
     var newTree = Tree.clone(globalTree);
     globalUndoRing.add(newTree);
-    React.render(
-      <TreeChildren style={{}} childNodes={newTree.childNodes} />,
-      document.getElementById("tree")
-    );
+    doRender(newTree);
 };
 
 function renderAllNoUndo() {
-    console.log('rendering with', Tree.toString(globalTree));
-    // TODO speedup by removing clone. I might not need to clone. What this does is allow us to
-    // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
-    // changed relative to the other, and we don't have to call render. But, we have to clone, which
-    // may be slow.
     var newTree = Tree.clone(globalTree);
+    doRender(newTree);
+}
+
+function doRender(tree) {
+    console.log('rendering with', Tree.toString(tree));
     React.render(
-      <TreeChildren style={{}} childNodes={newTree.childNodes} />,
+      <TreeChildren style={{}} childNodes={tree.childNodes} />,
       document.getElementById("tree")
     );
 }
