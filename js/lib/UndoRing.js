@@ -37,7 +37,6 @@ UndoRing.prototype.redo = function() {
 }
 
 UndoRing.prototype.add = function(obj) {
-    console.log('adding obj', obj.childNodes[0].title);
     this.start = this.current;
     if (this.bufferFull()) {
         this._pop();
