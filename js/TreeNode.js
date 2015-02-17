@@ -3,8 +3,10 @@ var Tree = require('./lib/Tree');
 var $ = require('jquery');
 var Cursor = require('./lib/Cursor');
 var _ = require('underscore');
+var UndoRing = require('./lib/UndoRing');
 
 var globalTree;
+var globalUndoRing;
 
 var TreeChildren = React.createClass({
 render: function() {
@@ -34,6 +36,7 @@ handleChange: function(event) {
     var selected = Tree.findSelected(globalTree);
     selected.title = event.target.innerHTML;
     selected.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+    renderAll();
 },
 
 componentDidMount: function() {
@@ -52,6 +55,8 @@ handleKeyDown: function(e) {
         ENTER: 13,
         TAB: 9,
         BACKSPACE: 8,
+        Z: 90,
+        Y: 89,
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
         console.log('left');
@@ -77,7 +82,6 @@ handleKeyDown: function(e) {
             Tree.findSelected(globalTree).caretLoc = 0;
         }
         renderAll();
-        console.log('tree now', globalTree);
         e.preventDefault();
     } else if (e.keyCode === KEYS.ENTER) {
         var selected = Tree.findSelected(globalTree);
@@ -106,6 +110,14 @@ handleKeyDown: function(e) {
     } else if (e.keyCode === KEYS.SPACE && e.ctrlKey) {
         Tree.collapseCurrent(globalTree);
         renderAll();
+    } else if (e.keyCode === KEYS.Z && e.ctrlKey) {
+        globalTree = Tree.clone(globalUndoRing.undo());
+        renderAllNoUndo();
+        e.preventDefault();
+    } else if (e.keyCode === KEYS.Y && e.ctrlKey) {
+        globalTree = Tree.clone(globalUndoRing.redo());
+        renderAllNoUndo();
+        e.preventDefault();
     } else {
         console.log(e.keyCode);
     }
@@ -120,9 +132,9 @@ componentDidUpdate: function(prevProps, prevState) {
 },
 
 // TODO good for speedups..
-shouldComponentUpdate: function(nextProps, nextState) {
-    return !_.isEqual(this.props, nextProps);
-},
+//shouldComponentUpdate: function(nextProps, nextState) {
+    //return !_.isEqual(this.props, nextProps);
+//},
 
 render: function() {
     var className = "dot";
@@ -156,11 +168,27 @@ toggle: function() {
 
 var startRender = function(tree) {
     globalTree = tree;
+    var newTree = Tree.clone(globalTree);
+    globalUndoRing = new UndoRing(newTree, 50);
     renderAll();
 }
 
 function renderAll() {
-    console.log('rendering with', globalTree);
+    console.log('rendering with', Tree.toString(globalTree));
+    // TODO speedup by removing clone. I might not need to clone. What this does is allow us to
+    // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
+    // changed relative to the other, and we don't have to call render. But, we have to clone, which
+    // may be slow.
+    var newTree = Tree.clone(globalTree);
+    globalUndoRing.add(newTree);
+    React.render(
+      <TreeChildren style={{}} childNodes={newTree.childNodes} />,
+      document.getElementById("tree")
+    );
+};
+
+function renderAllNoUndo() {
+    console.log('rendering with', Tree.toString(globalTree));
     // TODO speedup by removing clone. I might not need to clone. What this does is allow us to
     // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
@@ -170,7 +198,7 @@ function renderAll() {
       <TreeChildren style={{}} childNodes={newTree.childNodes} />,
       document.getElementById("tree")
     );
-};
+}
 
 module.exports = startRender;
 

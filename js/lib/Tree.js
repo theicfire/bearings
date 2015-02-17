@@ -23,17 +23,6 @@ Tree.selectPreviousNode = function(tree) {
     }
 };
 
-Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
-    if (fromObj[property] === undefined) {
-        if (defaultVal !== undefined) {
-            toObj[property] = defaultVal;
-        }
-        return;
-    }
-    toObj[property] = fromObj[property];
-};
-
-
 Tree.appendSibling = function(tree, title) {
     var i;
     for (i = 0; i < tree.parent.childNodes.length; i++) {
@@ -63,6 +52,16 @@ Tree.newLineAtCursor = function(tree) {
     selected.caretLoc = 0;
 };
 
+Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
+    if (fromObj[property] === undefined) {
+        if (defaultVal !== undefined) {
+            toObj[property] = defaultVal;
+        }
+        return;
+    }
+    toObj[property] = fromObj[property];
+};
+
 Tree.makeNode = function(args) {
     var ret = {};
     Tree.setIfReal(ret, args, 'title');
@@ -74,15 +73,28 @@ Tree.makeNode = function(args) {
     return ret;
 };
 
-Tree.clone = function(tree) {
-    return Tree.makeNode({
+Tree.clone = function(tree, noparent) {
+    return Tree.cloneGeneral(tree, null, false);
+};
+
+Tree.cloneNoParent = function(tree) {
+    return Tree.cloneGeneral(tree, null, true);
+};
+
+Tree.cloneGeneral = function(tree, parent, noparent) {
+    var me = Tree.makeNode({
             title: tree.title,
-            parent: tree.parent,
-            childNodes: tree.childNodes.map(Tree.clone),
+            parent: !!noparent ? undefined : parent,
             caretLoc: tree.caretLoc,
             selected: tree.selected,
             collapsed: tree.collapsed});
+    me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, noparent)});
+    return me;
 };
+
+Tree.saveAndClone = function(tree) {
+    var newTree = Tree.clone(tree);
+}
 
 Tree.indent = function(tree) {
     var selected = Tree.findSelected(tree);
@@ -282,4 +294,9 @@ Tree.makeTree = function(node, parent) {
         });
     }
     return me;
+};
+
+Tree.toString = function(tree) {
+    tree = Tree.cloneNoParent(tree);
+    return JSON.stringify(tree);
 };
