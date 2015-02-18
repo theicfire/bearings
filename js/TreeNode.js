@@ -34,15 +34,23 @@ getInitialState: function() {
 },
 
 handleChange: function(event) {
-    var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-    currentNode.title = event.target.innerHTML;
-    currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-    renderAll();
+    var html = this.refs.input.getDOMNode().innerHTML;
+    if (html !== this.lastHtml) {
+        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        currentNode.title = event.target.innerHTML;
+        currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+        renderAll();
+    } else {
+        console.assert(false, 'Why am I getting a change event if nothing changed?');
+    }
+    this.lastHtml = html;
 },
 
 handleClick: function(event) {
     var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-    console.log('click on title', currentNode.title);
+    var selected = Tree.findSelected(globalTree);
+    delete selected.selected;
+    currentNode.selected = true;
 },
 
 componentDidMount: function() {
@@ -135,12 +143,28 @@ componentDidUpdate: function(prevProps, prevState) {
         el.focus();
         Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
     }
+    if ( this.props.node.title !== this.refs.input.getDOMNode().innerHTML ) {
+        // Need this because of: http://stackoverflow.com/questions/22677931/react-js-onchange-event-for-contenteditable/27255103#27255103
+        // An example he was mentioning is that the virtual dom thinks that the div is empty, but if
+        // you type something and then press "clear", or specifically set the text, the VDOM will
+        // think the two are the same.
+        // I believe this will never happen for me though? Because I don't overtly set text.. text is only set when someone is typing, right?
+        //this.refs.input.getDOMNode().innerHTML = this.props.node.title;
+        console.assert(false, 'Did not expect this to get hit. My thoughts are wrong. Check out the comments.');
+    }
 },
 
 // TODO good for speedups..
 //shouldComponentUpdate: function(nextProps, nextState) {
     //return !_.isEqual(this.props, nextProps);
 //},
+// TODO something about cursor jumps need this?
+// See: http://stackoverflow.com/questions/22677931/react-js-onchange-event-for-contenteditable/27255103#27255103
+// I think what "cursor jump" means is that if we set the innerHTML for some reason, but we are
+// actually just setting it to be the exact same html, then the cursor will jump to the front/end.
+//shouldComponentUpdate: function(nextProps){
+        //return nextProps.html !== this.getDOMNode().innerHTML;
+    //},
 
 render: function() {
     var className = "dot";
@@ -160,7 +184,14 @@ render: function() {
         <div>
         <h5>
         <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
-        <div contentEditable={!!this.props.node.selected} ref="input" onKeyDown={this.handleKeyDown} onInput={this.handleChange} onClick={this.handleClick}>{this.props.node.title}</div>{this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
+        <div contentEditable
+            ref="input"
+            onKeyDown={this.handleKeyDown}
+            onInput={this.handleChange}
+            onClick={this.handleClick}
+            dangerouslySetInnerHTML={{__html: this.props.node.title}}>
+        </div>
+        {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
         </h5>
         <TreeChildren style={style} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
         </div>
