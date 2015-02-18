@@ -76,10 +76,15 @@ handleKeyDown: function(e) {
     if (e.keyCode === KEYS.LEFT) {
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-        if (newCaretLoc > 0) {
-            newCaretLoc -= 1;
+        if (newCaretLoc === 0) {
+            Tree.selectPreviousNode(globalTree);
+            var selected = Tree.findSelected(globalTree); // TODO could do this faster than two searches
+            selected.caretLoc = selected.title.length;
+            renderAll();
+            e.preventDefault();
+        } else {
+            currentNode.caretLoc = newCaretLoc - 1;
         }
-        currentNode.caretLoc = newCaretLoc;
     } else if (e.keyCode === KEYS.UP) {
         if (e.shiftKey && e.altKey) {
             console.log('shift up');
@@ -94,10 +99,15 @@ handleKeyDown: function(e) {
     } else if (e.keyCode === KEYS.RIGHT) {
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-        if (newCaretLoc < this.refs.input.getDOMNode().innerHTML.length - 1) {
-            newCaretLoc += 1;
+        if (newCaretLoc === this.refs.input.getDOMNode().innerHTML.length) {
+            Tree.selectNextNode(globalTree);
+            var selected = Tree.findSelected(globalTree); // TODO could do this faster then two searches
+            selected.caretLoc = 0;
+            renderAll();
+            e.preventDefault();
+        } else {
+            currentNode.caretLoc = newCaretLoc + 1;
         }
-        currentNode.caretLoc = newCaretLoc;
     } else if (e.keyCode === KEYS.DOWN) {
         if (e.shiftKey && e.altKey) {
             Tree.shiftDown(globalTree);
