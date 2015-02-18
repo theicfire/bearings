@@ -73,7 +73,12 @@ handleKeyDown: function(e) {
         Y: 89,
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
-        console.log('left');
+        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+        if (newCaretLoc > 0) {
+            newCaretLoc -= 1;
+        }
+        currentNode.caretLoc = newCaretLoc;
     } else if (e.keyCode === KEYS.UP) {
         if (e.shiftKey && e.altKey) {
             console.log('shift up');
@@ -86,7 +91,12 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.RIGHT) {
-        console.log('right');
+        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+        if (newCaretLoc < this.refs.input.getDOMNode().innerHTML.length - 1) {
+            newCaretLoc += 1;
+        }
+        currentNode.caretLoc = newCaretLoc;
     } else if (e.keyCode === KEYS.DOWN) {
         if (e.shiftKey && e.altKey) {
             Tree.shiftDown(globalTree);
