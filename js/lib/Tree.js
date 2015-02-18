@@ -180,7 +180,7 @@ Tree.getPath = function(tree) {
 
     var getReversePath = function(tree) {
         if (tree.parent.title === 'special_root_title') {
-            return '' + Tree.findChildNum(tree);
+            return Tree.findChildNum(tree) + '-'; // TODO hacky. Appending this because of TreeNode.js
         }
         return Tree.findChildNum(tree) + '-' + getReversePath(tree.parent);
     };
@@ -228,6 +228,9 @@ Tree.backspaceAtBeginning = function(tree) {
     console.assert(selected.caretLoc === 0);
     var previous = Tree.findPreviousNode(selected);
     if (previous === selected.parent) {
+        return;
+    }
+    if (previous === selected) {
         return;
     }
     var childNum = Tree.findChildNum(selected);

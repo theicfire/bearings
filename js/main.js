@@ -6,7 +6,7 @@ var Tree = require('./lib/Tree');
 var startTree = {
   title: "special_root_title",
   childNodes: [
-      {title: "howdy", selected: "true",
+      {title: "howdy", selected: "true", caretLoc: 0,
       childNodes: [
         {title: "billy"},
         {title: "suzie", childNodes: [
@@ -394,8 +394,8 @@ function testPath() {
     }]};
     var innerTree = Tree.makeTree(tree).childNodes[0].childNodes[1].childNodes[0].childNodes[0];
     var innerTree2 = Tree.makeTree(tree).childNodes[0];
-    console.assert(Tree.getPath(innerTree) === '0-1-0-0');
-    console.assert(Tree.getPath(innerTree2) === '0');
+    console.assert(Tree.getPath(innerTree) === '-0-1-0-0');
+    console.assert(Tree.getPath(innerTree2) === '-0');
 };
 
 function testTree() {

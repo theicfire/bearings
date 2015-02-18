@@ -264,12 +264,12 @@ function doRender(tree) {
     console.log('rendering with', Tree.toString(tree));
     if (tree.zoom !== undefined) {
         React.render(
-          <TreeChildren style={{}} childNodes={tree.zoom.childNodes}  indexer={Tree.getPath(tree.zoom)}/>,
+          <TreeNode node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>,
           document.getElementById("tree")
         );
     } else {
         React.render(
-          <TreeChildren style={{}} childNodes={tree.childNodes}  indexer=""/>,
+          <TreeNode node={tree}  indexer=""/>,
           document.getElementById("tree")
         );
     }
