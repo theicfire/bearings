@@ -75,15 +75,22 @@ handleKeyDown: function(e) {
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-        var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-        if (newCaretLoc === 0) {
-            Tree.selectPreviousNode(globalTree);
-            var selected = Tree.findSelected(globalTree); // TODO could do this faster than two searches
-            selected.caretLoc = selected.title.length;
+        if (e.altKey) {
+            console.log('zoom up!');
+            Tree.zoom(currentNode.parent);
             renderAll();
             e.preventDefault();
         } else {
-            currentNode.caretLoc = newCaretLoc - 1;
+            var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+            if (newCaretLoc === 0) {
+                Tree.selectPreviousNode(globalTree);
+                var selected = Tree.findSelected(globalTree); // TODO could do this faster than two searches
+                selected.caretLoc = selected.title.length;
+                renderAll();
+                e.preventDefault();
+            } else {
+                currentNode.caretLoc = newCaretLoc - 1;
+            }
         }
     } else if (e.keyCode === KEYS.UP) {
         if (e.shiftKey && e.altKey) {
@@ -262,6 +269,7 @@ function renderAllNoUndo() {
 
 function doRender(tree) {
     console.log('rendering with', Tree.toString(tree));
+    console.log('rendering with obj', tree);
     if (tree.zoom !== undefined) {
         React.render(
           <TreeNode node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>,

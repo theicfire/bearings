@@ -24,7 +24,7 @@ var startTree = {
 
 var tree = Tree.makeTree(startTree);
 
-testTree(Tree);
+//testTree(Tree);
 StartRender(tree);
 
 function testNotRemoveNode() {

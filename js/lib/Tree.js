@@ -196,6 +196,10 @@ Tree.getRoot = function(tree) {
 };
 
 Tree.zoom = function(tree) {
+    if (!tree) {
+        console.log('cannot zoom that high!');
+        return;
+    }
     var root = Tree.getRoot(tree);
     root.zoom = tree;
 };
@@ -289,6 +293,11 @@ Tree.collapseCurrent = function(tree) {
 Tree.findPreviousNode = function(tree) {
     if (!tree || !tree.parent) {
         return null;
+    }
+    console.log('find previous of', tree);
+    var root = Tree.getRoot(tree);
+    if (root.zoom === tree) {
+        return;
     }
     var childNum = Tree.findChildNum(tree);
     if (childNum - 1 >= 0) {
