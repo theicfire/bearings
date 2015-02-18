@@ -127,11 +127,17 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.BACKSPACE) {
-        var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-        if (caretLoc === 0) {
-            Tree.backspaceAtBeginning(globalTree);
+        if (e.ctrlKey && e.shiftKey) {
+            Tree.deleteSelected(globalTree);
             renderAll();
             e.preventDefault();
+        } else {
+            var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+            if (caretLoc === 0) {
+                Tree.backspaceAtBeginning(globalTree);
+                renderAll();
+                e.preventDefault();
+            }
         }
     } else if (e.keyCode === KEYS.TAB) {
         if (e.shiftKey) {

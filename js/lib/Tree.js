@@ -166,10 +166,32 @@ Tree.findChildNum = function(tree) {
     console.assert(false);
 }
 
+Tree.deleteSelected = function(tree) {
+    // TODO think if this is the root..
+    var selected = Tree.findSelected(tree);
+    var nextSelection = Tree.findPreviousNode(selected);
+    if (selected === nextSelection) {
+        console.assert(selected.parent.title === 'special_root_title');
+        if (selected.parent.childNodes.length > 1) {
+            nextSelection = selected.parent.childNodes[1];
+        } else {
+            selected.title = '';
+            selected.childNodes = [];
+            selected.selected = true;
+            selected.caretLoc = 0;
+            return;
+        }
+    }
+    var childNum = Tree.findChildNum(selected);
+    selected.parent.childNodes.splice(childNum, 1);
+    nextSelection.selected = true;
+    nextSelection.caretLoc = 0;
+};
+
 Tree.backspaceAtBeginning = function(tree) {
+    // TODO think if this is the root
     var selected = Tree.findSelected(tree);
     console.assert(selected.caretLoc === 0);
-    var i;
     var previous = Tree.findPreviousNode(selected);
     if (previous === selected.parent) {
         return;
@@ -235,7 +257,7 @@ Tree.findPreviousNode = function(tree) {
     if (childNum - 1 >= 0) {
         return Tree.findDeepest(tree.parent.childNodes[childNum - 1]);
     }
-    if (tree.parent.title === 'root') {
+    if (tree.parent.title === 'special_root_title') {
         return tree;
     }
     return tree.parent;

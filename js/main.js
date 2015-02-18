@@ -4,7 +4,7 @@ var StartRender = require('./TreeNode');
 var Tree = require('./lib/Tree');
 
 var startTree = {
-  title: "root",
+  title: "special_root_title",
   childNodes: [
       {title: "howdy", selected: "true",
       childNodes: [
