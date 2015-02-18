@@ -51,6 +51,7 @@ handleClick: function(event) {
     var selected = Tree.findSelected(globalTree);
     delete selected.selected;
     currentNode.selected = true;
+    currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
 },
 
 componentDidMount: function() {
