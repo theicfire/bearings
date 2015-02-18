@@ -174,13 +174,8 @@ Tree.backspaceAtBeginning = function(tree) {
     if (previous === selected.parent) {
         return;
     }
-    for (i = 0; i < selected.parent.childNodes.length; i++) {
-        if (selected.parent.childNodes[i] == selected) {
-            console.log('fouuuud');
-            break;
-        }
-    }
-    selected.parent.childNodes.splice(i, 1);
+    var childNum = Tree.findChildNum(selected);
+    selected.parent.childNodes.splice(childNum, 1);
     previous.selected = true;
     previous.caretLoc = previous.title.length;
     previous.title += selected.title;
