@@ -92,7 +92,7 @@ handleKeyDown: function(e) {
         } else {
             console.log('up');
             Tree.selectPreviousNode(globalTree);
-            Tree.findFromIndexer(globalTree, this.props.indexer).caretLoc = 0;
+            Tree.findSelected(globalTree).caretLoc = 0; // TODO could be faster
         }
         renderAll();
         e.preventDefault();
@@ -114,7 +114,7 @@ handleKeyDown: function(e) {
         } else {
             console.log('down');
             Tree.selectNextNode(globalTree);
-            Tree.findFromIndexer(globalTree, this.props.indexer).caretLoc = 0;
+            Tree.findSelected(globalTree).caretLoc = 0; // TODO could be faster
         }
         renderAll();
         e.preventDefault();

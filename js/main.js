@@ -27,7 +27,7 @@ var tree = Tree.makeTree(startTree);
 testTree(Tree);
 StartRender(tree);
 
-function testRemoveNode() {
+function testNotRemoveNode() {
     (function() {
         var tree;
         tree = Tree.makeTree(
@@ -37,16 +37,35 @@ function testRemoveNode() {
               ]},
               {title: "cherry"}
           ]});
-        newTree = Tree.makeTree(
+        var newTree = Tree.makeTree(
             {title: "suzie", childNodes: [
-              {title: "puppydog", selected: true, caretLoc: "puppy".length, childNodes: []},
+              {title: "puppy", childNodes: [
+                {title: 'dog', selected: true, caretLoc: 0}
+              ]},
               {title: "cherry"}
           ]});
         Tree.backspaceAtBeginning(tree);
         console.log('try compare', tree, newTree);
         console.assert(_.isEqual(tree, newTree));
     })();
+};
 
+function testRemoveNode() {
+    (function() {
+        var tree;
+        tree = Tree.makeTree(
+            {title: "suzie", childNodes: [
+                    {title: "puppy"},
+                    {title: "cherry", selected: true, caretLoc: 0}
+          ]});
+        var newTree = Tree.makeTree(
+            {title: "suzie", childNodes: [
+                    {title: "puppycherry", selected: true, caretLoc: 5}
+          ]});
+        Tree.backspaceAtBeginning(tree);
+        console.log('try compare', tree, newTree);
+        console.assert(_.isEqual(tree, newTree));
+    })();
 };
 
 function testClone() {
@@ -362,6 +381,7 @@ function testTree() {
     testSelectAndNextReverse();
     testSelectNextNode();
     testAddChild();
+    testNotRemoveNode();
     testRemoveNode();
     testClone();
     testIndent();

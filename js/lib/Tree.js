@@ -171,7 +171,9 @@ Tree.backspaceAtBeginning = function(tree) {
     console.assert(selected.caretLoc === 0);
     var i;
     var previous = Tree.findPreviousNode(selected);
-    var deleted = selected;
+    if (previous === selected.parent) {
+        return;
+    }
     for (i = 0; i < selected.parent.childNodes.length; i++) {
         if (selected.parent.childNodes[i] == selected) {
             console.log('fouuuud');
@@ -181,8 +183,8 @@ Tree.backspaceAtBeginning = function(tree) {
     selected.parent.childNodes.splice(i, 1);
     previous.selected = true;
     previous.caretLoc = previous.title.length;
-    previous.title += deleted.title;
-    Tree.setChildNodes(previous, deleted.childNodes);
+    previous.title += selected.title;
+    Tree.setChildNodes(previous, selected.childNodes);
 }
 
 Tree.setChildNodes = function(tree, childNodes) {
