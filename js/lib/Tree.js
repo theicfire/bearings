@@ -231,14 +231,9 @@ Tree.findPreviousNode = function(tree) {
     if (!tree || !tree.parent) {
         return null;
     }
-    var i = 0;
-    for (i = 0; i < tree.parent.childNodes.length; i++) {
-        if (tree.parent.childNodes[i] == tree) {
-            break;
-        }
-    }
-    if (i - 1 >= 0) {
-        return Tree.findDeepest(tree.parent.childNodes[i - 1]);
+    var childNum = Tree.findChildNum(tree);
+    if (childNum - 1 >= 0) {
+        return Tree.findDeepest(tree.parent.childNodes[childNum - 1]);
     }
     if (tree.parent.title === 'root') {
         return tree;
@@ -251,13 +246,9 @@ Tree.findNextNodeRec = function(tree) {
         return null;
     }
     var i = 0;
-    for (i = 0; i < tree.parent.childNodes.length; i++) {
-        if (tree.parent.childNodes[i] == tree) {
-            break;
-        }
-    }
-    if (i + 1 < tree.parent.childNodes.length) {
-        return tree.parent.childNodes[i + 1];
+    var childNum = Tree.findChildNum(tree);
+    if (childNum + 1 < tree.parent.childNodes.length) {
+        return tree.parent.childNodes[childNum + 1];
     }
     return Tree.findNextNodeRec(tree.parent);
 };
@@ -267,14 +258,9 @@ Tree.findPreviousNodeRec = function(tree) {
     if (!tree || !tree.parent) {
         return null;
     }
-    var i = 0;
-    for (i = 0; i < tree.parent.childNodes.length; i++) {
-        if (tree.parent.childNodes[i] == tree) {
-            break;
-        }
-    }
-    if (i - 1 >= 0) {
-        return tree.parent.childNodes[i - 1];
+    var childNum = Tree.findChildNum(tree);
+    if (childNum - 1 >= 0) {
+        return tree.parent.childNodes[childNum - 1];
     }
     return Tree.findPreviousNodeRec(tree.parent);
 }
