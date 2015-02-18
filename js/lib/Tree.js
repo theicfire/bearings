@@ -296,6 +296,14 @@ Tree.makeTree = function(node, parent) {
     return me;
 };
 
+Tree.findFromIndexer = function(tree, indexer) {
+    var parts = indexer.substr(1).split('-');
+    for (var i = 0; i < parts.length; i++) {
+        tree = tree.childNodes[parts[i]];
+    }
+    return tree;
+}
+
 Tree.toString = function(tree) {
     tree = Tree.cloneNoParent(tree);
     return JSON.stringify(tree);

@@ -12,8 +12,9 @@ var TreeChildren = React.createClass({
 render: function() {
     var childNodes;
     if (this.props.childNodes != null) {
+        var that = this;
         childNodes = this.props.childNodes.map(function(node, index) {
-            return <li key={index}><TreeNode node={node} /></li>
+            return <li key={index}><TreeNode node={node} indexer={that.props.indexer + '-' + index} /></li>
         });
     }
 
@@ -33,9 +34,9 @@ getInitialState: function() {
 },
 
 handleChange: function(event) {
-    var selected = Tree.findSelected(globalTree);
-    selected.title = event.target.innerHTML;
-    selected.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+    var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+    currentNode.title = event.target.innerHTML;
+    currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
     renderAll();
 },
 
@@ -67,7 +68,7 @@ handleKeyDown: function(e) {
         } else {
             console.log('up');
             Tree.selectPreviousNode(globalTree);
-            Tree.findSelected(globalTree).caretLoc = 0;
+            Tree.findFromIndexer(globalTree, this.props.indexer).caretLoc = 0;
         }
         renderAll();
         e.preventDefault();
@@ -79,14 +80,14 @@ handleKeyDown: function(e) {
         } else {
             console.log('down');
             Tree.selectNextNode(globalTree);
-            Tree.findSelected(globalTree).caretLoc = 0;
+            Tree.findFromIndexer(globalTree, this.props.indexer).caretLoc = 0;
         }
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.ENTER) {
-        var selected = Tree.findSelected(globalTree);
+        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-        selected.caretLoc = caretLoc;
+        currentNode.caretLoc = caretLoc;
         console.log('loc', caretLoc);
         Tree.newLineAtCursor(globalTree);
         renderAll();
@@ -156,7 +157,7 @@ render: function() {
         <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
         <div contentEditable={!!this.props.node.selected} ref="input" onKeyDown={this.handleKeyDown} onInput={this.handleChange}>{this.props.node.title}</div>{this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
         </h5>
-        <TreeChildren style={style} childNodes={this.props.node.childNodes} />
+        <TreeChildren style={style} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
         </div>
     );
 },
@@ -191,7 +192,7 @@ function renderAllNoUndo() {
 function doRender(tree) {
     console.log('rendering with', Tree.toString(tree));
     React.render(
-      <TreeChildren style={{}} childNodes={tree.childNodes} />,
+      <TreeChildren style={{}} childNodes={tree.childNodes}  indexer=""/>,
       document.getElementById("tree")
     );
 }
