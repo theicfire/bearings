@@ -70,6 +70,7 @@ Tree.makeNode = function(args) {
     Tree.setIfReal(ret, args, 'caretLoc');
     Tree.setIfReal(ret, args, 'selected');
     Tree.setIfReal(ret, args, 'collapsed');
+    Tree.setIfReal(ret, args, 'zoom');
     return ret;
 };
 
@@ -87,6 +88,7 @@ Tree.cloneGeneral = function(tree, parent, noparent) {
             parent: !!noparent ? undefined : parent,
             caretLoc: tree.caretLoc,
             selected: tree.selected,
+            zoom: !!noparent ? undefined : tree.zoom,
             collapsed: tree.collapsed});
     me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, noparent)});
     return me;
@@ -165,6 +167,38 @@ Tree.findChildNum = function(tree) {
     }
     console.assert(false);
 }
+
+
+Tree.getPath = function(tree) {
+    // TODO put in some utils
+    var reverse = function(s) {
+      var o = '';
+      for (var i = s.length - 1; i >= 0; i--)
+        o += s[i];
+      return o;
+    };
+
+    var getReversePath = function(tree) {
+        if (tree.parent.title === 'special_root_title') {
+            return '' + Tree.findChildNum(tree);
+        }
+        return Tree.findChildNum(tree) + '-' + getReversePath(tree.parent);
+    };
+
+    return reverse(getReversePath(tree));
+};
+
+Tree.getRoot = function(tree) {
+    if (tree.title === 'special_root_title') {
+        return tree;
+    }
+    return Tree.getRoot(tree.parent);
+};
+
+Tree.zoom = function(tree) {
+    var root = Tree.getRoot(tree);
+    root.zoom = tree;
+};
 
 Tree.deleteSelected = function(tree) {
     // TODO think if this is the root..

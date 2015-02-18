@@ -98,15 +98,23 @@ handleKeyDown: function(e) {
         e.preventDefault();
     } else if (e.keyCode === KEYS.RIGHT) {
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-        var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-        if (newCaretLoc === this.refs.input.getDOMNode().innerHTML.length) {
-            Tree.selectNextNode(globalTree);
-            var selected = Tree.findSelected(globalTree); // TODO could do this faster then two searches
-            selected.caretLoc = 0;
+        if (e.altKey) {
+            console.log('zoom!');
+            Tree.zoom(currentNode);
+            console.log('zoom is now', globalTree.zoom);
             renderAll();
             e.preventDefault();
         } else {
-            currentNode.caretLoc = newCaretLoc + 1;
+            var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+            if (newCaretLoc === this.refs.input.getDOMNode().innerHTML.length) {
+                Tree.selectNextNode(globalTree);
+                var selected = Tree.findSelected(globalTree); // TODO could do this faster then two searches
+                selected.caretLoc = 0;
+                renderAll();
+                e.preventDefault();
+            } else {
+                currentNode.caretLoc = newCaretLoc + 1;
+            }
         }
     } else if (e.keyCode === KEYS.DOWN) {
         if (e.shiftKey && e.altKey) {
@@ -254,10 +262,17 @@ function renderAllNoUndo() {
 
 function doRender(tree) {
     console.log('rendering with', Tree.toString(tree));
-    React.render(
-      <TreeChildren style={{}} childNodes={tree.childNodes}  indexer=""/>,
-      document.getElementById("tree")
-    );
+    if (tree.zoom !== undefined) {
+        React.render(
+          <TreeChildren style={{}} childNodes={tree.zoom.childNodes}  indexer={Tree.getPath(tree.zoom)}/>,
+          document.getElementById("tree")
+        );
+    } else {
+        React.render(
+          <TreeChildren style={{}} childNodes={tree.childNodes}  indexer=""/>,
+          document.getElementById("tree")
+        );
+    }
 }
 
 module.exports = startRender;

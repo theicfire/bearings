@@ -374,15 +374,39 @@ function testSelectNext() {
     };
     var tree = Tree.makeTree(treeNext2).childNodes[1].childNodes[0].childNodes[0];
     var next = Tree.findNextNode(tree);
+    console.assert(next.title === 'cherry');
+};
+
+function testPath() {
+    var tree = {
+      title: "special_root_title",
+      childNodes: [
+          {title: "howdy",
+          childNodes: [
+            {title: "bobby"},
+            {title: "suzie", childNodes: [
+              {title: "puppy", childNodes: [
+                {title: "dog", selected: true}
+              ]},
+              {title: "cherry"}
+            ]}
+          ]
+    }]};
+    var innerTree = Tree.makeTree(tree).childNodes[0].childNodes[1].childNodes[0].childNodes[0];
+    var innerTree2 = Tree.makeTree(tree).childNodes[0];
+    console.assert(Tree.getPath(innerTree) === '0-1-0-0');
+    console.assert(Tree.getPath(innerTree2) === '0');
 };
 
 function testTree() {
     testSelectAndNext();
     testSelectAndNextReverse();
     testSelectNextNode();
+    testSelectNext();
     testAddChild();
     testNotRemoveNode();
     testRemoveNode();
     testClone();
     testIndent();
+    testPath();
 }
