@@ -40,6 +40,11 @@ handleChange: function(event) {
     renderAll();
 },
 
+handleClick: function(event) {
+    var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+    console.log('click on title', currentNode.title);
+},
+
 componentDidMount: function() {
     if (this.props.node.selected) {
         var el = $(this.refs.input.getDOMNode());
@@ -155,7 +160,7 @@ render: function() {
         <div>
         <h5>
         <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
-        <div contentEditable={!!this.props.node.selected} ref="input" onKeyDown={this.handleKeyDown} onInput={this.handleChange}>{this.props.node.title}</div>{this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
+        <div contentEditable={!!this.props.node.selected} ref="input" onKeyDown={this.handleKeyDown} onInput={this.handleChange} onClick={this.handleClick}>{this.props.node.title}</div>{this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
         </h5>
         <TreeChildren style={style} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
         </div>
