@@ -16,9 +16,7 @@ Tree.selectPreviousNode = function(tree) {
     var selected = Tree.findSelected(tree);
     var previous = Tree.findPreviousNode(selected);
     if (previous) {
-        if (previous) {
-            delete selected.selected;
-        }
+        delete selected.selected;
         previous.selected = true;
     }
 };
@@ -219,7 +217,7 @@ Tree.deleteSelected = function(tree) {
     // TODO think if this is the root..
     var selected = Tree.findSelected(tree);
     var nextSelection = Tree.findPreviousNode(selected);
-    if (selected === nextSelection) {
+    if (!nextSelection) {
         console.assert(selected.parent.title === 'special_root_title');
         if (selected.parent.childNodes.length > 1) {
             nextSelection = selected.parent.childNodes[1];
@@ -242,10 +240,7 @@ Tree.backspaceAtBeginning = function(tree) {
     var selected = Tree.findSelected(tree);
     console.assert(selected.caretLoc === 0);
     var previous = Tree.findPreviousNode(selected);
-    if (previous === selected.parent) {
-        return;
-    }
-    if (previous === selected) {
+    if (!previous || previous === selected.parent) {
         return;
     }
     var childNum = Tree.findChildNum(selected);
@@ -315,7 +310,7 @@ Tree.findPreviousNode = function(tree) {
         return Tree.findDeepest(tree.parent.childNodes[childNum - 1]);
     }
     if (tree.parent.title === 'special_root_title') {
-        return tree;
+        return null;
     }
     return tree.parent;
 };
@@ -332,19 +327,16 @@ Tree.findNextNodeRec = function(tree) {
     return Tree.findNextNodeRec(tree.parent);
 };
 
+Tree.makeTree = function(nodes) {
+    var ret = {title: 'special_root_title', parent: null};
+    ret.childNodes = nodes.map(function (node) {
+        return Tree.makeSubTree(node, ret);
+    });
+    ret.zoom = ret;
+    return ret;
+};
 
-Tree.findPreviousNodeRec = function(tree) {
-    if (!tree || !tree.parent) {
-        return null;
-    }
-    var childNum = Tree.findChildNum(tree);
-    if (childNum - 1 >= 0) {
-        return tree.parent.childNodes[childNum - 1];
-    }
-    return Tree.findPreviousNodeRec(tree.parent);
-}
-
-Tree.makeTree = function(node, parent) {
+Tree.makeSubTree = function(node, parent) {
     var me = Tree.makeNode({
             title: node.title,
             parent: parent,
@@ -352,7 +344,7 @@ Tree.makeTree = function(node, parent) {
             caretLoc: node.caretLoc});
     if (node.childNodes) {
         me.childNodes = node.childNodes.map(function (node) {
-            return Tree.makeTree(node, me);
+            return Tree.makeSubTree(node, me);
         });
     }
     return me;
