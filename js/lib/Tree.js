@@ -170,6 +170,10 @@ Tree.findChildNum = function(tree) {
 
 
 Tree.getPath = function(tree) {
+    if (tree.title === 'special_root_title') {
+        return ''; // TODO hacky, because of the substr in findFromIndexer
+    }
+
     // TODO put in some utils
     var reverse = function(s) {
       var o = '';
@@ -202,6 +206,13 @@ Tree.zoom = function(tree) {
     }
     var root = Tree.getRoot(tree);
     root.zoom = tree;
+};
+
+Tree.zoomOutOne = function(tree) {
+    var root = Tree.getRoot(tree);
+    if (root.zoom) { // TODO this should be an invariant.. should always have root
+        Tree.zoom(root.zoom.parent);
+    }
 };
 
 Tree.deleteSelected = function(tree) {

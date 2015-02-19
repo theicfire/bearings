@@ -74,10 +74,9 @@ handleKeyDown: function(e) {
         Y: 89,
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         if (e.altKey) {
             console.log('zoom up!');
-            Tree.zoom(currentNode.parent);
+            Tree.zoomOutOne(globalTree);
             renderAll();
             e.preventDefault();
         } else {
@@ -89,6 +88,7 @@ handleKeyDown: function(e) {
                 renderAll();
                 e.preventDefault();
             } else {
+                var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
                 currentNode.caretLoc = newCaretLoc - 1;
             }
         }
@@ -106,9 +106,7 @@ handleKeyDown: function(e) {
     } else if (e.keyCode === KEYS.RIGHT) {
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         if (e.altKey) {
-            console.log('zoom!');
             Tree.zoom(currentNode);
-            console.log('zoom is now', globalTree.zoom);
             renderAll();
             e.preventDefault();
         } else {
@@ -269,7 +267,7 @@ function renderAllNoUndo() {
 
 function doRender(tree) {
     console.log('rendering with', Tree.toString(tree));
-    console.log('rendering with obj', tree);
+    //console.log('rendering with obj', tree);
     if (tree.zoom !== undefined) {
         React.render(
           <TreeNode node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>,
