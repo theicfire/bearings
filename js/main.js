@@ -369,7 +369,9 @@ function testSelectNext() {
         ]}
       ]
     }];
-    var tree = Tree.makeTree(treeNext2).childNodes[1].childNodes[0].childNodes[0];
+    // TODO make statements like this more clear about why the first call is childNodes[0]... it's because
+    // this is wrapped in some root node.
+    var tree = Tree.makeTree(treeNext2).childNodes[0].childNodes[1].childNodes[0].childNodes[0];
     var next = Tree.findNextNode(tree);
     console.assert(next.title === 'cherry');
 };
@@ -389,21 +391,21 @@ function testPath() {
             ]}
           ]
     }]}];
-    var innerTree = Tree.makeTree(tree).childNodes[0].childNodes[1].childNodes[0].childNodes[0];
-    var innerTree2 = Tree.makeTree(tree).childNodes[0];
+    var innerTree = Tree.makeTree(tree).childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0];
+    var innerTree2 = Tree.makeTree(tree).childNodes[0].childNodes[0];
     console.assert(Tree.getPath(innerTree) === '-0-1-0-0');
     console.assert(Tree.getPath(innerTree2) === '-0');
 };
 
 function testTree() {
-    //testSelectAndNext();
+    testSelectAndNext();
     testSelectAndNextReverse();
-    //testSelectNextNode();
-    //testSelectNext();
-    //testAddChild();
-    //testNotRemoveNode();
-    //testRemoveNode();
-    //testClone();
-    //testIndent();
-    //testPath();
+    testSelectNextNode();
+    testSelectNext();
+    testAddChild();
+    testNotRemoveNode();
+    testRemoveNode();
+    testClone();
+    testIndent();
+    testPath();
 }
