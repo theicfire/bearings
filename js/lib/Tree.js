@@ -362,3 +362,10 @@ Tree.toString = function(tree) {
     tree = Tree.cloneNoParent(tree);
     return JSON.stringify(tree);
 };
+
+Tree.fromString = function(s) {
+    var obj = JSON.parse(s);
+    var ret = Tree.makeSubTree(obj, null);
+    ret.zoom = ret;
+    return ret;
+};

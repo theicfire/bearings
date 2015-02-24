@@ -24,6 +24,23 @@ var tree = Tree.makeTree(startTree);
 testTree(Tree);
 StartRender(tree);
 
+function testFromString() {
+    var startTree =
+      [{title: "howdy", selected: "true", caretLoc: 0,
+          childNodes: [
+            {title: "billy"},
+            {title: "suzie", childNodes: [
+              {title: "puppy", childNodes: [
+                {title: "dog house"}
+              ]},
+              {title: "cherry thing"}
+            ]}
+        ]}];
+
+    var tree = Tree.makeTree(startTree);
+    console.assert(Tree.toString(tree) === Tree.toString(Tree.fromString(Tree.toString(tree))));
+};
+
 function testNotRemoveNode() {
     (function() {
         var tree;
@@ -408,4 +425,5 @@ function testTree() {
     testClone();
     testIndent();
     testPath();
+    testFromString();
 }
