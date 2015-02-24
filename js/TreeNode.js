@@ -231,7 +231,6 @@ render: function() {
             onClick={this.handleClick}
             dangerouslySetInnerHTML={{__html: this.props.node.title}}>
         </div>
-        {this.props.node.parent ? 'parent: ' + this.props.node.parent.title : ''}
         </h5>
         <TreeChildren style={style} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
         </div>
