@@ -91,13 +91,13 @@ Tree.cloneGeneral = function(tree, parent, options) {
             caretLoc: !!options.nomouse ? undefined : tree.caretLoc,
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed});
+    me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
     if (!options.noparent) {
         if (tree.zoom) {
             // me.zoom = tree.zoom is wrong! That will set the pointer to the wrong tree.
             me.zoom = Tree.findFromIndexer(me, Tree.getPath(tree.zoom));
         }
     }
-    me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
     return me;
 };
 

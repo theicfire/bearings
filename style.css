@@ -13,6 +13,8 @@ h5 {
 div.editable {
     display: inline;
     margin-left: 5px;
+    border: 0;
+    outline: 0;
 }
 
 .togglable {
