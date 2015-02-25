@@ -252,17 +252,17 @@ render: function() {
     }
 
     return (
+        <div className="NodeWrapper">
         <div>
-        <h5>
         <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
-        <div contentEditable
+        <div className="editable" contentEditable
             ref="input"
             onKeyDown={this.handleKeyDown}
             onInput={this.handleChange}
             onClick={this.handleClick}
             dangerouslySetInnerHTML={{__html: this.props.node.title}}>
         </div>
-        </h5>
+        </div>
         <TreeChildren style={style} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
         </div>
     );

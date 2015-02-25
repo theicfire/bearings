@@ -6,23 +6,22 @@ h3 {
   color: #BF616A;
 }
 
+h5 {
+    font-weight: normal;
+}
+
+div.editable {
+    display: inline;
+    margin-left: 5px;
+}
+
 .togglable {
   color: blue;
   cursor: pointer;
 }
 
-
-.dot {
-    font-size: 20px;
-    position: relative;
-    top: -3px;
-    margin-right: 5px;
-    float: left;
-}
-
 .dot-collapsed {
-  font-size: 30px;
-    top: -9px;
+    color: red;
 }
 
 .text {
