@@ -5,23 +5,6 @@ var Tree = require('./lib/Tree');
 var Parse = require('parse').Parse;
 Parse.initialize("R7ngCzUNFlUFW2jZO90HfG7Pgr8Roa0dgIsFknNJ", "hvTrWozZrInn3qmEuE2zlscYBNRwUWjkndcIwIOL");
 
-//var startTree =
-  //[{title: "howdy", selected: "true", caretLoc: 0,
-      //childNodes: [
-        //{title: "billy"},
-        //{title: "suzie", childNodes: [
-          //{title: "puppy", childNodes: [
-            //{title: "dog house"}
-          //]},
-          //{title: "cherry thing"}
-        //]}
-    //]}];
-  ////for (var i = 0; i < 10000; i++) {
-      ////startTree.push({title: "oh baby"});
-  ////}
-  //startTree.push({title: "the end"});
-
-//var tree = Tree.makeTree(startTree);
 
 var TestObject = Parse.Object.extend("TestObject");
 var query = new Parse.Query(TestObject);

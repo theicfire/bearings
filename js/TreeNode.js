@@ -9,6 +9,34 @@ var globalTree;
 var globalParseTree;
 var globalUndoRing;
 
+var ResetButton = React.createClass({
+    render: function() {
+        return (<a href="#" onClick={this.handleClick}>Reset</a>);
+    },
+    handleClick: function(e) {
+        console.log('reset');
+        var rawStartTree =
+          [{title: "howdy", selected: "true", caretLoc: 0,
+              childNodes: [
+                {title: "billy"},
+                {title: "suzie", childNodes: [
+                  {title: "puppy", childNodes: [
+                    {title: "dog house"}
+                  ]},
+                  {title: "cherry thing"}
+                ]}
+            ]}];
+        //for (var i = 0; i < 10000; i++) {
+          //startTree.push({title: "oh baby"});
+        //}
+        rawStartTree.push({title: "the end"});
+
+        globalTree = Tree.makeTree(rawStartTree);
+        renderAll();
+        e.preventDefault();
+    }
+});
+
 var TreeChildren = React.createClass({
 render: function() {
     var childNodes;
@@ -249,6 +277,10 @@ var startRender = function(parseTree) {
     var newTree = Tree.clone(globalTree);
     globalUndoRing = new UndoRing(newTree, 50);
     renderAll();
+    React.render(
+      <ResetButton/>,
+      document.getElementById("reset-button")
+    );
 }
 
 function renderAll() {
