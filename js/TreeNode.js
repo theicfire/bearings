@@ -8,6 +8,7 @@ var UndoRing = require('./lib/UndoRing');
 var globalTree;
 var globalParseTree;
 var globalUndoRing;
+var globalDataSaved = false;
 
 var ResetButton = React.createClass({
     render: function() {
@@ -281,15 +282,22 @@ var startRender = function(parseTree) {
       <ResetButton/>,
       document.getElementById("reset-button")
     );
+
+    setInterval(function () {
+        if (!globalDataSaved) {
+            globalParseTree.set('tree', Tree.toString(globalTree));
+            globalParseTree.save();
+            globalDataSaved = true;
+        }
+    }, 2000);
 }
+
 
 function renderAll() {
     // TODO speedup by removing clone. I might not need to clone. What this does is allow us to
     // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
     // may be slow.
-    globalParseTree.set('tree', Tree.toString(globalTree));
-    globalParseTree.save();
     var newTree = Tree.clone(globalTree);
     globalUndoRing.add(newTree);
     doRender(newTree);
@@ -302,6 +310,7 @@ function renderAllNoUndo() {
 
 function doRender(tree) {
     console.log('rendering with', Tree.toString(tree));
+    globalDataSaved = false;
     //console.log('rendering with obj', tree);
     if (tree.zoom !== undefined) {
         React.render(
