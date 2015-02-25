@@ -72,28 +72,32 @@ Tree.makeNode = function(args) {
     return ret;
 };
 
-Tree.clone = function(tree, noparent) {
-    return Tree.cloneGeneral(tree, null, false);
+Tree.clone = function(tree) {
+    return Tree.cloneGeneral(tree, null, {noparent: false, nomouse: false});
 };
 
 Tree.cloneNoParent = function(tree) {
-    return Tree.cloneGeneral(tree, null, true);
+    return Tree.cloneGeneral(tree, null, {noparent: true, nomouse: false});
 };
 
-Tree.cloneGeneral = function(tree, parent, noparent) {
+Tree.cloneNoParentNoCursor = function(tree) {
+    return Tree.cloneGeneral(tree, null, {noparent: true, nomouse: true});
+};
+
+Tree.cloneGeneral = function(tree, parent, options) {
     var me = Tree.makeNode({
             title: tree.title,
-            parent: !!noparent ? undefined : parent,
-            caretLoc: tree.caretLoc,
-            selected: tree.selected,
+            parent: !!options.noparent ? undefined : parent,
+            caretLoc: !!options.nomouse ? undefined : tree.caretLoc,
+            selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed});
-    if (!noparent) {
+    if (!options.noparent) {
         if (tree.zoom) {
             // me.zoom = tree.zoom is wrong! That will set the pointer to the wrong tree.
             me.zoom = Tree.findFromIndexer(me, Tree.getPath(tree.zoom));
         }
     }
-    me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, noparent)});
+    me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
     return me;
 };
 

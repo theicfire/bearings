@@ -6,6 +6,7 @@ var _ = require('underscore');
 var UndoRing = require('./lib/UndoRing');
 
 var globalTree;
+var globalOldTree;
 var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = false;
@@ -300,7 +301,10 @@ function renderAll() {
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
     // may be slow.
     var newTree = Tree.clone(globalTree);
-    globalUndoRing.addPending(newTree);
+    if (!_.isEqual(globalOldTree, Tree.cloneNoParentNoCursor(globalTree))) {
+        globalUndoRing.addPending(newTree);
+        globalOldTree = Tree.cloneNoParentNoCursor(globalTree);
+    }
     doRender(newTree);
 };
 
