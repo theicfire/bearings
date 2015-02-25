@@ -32,6 +32,9 @@ UndoRing.prototype.undo = function() {
 }
 
 UndoRing.prototype.redo = function() {
+    if (this.pending) {
+        this.commit();
+    }
     if (this.current == this.start) {
         return this.ring[this.current];
     }
