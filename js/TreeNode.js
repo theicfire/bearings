@@ -6,6 +6,7 @@ var _ = require('underscore');
 var UndoRing = require('./lib/UndoRing');
 
 var globalTree;
+var globalParseTree;
 var globalUndoRing;
 
 var TreeChildren = React.createClass({
@@ -242,8 +243,9 @@ toggle: function() {
 }
 });
 
-var startRender = function(tree) {
-    globalTree = tree;
+var startRender = function(parseTree) {
+    globalTree = Tree.fromString(parseTree.get('tree'));
+    globalParseTree = parseTree;
     var newTree = Tree.clone(globalTree);
     globalUndoRing = new UndoRing(newTree, 50);
     renderAll();
@@ -254,6 +256,8 @@ function renderAll() {
     // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
     // may be slow.
+    globalParseTree.set('tree', Tree.toString(globalTree));
+    globalParseTree.save();
     var newTree = Tree.clone(globalTree);
     globalUndoRing.add(newTree);
     doRender(newTree);
