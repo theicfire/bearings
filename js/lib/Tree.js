@@ -86,8 +86,13 @@ Tree.cloneGeneral = function(tree, parent, noparent) {
             parent: !!noparent ? undefined : parent,
             caretLoc: tree.caretLoc,
             selected: tree.selected,
-            zoom: !!noparent ? undefined : tree.zoom,
             collapsed: tree.collapsed});
+    if (!noparent) {
+        if (tree.zoom) {
+            // me.zoom = tree.zoom is wrong! That will set the pointer to the wrong tree.
+            me.zoom = Tree.findFromIndexer(me, Tree.getPath(tree.zoom));
+        }
+    }
     me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, noparent)});
     return me;
 };
@@ -351,6 +356,9 @@ Tree.makeSubTree = function(node, parent) {
 };
 
 Tree.findFromIndexer = function(tree, indexer) {
+    if (indexer.length <= 1) {
+        return tree;
+    }
     var parts = indexer.substr(1).split('-');
     for (var i = 0; i < parts.length; i++) {
         tree = tree.childNodes[parts[i]];
