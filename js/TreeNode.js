@@ -103,6 +103,8 @@ handleKeyDown: function(e) {
         BACKSPACE: 8,
         Z: 90,
         Y: 89,
+        END: 35,
+        HOME: 36,
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
         if (e.altKey) {
@@ -123,6 +125,15 @@ handleKeyDown: function(e) {
                 currentNode.caretLoc = newCaretLoc - 1;
             }
         }
+    } else if (e.keyCode === KEYS.END && e.ctrlKey) {
+        Tree.selectLastNode(globalTree);
+        renderAll();
+        e.preventDefault();
+    } else if (e.keyCode === KEYS.HOME && e.ctrlKey) {
+        console.log('first!');
+        Tree.selectFirstNode(globalTree);
+        renderAll();
+        e.preventDefault();
     } else if (e.keyCode === KEYS.UP) {
         if (e.shiftKey && e.altKey) {
             console.log('shift up');

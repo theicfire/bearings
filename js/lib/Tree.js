@@ -21,6 +21,23 @@ Tree.selectPreviousNode = function(tree) {
     }
 };
 
+Tree.selectLastNode = function(tree) {
+    var root = Tree.getRoot(tree);
+    var last = Tree.findDeepest(root.childNodes[root.childNodes.length - 1]);
+    var selected = Tree.findSelected(tree);
+    delete selected.selected;
+    last.selected = true;
+    last.caretLoc = last.title.length;
+};
+
+Tree.selectFirstNode = function(tree) {
+    var root = Tree.getRoot(tree);
+    var selected = Tree.findSelected(tree);
+    delete selected.selected;
+    root.childNodes[0].selected = true;
+    root.childNodes[0].caretLoc = 0;
+};
+
 Tree.appendSibling = function(tree, title) {
     var i;
     for (i = 0; i < tree.parent.childNodes.length; i++) {
