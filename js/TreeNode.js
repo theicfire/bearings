@@ -108,7 +108,6 @@ handleKeyDown: function(e) {
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
         if (e.altKey) {
-            console.log('zoom up!');
             Tree.zoomOutOne(globalTree);
             renderAll();
             e.preventDefault();
@@ -130,16 +129,13 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.HOME && e.ctrlKey) {
-        console.log('first!');
         Tree.selectFirstNode(globalTree);
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.UP) {
         if (e.shiftKey && e.altKey) {
-            console.log('shift up');
             Tree.shiftUp(globalTree);
         } else {
-            console.log('up');
             Tree.selectPreviousNode(globalTree);
             Tree.findSelected(globalTree).caretLoc = 0; // TODO could be faster
         }
