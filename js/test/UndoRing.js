@@ -22,14 +22,18 @@ describe('UndoRing', function(){
             assert.equal(0, ring.start);
             assert.equal(0, ring.end);
 
-            ring.add(5);
+            ring.addPending(5);
+            ring.commit();
             assert(_.isEqual([0, 5, 2, 3], ring.ring));
             assert.equal(1, ring.start);
             assert.equal(0, ring.end);
 
-            ring.add(6);
-            ring.add(7);
-            ring.add(8);
+            ring.addPending(6);
+            ring.commit();
+            ring.addPending(7);
+            ring.commit();
+            ring.addPending(8);
+            ring.commit();
             assert(_.isEqual([8, 5, 6, 7], ring.ring));
             assert.equal(0, ring.start);
             assert.equal(1, ring.end);
@@ -42,30 +46,37 @@ describe('UndoRing', function(){
     describe('undoredo', function(){
         it('undoredo', function(){
             var ring = new UndoRing(0, 4);
-            ring.add(5);
-            ring.add(6);
-            ring.add(7);
-            ring.add(8);
+            ring.addPending(5);
+            ring.commit();
+            ring.addPending(6);
+            ring.commit();
+            ring.addPending(7);
+            ring.commit();
+            ring.addPending(8);
+            ring.commit();
             assert.equal(7, ring.undo());
             assert.equal(6, ring.undo());
             assert.equal(5, ring.undo());
             assert.equal(5, ring.undo());
             assert.equal(6, ring.redo());
 
-            ring.add(10);
+            ring.addPending(10);
+            ring.commit();
             assert.equal(6, ring.undo());
             assert.equal(5, ring.undo());
             assert.equal(6, ring.redo());
             assert.equal(10, ring.redo());
             assert.equal(10, ring.redo());
 
-            ring.add(11);
+            ring.addPending(11);
+            ring.commit();
             assert.equal(10, ring.undo());
             assert.equal(6, ring.undo());
             assert.equal(5, ring.undo());
             assert.equal(5, ring.undo());
 
-            ring.add(12);
+            ring.addPending(12);
+            ring.commit();
             assert.equal(5, ring.undo());
             assert.equal(5, ring.undo());
         })
@@ -76,7 +87,8 @@ describe('UndoRing', function(){
     describe('undoredo', function(){
         it('undoredo', function(){
             var ring = new UndoRing(0, 4);
-            ring.add(5);
+            ring.addPending(5);
+            ring.commit();
             assert.equal(0, ring.undo());
             assert.equal(0, ring.undo());
         })

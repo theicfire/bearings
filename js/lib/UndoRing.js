@@ -10,6 +10,7 @@ function UndoRing(obj, length) {
     this.start = 0;
     this.end = 0;
     this.current = 0;
+    this.pending = null;
 }
 
 //UndoRing.prototype.printCurrent = function() {
@@ -20,6 +21,9 @@ function UndoRing(obj, length) {
 //};
 
 UndoRing.prototype.undo = function() {
+    if (this.pending) {
+        this.commit();
+    }
     if (this.current == this.end) {
         return this.ring[this.current];
     }
@@ -36,13 +40,21 @@ UndoRing.prototype.redo = function() {
 
 }
 
-UndoRing.prototype.add = function(obj) {
-    this.start = this.current;
-    if (this.bufferFull()) {
-        this._pop();
+UndoRing.prototype.addPending = function(obj) {
+    this.pending = obj;
+}
+
+UndoRing.prototype.commit = function() {
+    if (this.pending) {
+        this.start = this.current;
+        if (this.bufferFull()) {
+            this._pop();
+        }
+        this.current = this.start = (this.start + 1) % this.length;
+        this.ring[this.start] = this.pending;
+
+        this.pending = null;
     }
-    this.current = this.start = (this.start + 1) % this.length;
-    this.ring[this.start] = obj;
 }
 
 UndoRing.prototype._pop = function() {

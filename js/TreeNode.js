@@ -289,6 +289,7 @@ var startRender = function(parseTree) {
             globalParseTree.save();
             globalDataSaved = true;
         }
+        globalUndoRing.commit();
     }, 2000);
 }
 
@@ -299,7 +300,7 @@ function renderAll() {
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
     // may be slow.
     var newTree = Tree.clone(globalTree);
-    globalUndoRing.add(newTree);
+    globalUndoRing.addPending(newTree);
     doRender(newTree);
 };
 
