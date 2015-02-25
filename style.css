@@ -1,5 +1,5 @@
 body {
-  font-family: "Helvetica Neue";
+  font-family: 'Helvetica Neue', Arial, Sans-serif;
 }
 
 h3 {
@@ -8,6 +8,10 @@ h3 {
 
 h5 {
     font-weight: normal;
+}
+
+div.node-direct-wrapper {
+    line-height: 20px;
 }
 
 div.editable {

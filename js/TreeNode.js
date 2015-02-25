@@ -252,8 +252,8 @@ render: function() {
     }
 
     return (
-        <div className="NodeWrapper">
-        <div>
+        <div className="node-wrapper">
+        <div className="node-direct-wrapper">
         <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
         <div className="editable" contentEditable
             ref="input"
