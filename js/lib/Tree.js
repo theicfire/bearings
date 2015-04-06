@@ -223,6 +223,15 @@ Tree.getRoot = function(tree) {
     return Tree.getRoot(tree.parent);
 };
 
+Tree.getBreadcrumb = function(tree) {
+    if (tree.title === 'special_root_title' || tree.parent.title === 'special_root_title') {
+        return [];
+    }
+    ret.append(Tree.getBreadcrumb(tree.parent));
+    ret.append(tree.parent);
+    return ret;
+}
+
 Tree.zoom = function(tree) {
     if (!tree) {
         console.log('cannot zoom that high!');
@@ -326,7 +335,6 @@ Tree.findPreviousNode = function(tree) {
     if (!tree || !tree.parent) {
         return null;
     }
-    console.log('find previous of', tree);
     var root = Tree.getRoot(tree);
     if (root.zoom === tree) {
         return;
@@ -397,4 +405,8 @@ Tree.fromString = function(s) {
     var ret = Tree.makeSubTree(obj, null);
     ret.zoom = ret;
     return ret;
+};
+
+Tree.equals = function(one, two) {
+    return Tree.toString(one) === Tree.toString(two);
 };
