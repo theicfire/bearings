@@ -285,74 +285,82 @@ it('testSelectNextNode', function() {
     console.assert(_.isEqual(tree, treeNext));
 });
 
-it('testSelectAndNextReverse', function() {
-    var tree = [{
-      title: "howdy",
-      childNodes: [
-        {title: "bobby", selected: "true"},
-        {title: "suzie", childNodes: [
-          {title: "puppy", childNodes: [
-            {title: "dog house"}
-          ]},
-          {title: "cherry thing"}
-        ]}
-      ]
-    }];
-    selected = Tree.findSelected(Tree.makeTree(tree));
-    next = Tree.findPreviousNode(selected);
-    assert.equal(selected.title, 'bobby');
-    assert.equal(next.title, 'howdy');
+describe('testSelectAndNextReverse', function() {
+    it('one', function() {
+        var tree = [{
+          title: "howdy",
+          childNodes: [
+            {title: "bobby", selected: "true"},
+            {title: "suzie", childNodes: [
+              {title: "puppy", childNodes: [
+                {title: "dog house"}
+              ]},
+              {title: "cherry thing"}
+            ]}
+          ]
+        }];
+        selected = Tree.findSelected(Tree.makeTree(tree));
+        next = Tree.findPreviousNode(selected);
+        assert.equal(selected.title, 'bobby');
+        assert.equal(next.title, 'howdy');
+    });
 
-    var treeNext = [{
-      title: "howdy",
-      childNodes: [
-        {title: "bobby"},
-        {title: "suzie", selected: true, childNodes: [
-          {title: "puppy", childNodes: [
-            {title: "dog house"}
-          ]},
-          {title: "cherry thing"}
-        ]}
-      ]
-    }];
-    selected = Tree.findSelected(Tree.makeTree(treeNext));
-    next = Tree.findPreviousNode(selected);
-    assert.equal(selected.title, 'suzie');
-    assert.equal(next.title, 'bobby');
+    it('two', function() {
+        var treeNext = [{
+          title: "howdy",
+          childNodes: [
+            {title: "bobby"},
+            {title: "suzie", selected: true, childNodes: [
+              {title: "puppy", childNodes: [
+                {title: "dog house"}
+              ]},
+              {title: "cherry thing"}
+            ]}
+          ]
+        }];
+        selected = Tree.findSelected(Tree.makeTree(treeNext));
+        next = Tree.findPreviousNode(selected);
+        assert.equal(selected.title, 'suzie');
+        assert.equal(next.title, 'bobby');
+    });
 
-    var treeNext2 = [{
-      title: "howdy", selected: true,
-      childNodes: [
-        {title: "bobby"},
-        {title: "suzie", childNodes: [
-          {title: "puppy", childNodes: [
-            {title: "dog"}
-          ]},
-          {title: "cherry"}
-        ]}
-      ]
-    }];
-    selected = Tree.findSelected(Tree.makeTree(treeNext2));
-    next = Tree.findPreviousNode(selected);
-    assert.equal(selected.title, 'howdy');
-    assert.equal(next, null);
+    it('three', function() {
+        var treeNext2 = [{
+          title: "howdy", selected: true,
+          childNodes: [
+            {title: "bobby"},
+            {title: "suzie", childNodes: [
+              {title: "puppy", childNodes: [
+                {title: "dog"}
+              ]},
+              {title: "cherry"}
+            ]}
+          ]
+        }];
+        selected = Tree.findSelected(Tree.makeTree(treeNext2));
+        next = Tree.findPreviousNode(selected);
+        assert.equal(selected.title, 'howdy');
+        assert.equal(next, null);
+    });
 
-    var treeNext3 = [{
-      title: "howdy",
-      childNodes: [
-        {title: "bobby"},
-        {title: "suzie", childNodes: [
-          {title: "puppy", childNodes: [
-            {title: "dog"}
-          ]},
-          {title: "cherry", selected: true,}
-        ]}
-      ]
-    }];
-    selected = Tree.findSelected(Tree.makeTree(treeNext3));
-    next = Tree.findPreviousNode(selected);
-    assert.equal(selected.title, 'cherry');
-    assert.equal(next.title, 'dog');
+    it('four', function() {
+        var treeNext3 = [{
+          title: "howdy",
+          childNodes: [
+            {title: "bobby"},
+            {title: "suzie", childNodes: [
+              {title: "puppy", childNodes: [
+                {title: "dog"}
+              ]},
+              {title: "cherry", selected: true,}
+            ]}
+          ]
+        }];
+        selected = Tree.findSelected(Tree.makeTree(treeNext3));
+        next = Tree.findPreviousNode(selected);
+        assert.equal(selected.title, 'cherry');
+        assert.equal(next.title, 'dog');
+    });
 });
 
 it('testSelectNext', function() {
