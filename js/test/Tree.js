@@ -285,8 +285,8 @@ it('testSelectNextNode', function() {
     console.assert(_.isEqual(tree, treeNext));
 });
 
-describe('testSelectAndNextReverse', function() {
-    it('one', function() {
+describe('Looking for the previous node of some selected node (findPreviousNode)', function() {
+    it('If you have no siblings above you, the previous node is the parent', function() {
         var tree = [{
           title: "howdy",
           childNodes: [
@@ -305,7 +305,7 @@ describe('testSelectAndNextReverse', function() {
         assert.equal(next.title, 'howdy');
     });
 
-    it('two', function() {
+    it('If you have a sibling above you, that is the previous node', function() {
         var treeNext = [{
           title: "howdy",
           childNodes: [
@@ -324,7 +324,7 @@ describe('testSelectAndNextReverse', function() {
         assert.equal(next.title, 'bobby');
     });
 
-    it('three', function() {
+    it('If there are no siblings above you and you have no parent, the previous node is... null', function() {
         var treeNext2 = [{
           title: "howdy", selected: true,
           childNodes: [
