@@ -55,7 +55,7 @@ it('If there is a sibling above the current line and backspace is pressed at the
     assert(Tree.equals(tree, newTree));
 });
 
-it('testClone', function() {
+it('clone', function() {
     var tree = Tree.makeTree([
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
@@ -66,7 +66,7 @@ it('testClone', function() {
     assert(Tree.equals(tree, Tree.clone(tree)));
 });
 
-describe('testIndent', function() {
+describe('indent', function() {
     it('one', function() {
         var tree = Tree.makeTree([
             {title: "suzie", childNodes: [
