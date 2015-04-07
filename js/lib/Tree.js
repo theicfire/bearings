@@ -81,7 +81,7 @@ Tree.makeNode = function(args) {
     var ret = {};
     Tree.setIfReal(ret, args, 'title');
     Tree.setIfReal(ret, args, 'childNodes', []);
-    Tree.setIfReal(ret, args, 'parent', null);
+    Tree.setIfReal(ret, args, 'parent');
     Tree.setIfReal(ret, args, 'caretLoc');
     Tree.setIfReal(ret, args, 'selected');
     Tree.setIfReal(ret, args, 'collapsed');
