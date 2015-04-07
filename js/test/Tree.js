@@ -1,6 +1,7 @@
 var assert = require("assert");
 var _ = require("underscore");
 var Tree = require('../lib/Tree');
+var multiline = require('multiline');
 
 it('toString and fromString should be opposites', function(){
     var startTree =
@@ -324,6 +325,7 @@ describe('Looking for the previous node of some selected node (findPreviousNode)
         assert.equal(next.title, 'bobby');
     });
 
+    // TODO this is not symetric with getNextNode. getNextNode never returns null.
     it('If there are no siblings above you and you have no parent, the previous node is... null', function() {
         var treeNext2 = [{
           title: "howdy", selected: true,
@@ -402,4 +404,49 @@ it('testPath', function() {
     var innerTree2 = Tree.makeTree(tree).childNodes[0].childNodes[0];
     assert.equal(Tree.getPath(innerTree), '-0-1-0-0');
     assert.equal(Tree.getPath(innerTree2), '-0');
+});
+
+it('deleteSelected', function() {
+    var tree = Tree.fromString(multiline(function(){/*
+    {
+        "title": "special_root_title",
+        "childNodes": [
+            {
+                "title": "howdy",
+                "childNodes": [
+                    {
+                        "title": "billy"
+                    },
+                    {
+                        "title": "suzie",
+                        "childNodes": [
+                            {
+                                "title": "cherry thing"
+                            }
+                        ]
+                    }
+                ],
+                "selected": true
+            },
+            {
+                "title": "the end"
+            }
+        ]
+    }
+    */}));
+
+    var after = Tree.fromString(multiline(function() {/*
+    {
+        "title": "special_root_title",
+        "childNodes": [
+            {
+                "title": "the end",
+                "selected": true
+            }
+        ]
+    }
+    */}));
+
+    Tree.deleteSelected(tree);
+    assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
 });

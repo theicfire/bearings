@@ -24,6 +24,7 @@
   "homepage": "https://github.com/theicfire/workclone",
   "dependencies": {
     "jquery": "^2.1.3",
+    "multiline": "^1.0.2",
     "parse": "^1.3.5",
     "react": "^0.12.2",
     "underscore": "^1.7.0"

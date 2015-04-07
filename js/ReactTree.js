@@ -103,6 +103,7 @@ handleKeyDown: function(e) {
         BACKSPACE: 8,
         Z: 90,
         Y: 89,
+        S: 83,
         END: 35,
         HOME: 36,
         SPACE: 32};
@@ -209,6 +210,10 @@ handleKeyDown: function(e) {
     } else if (e.keyCode === KEYS.Y && e.ctrlKey) {
         globalTree = Tree.clone(globalUndoRing.redo());
         renderAllNoUndo();
+        e.preventDefault();
+    } else if (e.keyCode === KEYS.S && e.ctrlKey) {
+        console.log('ctrl s');
+        console.log(JSON.stringify(Tree.cloneNoParentClean(globalTree), null, 4));
         e.preventDefault();
     } else {
         console.log(e.keyCode);

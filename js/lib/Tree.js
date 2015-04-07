@@ -101,14 +101,22 @@ Tree.cloneNoParentNoCursor = function(tree) {
     return Tree.cloneGeneral(tree, null, {noparent: true, nomouse: true});
 };
 
+Tree.cloneNoParentClean = function(tree) {
+    return Tree.cloneGeneral(tree, null, {noparent: true, nomouse: false, clean: true});
+};
+
 Tree.cloneGeneral = function(tree, parent, options) {
     var me = Tree.makeNode({
             title: tree.title,
             parent: !!options.noparent ? undefined : parent,
-            caretLoc: !!options.nomouse ? undefined : tree.caretLoc,
+            caretLoc: (!!options.nomouse || !!options.clean) ? undefined : tree.caretLoc,
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed});
-    me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
+    if (tree.childNodes.length > 0 || !options.clean) {
+        me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
+    } else {
+        me.childNodes = undefined;
+    }
     if (!options.noparent) {
         if (tree.zoom) {
             // me.zoom = tree.zoom is wrong! That will set the pointer to the wrong tree.
@@ -397,6 +405,11 @@ Tree.findFromIndexer = function(tree, indexer) {
 
 Tree.toString = function(tree) {
     tree = Tree.cloneNoParent(tree);
+    return JSON.stringify(tree);
+};
+
+Tree.toStringClean = function(tree) {
+    tree = Tree.cloneNoParentClean(tree);
     return JSON.stringify(tree);
 };
 
