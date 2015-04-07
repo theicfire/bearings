@@ -494,3 +494,40 @@ describe('deleteSelected', function() {
         assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
 });
+
+describe('shiftUp', function() {
+    it('one', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "howdy"
+        },
+        {
+            "title": "billy",
+            "selected": true
+        }
+    ]
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "billy",
+            "selected": true
+        },
+        {
+            "title": "howdy"
+        }
+    ]
+}
+        */}));
+        Tree.shiftUp(before);
+
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+});
