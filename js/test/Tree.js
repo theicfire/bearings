@@ -496,7 +496,7 @@ describe('deleteSelected', function() {
 });
 
 describe('shiftUp', function() {
-    it('one', function() {
+    it('regular', function() {
         var before = Tree.fromString(multiline(function(){/*
 {
     "title": "special_root_title",
@@ -519,6 +519,84 @@ describe('shiftUp', function() {
         {
             "title": "billy",
             "selected": true
+        },
+        {
+            "title": "howdy"
+        }
+    ]
+}
+        */}));
+        Tree.shiftUp(before);
+
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+    it('moving an item up that\'s already at the top does nothing', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "billy",
+            "selected": true
+        },
+        {
+            "title": "howdy"
+        }
+    ]
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "billy",
+            "selected": true
+        },
+        {
+            "title": "howdy"
+        }
+    ]
+}
+        */}));
+        Tree.shiftUp(before);
+
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+    it('Moving a single child up does nothing', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "billy",
+            "childNodes": [
+                {
+                    "title": "cool child",
+                    "selected": true
+                }
+            ]
+        },
+        {
+            "title": "howdy"
+        }
+    ]
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "billy",
+            "childNodes": [
+                {
+                    "title": "cool child",
+                    "selected": true
+                }
+            ]
         },
         {
             "title": "howdy"
