@@ -2,14 +2,11 @@ var assert = require("assert");
 var _ = require("underscore");
 var UndoRing = require('../lib/UndoRing');
 
-describe('Initialize', function(){
-    it('Length of buffer should be 10', function(){
+describe('undoredo', function(){
+    it('Length of buffer should be initialized to 10', function(){
         var ring = new UndoRing(0, 10);
         assert.equal(10, ring.length);
     })
-})
-
-describe('more', function(){
     it('blah', function(){
         var ring = new UndoRing(0, 4);
         assert.equal(ring.ring[0], 0);
@@ -35,10 +32,6 @@ describe('more', function(){
         assert.equal(0, ring.start);
         assert.equal(1, ring.end);
     })
-})
-
-
-describe('undoredo', function(){
     it('undoredo', function(){
         var ring = new UndoRing(0, 4);
         ring.addPending(5);
@@ -75,9 +68,6 @@ describe('undoredo', function(){
         assert.equal(5, ring.undo());
         assert.equal(5, ring.undo());
     })
-})
-
-describe('undoredo', function(){
     it('undoredo', function(){
         var ring = new UndoRing(0, 4);
         ring.addPending(5);
