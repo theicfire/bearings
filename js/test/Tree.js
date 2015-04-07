@@ -690,3 +690,44 @@ describe('shiftDown', function() {
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });
+
+
+describe('selectPreviousNode', function() {
+    it('regular', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "howdy"
+        },
+        {
+            "title": "billy",
+            "selected": true
+        }
+    ]
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "howdy",
+            "selected": true
+        },
+        {
+            "title": "billy"
+        }
+    ]
+}
+        */}));
+        Tree.selectPreviousNode(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+
+        // Doesn't change the second time
+        Tree.selectPreviousNode(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+});
