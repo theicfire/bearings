@@ -451,4 +451,46 @@ describe('deleteSelected', function() {
         Tree.deleteSelected(tree);
         assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
+
+    it('deleting the last item works', function() {
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+            "title": "special_root_title",
+            "childNodes": [
+                {
+                    "title": "howdy",
+                    "childNodes": [
+                        {
+                            "title": "billy"
+                        }
+                    ]
+                },
+                {
+                    "title": "the end",
+                    "selected": true
+                }
+            ]
+        }
+
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+        {
+            "title": "special_root_title",
+            "childNodes": [
+                {
+                    "title": "howdy",
+                    "childNodes": [
+                        {
+                            "title": "billy",
+                            "selected": true
+                        }
+                    ]
+                }
+            ]
+        }
+        */}));
+        Tree.deleteSelected(tree);
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+    });
 });
