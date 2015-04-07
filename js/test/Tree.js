@@ -608,4 +608,48 @@ describe('shiftUp', function() {
 
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
+    it('Shifting up over items with children', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "billy",
+            "childNodes": [
+                {
+                    "title": "cool child"
+                }
+            ]
+        },
+        {
+            "title": "howdy",
+            "selected": true
+        }
+    ]
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "howdy",
+            "selected": true
+        },
+        {
+            "title": "billy",
+            "childNodes": [
+                {
+                    "title": "cool child"
+                }
+            ]
+        }
+    ]
+}
+        */}));
+        Tree.shiftUp(before);
+
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
 });
