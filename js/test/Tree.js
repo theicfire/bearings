@@ -653,3 +653,40 @@ describe('shiftUp', function() {
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });
+
+describe('shiftDown', function() {
+    it('regular', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "billy",
+            "selected": true
+        },
+        {
+            "title": "howdy"
+        }
+    ]
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "howdy"
+        },
+        {
+            "title": "billy",
+            "selected": true
+        }
+    ]
+}
+        */}));
+        Tree.shiftDown(before);
+
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+});
