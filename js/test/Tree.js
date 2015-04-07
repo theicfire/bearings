@@ -406,47 +406,49 @@ it('testPath', function() {
     assert.equal(Tree.getPath(innerTree2), '-0');
 });
 
-it('deleteSelected', function() {
-    var tree = Tree.fromString(multiline(function(){/*
-    {
-        "title": "special_root_title",
-        "childNodes": [
-            {
-                "title": "howdy",
-                "childNodes": [
-                    {
-                        "title": "billy"
-                    },
-                    {
-                        "title": "suzie",
-                        "childNodes": [
-                            {
-                                "title": "cherry thing"
-                            }
-                        ]
-                    }
-                ],
-                "selected": true
-            },
-            {
-                "title": "the end"
-            }
-        ]
-    }
-    */}));
+describe('deleteSelected', function() {
+    it('deleting an item with children should kill the children', function() {
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+            "title": "special_root_title",
+            "childNodes": [
+                {
+                    "title": "howdy",
+                    "childNodes": [
+                        {
+                            "title": "billy"
+                        },
+                        {
+                            "title": "suzie",
+                            "childNodes": [
+                                {
+                                    "title": "cherry thing"
+                                }
+                            ]
+                        }
+                    ],
+                    "selected": true
+                },
+                {
+                    "title": "the end"
+                }
+            ]
+        }
+        */}));
 
-    var after = Tree.fromString(multiline(function() {/*
-    {
-        "title": "special_root_title",
-        "childNodes": [
-            {
-                "title": "the end",
-                "selected": true
-            }
-        ]
-    }
-    */}));
+        var after = Tree.fromString(multiline(function() {/*
+        {
+            "title": "special_root_title",
+            "childNodes": [
+                {
+                    "title": "the end",
+                    "selected": true
+                }
+            ]
+        }
+        */}));
 
-    Tree.deleteSelected(tree);
-    assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+        Tree.deleteSelected(tree);
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+    });
 });
