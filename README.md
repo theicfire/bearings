@@ -1,6 +1,6 @@
 # Installation
 ```sh
-$ num install
+$ npm install
 $ npm start
 (Open a new terminal)
 $ python -m SimpleHTTPServer`
