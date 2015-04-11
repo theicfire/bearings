@@ -421,6 +421,7 @@ Tree.fromString = function(s) {
     var obj = JSON.parse(s);
     var ret = Tree.makeSubTree(obj, null);
     // TODO there should always be a zoomPath
+    ret.zoomPath = obj.zoomPath;
     if (!ret.zoomPath) {
         ret.zoom = ret;
     } else {

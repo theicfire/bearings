@@ -297,9 +297,7 @@ var startRender = function(parseTree) {
     );
 
     setInterval(function () {
-        console.log('attempt save');
         if (!globalDataSaved) {
-            console.log('actual parse save');
             globalParseTree.set('tree', Tree.toString(globalTree));
             globalParseTree.save();
             globalDataSaved = true;
