@@ -77,7 +77,7 @@ Tree.newLineAtCursor = function(tree) {
         var nextNode = Tree.appendSibling(selected, textRest);
         Tree.setChildNodes(nextNode, selected.childNodes);
         Tree.setChildNodes(selected, []);
-        if (textStart.length > 0) {
+        if (textStart.length > 0 || (textStart.length === 0 && textRest.length === 0)) {
             delete selected.selected;
             delete selected.caretLoc;
             nextNode.selected = true;
@@ -307,7 +307,7 @@ Tree.deleteSelected = function(tree) {
     var childNum = Tree.findChildNum(selected);
     selected.parent.childNodes.splice(childNum, 1);
     nextSelection.selected = true;
-    nextSelection.caretLoc = 0;
+    nextSelection.caretLoc = nextSelection.title.length;
 };
 
 Tree.backspaceAtBeginning = function(tree) {
@@ -316,6 +316,9 @@ Tree.backspaceAtBeginning = function(tree) {
     console.assert(selected.caretLoc === 0);
     var previous = Tree.findPreviousNode(selected);
     if (!previous || previous === selected.parent) {
+        if (selected.title.length === 0) {
+            Tree.deleteSelected(tree);
+        }
         return;
     }
     var childNum = Tree.findChildNum(selected);
