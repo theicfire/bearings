@@ -51,21 +51,40 @@ Tree.appendSibling = function(tree, title) {
     return ret;
 };
 
+Tree.newChildAtCursor = function(selected) {
+    var ret = Tree.makeNode({title: '', parent: selected});
+    if (selected.childNodes) {
+        selected.childNodes.unshift(ret);
+    } else {
+        selected.childNodes = [ret];
+    }
+    delete selected.selected;
+    delete selected.caretLoc;
+    ret.selected = true;
+    ret.caretLoc = 0;
+};
+
 Tree.newLineAtCursor = function(tree) {
     var selected = Tree.findSelected(tree);
-    var start = selected.title.substr(0, selected.caretLoc);
-    var rest = selected.title.substr(selected.caretLoc);
-    selected.title = start;
-    var nextNode = Tree.appendSibling(selected, rest);
-    Tree.setChildNodes(nextNode, selected.childNodes);
-    Tree.setChildNodes(selected, []);
-    if (start.length > 0) {
-        delete selected.selected;
-        delete selected.caretLoc;
-        nextNode.selected = true;
-        selected = nextNode;
+    var root = Tree.getRoot(tree);
+    var textStart = selected.title.substr(0, selected.caretLoc);
+    var textRest = selected.title.substr(selected.caretLoc);
+    if (selected === root.zoom ||
+              (textRest.length === 0 && selected.childNodes.length > 0)) {
+        Tree.newChildAtCursor(selected);
+    } else {
+        selected.title = textStart;
+        var nextNode = Tree.appendSibling(selected, textRest);
+        Tree.setChildNodes(nextNode, selected.childNodes);
+        Tree.setChildNodes(selected, []);
+        if (textStart.length > 0) {
+            delete selected.selected;
+            delete selected.caretLoc;
+            nextNode.selected = true;
+            selected = nextNode;
+        }
+        selected.caretLoc = 0;
     }
-    selected.caretLoc = 0;
 };
 
 Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {

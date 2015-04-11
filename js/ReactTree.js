@@ -335,10 +335,11 @@ function renderAllNoUndo() {
 }
 
 function doRender(tree) {
-    console.log('rendering with', Tree.toString(tree));
+    //console.log('rendering with', Tree.toString(tree));
     globalDataSaved = false;
 
     // TODO should always have a zoom?
+    //<TreeChildren childNodes={tree.zoom.childNodes} indexer={Tree.getPath(tree.zoom)} />
     if (tree.zoom !== undefined) {
         React.render(
           <div>
