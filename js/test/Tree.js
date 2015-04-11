@@ -859,3 +859,57 @@ describe('selectNextNode', function() {
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });
+
+describe('selectLastNode', function() {
+    it('When zoomed in, the last node should be the last node of the zoomed in view', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "selected": true
+                },
+                {
+                    "title": "three"
+                }
+            ]
+        },
+        {
+            "title": "four"
+        }
+    ],
+    "zoomPath": "-0"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two"
+                },
+                {
+                    "title": "three",
+                    "selected": true
+                }
+            ]
+        },
+        {
+            "title": "four"
+        }
+    ],
+    "zoomPath": "-0"
+}
+        */}));
+        Tree.selectLastNode(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+});

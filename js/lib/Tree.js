@@ -24,7 +24,7 @@ Tree.selectPreviousNode = function(tree) {
 // TODO shouldn't this be the last node of the current zoom?
 Tree.selectLastNode = function(tree) {
     var root = Tree.getRoot(tree);
-    var last = Tree.findDeepest(root.childNodes[root.childNodes.length - 1]);
+    var last = Tree.findDeepest(tree.zoom.childNodes[tree.zoom.childNodes.length - 1]);
     var selected = Tree.findSelected(tree);
     delete selected.selected;
     last.selected = true;
