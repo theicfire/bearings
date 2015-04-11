@@ -236,13 +236,16 @@ Tree.getRoot = function(tree) {
     return Tree.getRoot(tree.parent);
 };
 
-// TODO actually implement..
-Tree.getBreadcrumb = function(tree) {
-    if (tree.title === 'special_root_title' || tree.parent.title === 'special_root_title') {
+Tree.getBreadcrumb = function(root) {
+    return Tree.getBreadcrumbInner(root.zoom.parent);
+};
+
+Tree.getBreadcrumbInner = function(tree) {
+    if (tree.title === 'special_root_title') {
         return [];
     }
-    ret.append(Tree.getBreadcrumb(tree.parent));
-    ret.append(tree.parent);
+    var ret = Tree.getBreadcrumbInner(tree.parent);
+    ret.push(tree.title);
     return ret;
 }
 

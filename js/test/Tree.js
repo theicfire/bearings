@@ -1007,3 +1007,34 @@ describe('unindent', function() {
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });
+
+
+describe('breadcrumb', function() {
+    it('regular', function() {
+        var tree = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "selected": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "zoomPath": "-0-0-0"
+}
+        */}));
+
+        var root = tree;
+        assert.deepEqual(Tree.getBreadcrumb(root), ['one', 'two']);
+    });
+});
