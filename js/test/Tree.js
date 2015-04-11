@@ -256,36 +256,6 @@ describe('findSelected and findNextNode', function() {
     });
 });
 
-it('testSelectNextNode', function() {
-    var tree = Tree.makeTree([{
-      title: "howdy",
-      childNodes: [
-        {title: "bobby", selected: "true"},
-        {title: "suzie", childNodes: [
-          {title: "puppy", childNodes: [
-            {title: "dog house"}
-          ]},
-          {title: "cherry thing"}
-        ]}
-      ]
-    }]);
-
-    var treeNext = Tree.makeTree([{
-      title: "howdy",
-      childNodes: [
-        {title: "bobby"},
-        {title: "suzie", selected: true, childNodes: [
-          {title: "puppy", childNodes: [
-            {title: "dog house"}
-          ]},
-          {title: "cherry thing"}
-        ]}
-      ]
-      }]);
-    Tree.selectNextNode(tree);
-    console.assert(_.isEqual(tree, treeNext));
-});
-
 describe('Looking for the previous node of some selected node (findPreviousNode)', function() {
     it('If you have no siblings above you, the previous node is the parent', function() {
         var tree = [{
@@ -728,6 +698,164 @@ describe('selectPreviousNode', function() {
 
         // Doesn't change the second time
         Tree.selectPreviousNode(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+});
+
+
+describe('selectNextNode', function() {
+    it('If you have a child, that is the next node', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two"
+                },
+                {
+                    "title": "three"
+                }
+            ],
+            "selected": true
+        },
+        {
+            "title": "four"
+        }
+    ],
+    "zoomPath": ""
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "selected": true
+                },
+                {
+                    "title": "three"
+                }
+            ]
+        },
+        {
+            "title": "four"
+        }
+    ],
+    "zoomPath": ""
+}
+        */}));
+        Tree.selectNextNode(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+    it('If you have no children and a sibling, that is the next node', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "selected": true
+                },
+                {
+                    "title": "three"
+                }
+            ]
+        },
+        {
+            "title": "four"
+        }
+    ],
+    "zoomPath": ""
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two"
+                },
+                {
+                    "title": "three",
+                    "selected": true
+                }
+            ]
+        },
+        {
+            "title": "four"
+        }
+    ],
+    "zoomPath": ""
+}
+        */}));
+        Tree.selectNextNode(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+
+    it('If you are zoomed in and are at the bottom of your view, do not select the next node', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two"
+                },
+                {
+                    "title": "three",
+                    "selected": true
+                }
+            ]
+        },
+        {
+            "title": "four"
+        }
+    ],
+    "zoomPath": "-0"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two"
+                },
+                {
+                    "title": "three",
+                    "selected": true
+                }
+            ]
+        },
+        {
+            "title": "four"
+        }
+    ],
+    "zoomPath": "-0"
+}
+        */}));
+        Tree.selectNextNode(before);
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });

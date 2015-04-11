@@ -332,7 +332,8 @@ Tree.findNextNode = function(tree) {
     if (tree.childNodes && tree.childNodes.length > 0 && !tree.collapsed) {
         return tree.childNodes[0];
     }
-    return Tree.findNextNodeRec(tree);
+    var root = Tree.getRoot(tree);
+    return Tree.findNextNodeRec(tree, root.zoom);
 };
 
 Tree.collapseCurrent = function(tree) {
@@ -360,8 +361,11 @@ Tree.findPreviousNode = function(tree) {
     return tree.parent;
 };
 
-Tree.findNextNodeRec = function(tree) {
+Tree.findNextNodeRec = function(tree, zoom) {
     if (!tree || !tree.parent) {
+        return null;
+    }
+    if (tree === zoom) {
         return null;
     }
     var i = 0;
@@ -369,7 +373,7 @@ Tree.findNextNodeRec = function(tree) {
     if (childNum + 1 < tree.parent.childNodes.length) {
         return tree.parent.childNodes[childNum + 1];
     }
-    return Tree.findNextNodeRec(tree.parent);
+    return Tree.findNextNodeRec(tree.parent, zoom);
 };
 
 Tree.makeTree = function(nodes) {
