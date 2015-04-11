@@ -19,6 +19,8 @@ div.editable {
     margin-left: 5px;
     border: 0;
     outline: 0;
+    padding-left: 1px; /* Shows the cursor at all times */
+
 }
 
 .togglable {
