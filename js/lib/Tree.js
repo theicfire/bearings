@@ -21,6 +21,7 @@ Tree.selectPreviousNode = function(tree) {
     }
 };
 
+// TODO shouldn't this be the last node of the current zoom?
 Tree.selectLastNode = function(tree) {
     var root = Tree.getRoot(tree);
     var last = Tree.findDeepest(root.childNodes[root.childNodes.length - 1]);
@@ -118,11 +119,11 @@ Tree.cloneGeneral = function(tree, parent, options) {
         me.childNodes = undefined;
     }
     if (!options.noparent) {
-        if (tree.zoom) {
-            // me.zoom = tree.zoom is wrong! That will set the pointer to the wrong tree.
+        if (tree.zoom) { // TODO should be an invariant
             me.zoom = Tree.findFromIndexer(me, Tree.getPath(tree.zoom));
         }
     }
+    me.zoomPath = tree.zoomPath;
     return me;
 };
 
@@ -231,6 +232,7 @@ Tree.getRoot = function(tree) {
     return Tree.getRoot(tree.parent);
 };
 
+// TODO actually implement..
 Tree.getBreadcrumb = function(tree) {
     if (tree.title === 'special_root_title' || tree.parent.title === 'special_root_title') {
         return [];
@@ -247,6 +249,7 @@ Tree.zoom = function(tree) {
     }
     var root = Tree.getRoot(tree);
     root.zoom = tree;
+    root.zoomPath = Tree.getPath(tree);
 };
 
 Tree.zoomOutOne = function(tree) {
@@ -375,6 +378,7 @@ Tree.makeTree = function(nodes) {
         return Tree.makeSubTree(node, ret);
     });
     ret.zoom = ret;
+    ret.zoomPath = Tree.getPath(ret);
     return ret;
 };
 
@@ -416,7 +420,12 @@ Tree.toStringClean = function(tree) {
 Tree.fromString = function(s) {
     var obj = JSON.parse(s);
     var ret = Tree.makeSubTree(obj, null);
-    ret.zoom = ret;
+    // TODO there should always be a zoomPath
+    if (!ret.zoomPath) {
+        ret.zoom = ret;
+    } else {
+        ret.zoom = Tree.findFromIndexer(ret, ret.zoomPath);
+    }
     return ret;
 };
 
