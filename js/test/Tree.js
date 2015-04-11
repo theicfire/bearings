@@ -913,3 +913,55 @@ describe('selectLastNode', function() {
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });
+
+describe('selectFirstNode', function() {
+    it('First node is the first node up, up to the zoom level', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "selected": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "zoomPath": "-0-0"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three"
+                        }
+                    ],
+                    "selected": true
+                }
+            ]
+        }
+    ],
+    "zoomPath": "-0-0"
+}
+        */}));
+        Tree.selectFirstNode(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+});
