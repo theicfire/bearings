@@ -13,7 +13,7 @@ var globalDataSaved = false;
 
 var Breadcrumb = React.createClass({
     render: function() {
-        return (<b>{this.breadcrumbToText(Tree.getBreadcrumb(this.props.node))}</b>);
+        return (<span className='breadcrumb'>{this.breadcrumbToText(Tree.getBreadcrumb(this.props.node))}</span>);
     },
     breadcrumbToText: function(titles) {
         return titles.join(' > ');
@@ -272,11 +272,22 @@ render: function() {
         style.display = "none";
     }
 
+    var contentClassName = "editable";
+    if (this.props.topBullet) {
+        contentClassName = "editable topBullet";
+    }
+
+    var bulletPoint = '';
+    if (!this.props.topBullet) {
+        bulletPoint = <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
+    }
+
+
     return (
         <div className="node-wrapper">
         <div className="node-direct-wrapper">
-        <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
-        <div className="editable" contentEditable
+        {bulletPoint}
+        <div className={contentClassName} contentEditable
             ref="input"
             onKeyDown={this.handleKeyDown}
             onInput={this.handleChange}
@@ -344,7 +355,7 @@ function doRender(tree) {
         React.render(
           <div>
           <Breadcrumb node={tree} />
-          <TreeNode node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
+          <TreeNode topBullet={true} node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
           </div>,
           document.getElementById("tree")
         );

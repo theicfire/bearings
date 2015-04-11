@@ -38,3 +38,13 @@ div.editable {
 ul, li {
     list-style-type: none;
 }
+
+.topBullet {
+    font-size: 18px;
+    margin-left: 0px;
+}
+
+.breadcrumb {
+    color: #aaa;
+    font-weight: bold;
+}
