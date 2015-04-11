@@ -89,6 +89,9 @@ handleChange: function(event) {
 handleClick: function(event) {
     var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
     var selected = Tree.findSelected(globalTree);
+    if (currentNode === selected) {
+        return;
+    }
     delete selected.selected;
     currentNode.selected = true;
     currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
@@ -292,6 +295,7 @@ render: function() {
             onKeyDown={this.handleKeyDown}
             onInput={this.handleChange}
             onClick={this.handleClick}
+            onFocus={this.handleClick}
             dangerouslySetInnerHTML={{__html: this.props.node.title}}>
         </div>
         </div>
