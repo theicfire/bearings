@@ -11,6 +11,15 @@ var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = false;
 
+var Breadcrumb = React.createClass({
+    render: function() {
+        return (<b>{this.breadcrumbToText(Tree.getBreadcrumb(this.props.node))}</b>);
+    },
+    breadcrumbToText: function(titles) {
+        return titles.join(' > ');
+    }
+});
+
 var ResetButton = React.createClass({
     render: function() {
         return (<a href="#" onClick={this.handleClick}>Reset</a>);
@@ -328,15 +337,22 @@ function renderAllNoUndo() {
 function doRender(tree) {
     console.log('rendering with', Tree.toString(tree));
     globalDataSaved = false;
-    //console.log('rendering with obj', tree);
+
+    // TODO should always have a zoom?
     if (tree.zoom !== undefined) {
         React.render(
-          <TreeNode node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>,
+          <div>
+          <Breadcrumb node={tree} />
+          <TreeNode node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
+          </div>,
           document.getElementById("tree")
         );
     } else {
         React.render(
-          <TreeNode node={tree}  indexer=""/>,
+          <div>
+          <Breadcrumb node={tree} />
+          <TreeNode node={tree}  indexer=""/>
+          </div>,
           document.getElementById("tree")
         );
     }
