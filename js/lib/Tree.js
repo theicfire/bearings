@@ -145,7 +145,11 @@ Tree.indent = function(tree) {
 
 Tree.unindent = function(tree) {
     var selected = Tree.findSelected(tree);
+    var root = Tree.getRoot(tree);
     if (!selected.parent.parent) {
+        return;
+    }
+    if (selected === root.zoom || selected.parent === root.zoom) {
         return;
     }
     var childNum = Tree.findChildNum(selected);

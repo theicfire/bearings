@@ -965,3 +965,45 @@ describe('selectFirstNode', function() {
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });
+
+describe('unindent', function() {
+    it('Do not unindent outside of your current zoom', function() {
+        var before = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "selected": true
+                }
+            ]
+        }
+    ],
+    "zoomPath": "-0"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "selected": true
+                }
+            ]
+        }
+    ],
+    "zoomPath": "-0"
+}
+        */}));
+        Tree.unindent(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+});
