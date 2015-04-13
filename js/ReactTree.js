@@ -89,12 +89,13 @@ handleChange: function(event) {
 handleClick: function(event) {
     var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
     var selected = Tree.findSelected(globalTree);
-    if (currentNode === selected) {
-        return;
-    }
     delete selected.selected;
     currentNode.selected = true;
-    currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+    if (event.type === 'focus') {
+        currentNode.caretLoc = currentNode.title.length;
+    } else {
+        currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+    }
 },
 
 componentDidMount: function() {
@@ -270,9 +271,9 @@ render: function() {
         }
     }
 
-    var style = {};
+    var childrenStyle = {};
     if (this.props.node.collapsed) {
-        style.display = "none";
+        childrenStyle.display = "none";
     }
 
     var contentClassName = "editable";
@@ -294,12 +295,12 @@ render: function() {
             ref="input"
             onKeyDown={this.handleKeyDown}
             onInput={this.handleChange}
-            onClick={this.handleClick}
             onFocus={this.handleClick}
+            onClick={this.handleClick}
             dangerouslySetInnerHTML={{__html: this.props.node.title}}>
         </div>
         </div>
-        <TreeChildren style={style} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
+        <TreeChildren style={childrenStyle} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
         </div>
     );
 },

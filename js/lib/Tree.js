@@ -70,13 +70,19 @@ Tree.newLineAtCursor = function(tree) {
     var textStart = selected.title.substr(0, selected.caretLoc);
     var textRest = selected.title.substr(selected.caretLoc);
     if (selected === root.zoom ||
-              (textRest.length === 0 && selected.childNodes.length > 0)) {
+              (textRest.length === 0 && selected.childNodes.length > 0 && !selected.collapsed)) {
         Tree.newChildAtCursor(selected);
     } else {
         selected.title = textStart;
         var nextNode = Tree.appendSibling(selected, textRest);
-        Tree.setChildNodes(nextNode, selected.childNodes);
-        Tree.setChildNodes(selected, []);
+        if (textRest.length > 0) {
+            Tree.setChildNodes(nextNode, selected.childNodes);
+            Tree.setChildNodes(selected, []);
+            if (selected.collapsed) {
+                nextNode.collapsed = true;
+                delete selected.collapsed;
+            }
+        }
         if (textStart.length > 0 || (textStart.length === 0 && textRest.length === 0)) {
             delete selected.selected;
             delete selected.caretLoc;
@@ -284,6 +290,13 @@ Tree.zoom = function(tree) {
 Tree.zoomOutOne = function(tree) {
     var root = Tree.getRoot(tree);
     if (root.zoom) { // TODO this should be an invariant.. should always have root
+        if (root.zoom.collapsed) {
+            // When zooming out from a collapsed node, we need to select that node, otherwise
+            // our cursor will disappear
+            var selected = Tree.findSelected(tree);
+            delete selected.selected;
+            root.zoom.selected = true;
+        }
         Tree.zoom(root.zoom.parent);
     }
 };
@@ -313,7 +326,9 @@ Tree.deleteSelected = function(tree) {
 Tree.backspaceAtBeginning = function(tree) {
     // TODO think if this is the root
     var selected = Tree.findSelected(tree);
-    console.assert(selected.caretLoc === 0);
+    if (selected.caretLoc !== 0) {
+        console.log('TODO: home/end keys do not update caretLoc, and so this invariant fails');
+    }
     var previous = Tree.findPreviousNode(selected);
     if (!previous || previous === selected.parent) {
         if (selected.title.length === 0) {
@@ -321,12 +336,18 @@ Tree.backspaceAtBeginning = function(tree) {
         }
         return;
     }
-    var childNum = Tree.findChildNum(selected);
-    selected.parent.childNodes.splice(childNum, 1);
-    previous.selected = true;
-    previous.caretLoc = previous.title.length;
-    previous.title += selected.title;
-    Tree.setChildNodes(previous, selected.childNodes);
+    // If the previous node is collapsed, it would be confusing to allow a "backspaceAtBeginning" to happen.
+    if (!previous.collapsed) {
+        var childNum = Tree.findChildNum(selected);
+        selected.parent.childNodes.splice(childNum, 1);
+        previous.selected = true;
+        previous.caretLoc = previous.title.length;
+        previous.title += selected.title;
+        Tree.setChildNodes(previous, selected.childNodes);
+        previous.collapsed = selected.collapsed;
+    } else if (selected.title.length === 0) {
+        Tree.deleteSelected(tree);
+    }
 }
 
 Tree.setChildNodes = function(tree, childNodes) {
@@ -360,13 +381,6 @@ Tree.findSelected = function(node) {
     return null;
 };
 
-Tree.findNextNode = function(tree) {
-    if (tree.childNodes && tree.childNodes.length > 0 && !tree.collapsed) {
-        return tree.childNodes[0];
-    }
-    var root = Tree.getRoot(tree);
-    return Tree.findNextNodeRec(tree, root.zoom);
-};
 
 Tree.collapseCurrent = function(tree) {
     var selected = Tree.findSelected(tree);
@@ -391,6 +405,14 @@ Tree.findPreviousNode = function(tree) {
         return null;
     }
     return tree.parent;
+};
+
+Tree.findNextNode = function(tree) {
+    var root = Tree.getRoot(tree);
+    if (tree.childNodes && tree.childNodes.length > 0 && (!tree.collapsed || root.zoom === tree)) {
+        return tree.childNodes[0];
+    }
+    return Tree.findNextNodeRec(tree, root.zoom);
 };
 
 Tree.findNextNodeRec = function(tree, zoom) {
