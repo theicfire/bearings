@@ -22,6 +22,7 @@ var SubmitButton = React.createClass({
     },
     handleClick: function(e) {
         console.log('clicked', this.state.value);
+        submitOpml(this.state.value);
     },
     handleChange: function(event) {
         this.setState({value: event.target.value});
@@ -58,7 +59,7 @@ var rawStartTree =
     ]}
 ]}];
 
-var opml = multiline(function(){/*
+var sampleOpml = multiline(function(){/*
     <?xml version="1.0"?>
     <opml version="2.0">
       <head>
@@ -80,16 +81,19 @@ React.render(
       <SubmitButton />
     , document.getElementById('all'));
 
-query.get("qJbAFzSI53", {
-    success: function (parseTree) {
-        opmlToJSON(opml, function (error, json) {
-            var tree = Tree.makeTree(workflowyToWorkclone(json));
-            console.log('tree', Tree.toString(tree));
-            parseTree.set('tree', Tree.toString(tree));
-            parseTree.save();
-        });
-    },
-    error: function(obj, error) {
-        throw('Error loading tree' + obj + error);
-    }
-});
+function submitOpml(opml) {
+    console.log('submit', opml);
+    query.get("qJbAFzSI53", {
+        success: function (parseTree) {
+            opmlToJSON(opml, function (error, json) {
+                var tree = Tree.makeTree(workflowyToWorkclone(json));
+                console.log('tree', Tree.toString(tree));
+                parseTree.set('tree', Tree.toString(tree));
+                parseTree.save();
+            });
+        },
+        error: function(obj, error) {
+            throw('Error loading tree' + obj + error);
+        }
+    });
+}

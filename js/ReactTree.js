@@ -23,7 +23,10 @@ var Breadcrumb = React.createClass({
         return (<span className='breadcrumb'>{this.breadcrumbToText(Tree.getBreadcrumb(this.props.node))}</span>);
     },
     breadcrumbToText: function(titles) {
-        return titles.join(' > ');
+        if (titles.length > 0) {
+            return titles.join(' > ') + ' >';
+        }
+        return '';
     }
 });
 
@@ -323,10 +326,6 @@ var startRender = function(parseTree) {
     var newTree = Tree.clone(globalTree);
     globalUndoRing = new UndoRing(newTree, 50);
     renderAll();
-    React.render(
-      <ResetButton/>,
-      document.getElementById("reset-button")
-    );
 
     setInterval(function () {
         if (!globalDataSaved) {
@@ -367,21 +366,23 @@ function doRender(tree) {
     if (tree.zoom !== undefined) {
         React.render(
           <div>
-          <DataSaved />
-          <Breadcrumb node={tree} />
+          <ResetButton/> | <a href="import.html">Import</a> | <DataSaved />
+          <div><Breadcrumb node={tree} /></div>
           <TreeNode topBullet={true} node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
           </div>,
           document.getElementById("tree")
         );
     } else {
-        React.render(
-          <div>
-          <DataSaved />
-          <Breadcrumb node={tree} />
-          <TreeNode node={tree}  indexer=""/>
-          </div>,
-          document.getElementById("tree")
-        );
+        console.assert(false, 'I didn\'t think this would happen');
+        //console.log('no zoom');
+        //React.render(
+          //<div>
+      //<ResetButton/> | <a href="import.html">Import</a> | <DataSaved />
+          //<div><Breadcrumb node={tree} /></div>
+          //<TreeNode node={tree}  indexer=""/>
+          //</div>,
+          //document.getElementById("tree")
+        //);
     }
 }
 

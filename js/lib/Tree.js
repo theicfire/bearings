@@ -265,7 +265,9 @@ Tree.getBreadcrumb = function(root) {
     if (root.zoom.title === 'special_root_title') {
         return [];
     }
-    return Tree.getBreadcrumbInner(root.zoom.parent);
+    var ret = Tree.getBreadcrumbInner(root.zoom.parent);
+    ret.unshift('Home');
+    return ret;
 };
 
 Tree.getBreadcrumbInner = function(tree) {
