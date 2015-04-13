@@ -9,7 +9,14 @@ var globalTree;
 var globalOldTree;
 var globalParseTree;
 var globalUndoRing;
-var globalDataSaved = false;
+var globalDataSaved = true;
+
+var DataSaved = React.createClass({
+    render: function() {
+        var text = globalDataSaved ? "Saved" : "Unsaved";
+        return (<span>{text}</span>);
+    }
+});
 
 var Breadcrumb = React.createClass({
     render: function() {
@@ -326,6 +333,7 @@ var startRender = function(parseTree) {
             globalParseTree.set('tree', Tree.toString(globalTree));
             globalParseTree.save();
             globalDataSaved = true;
+            renderAllNoUndo();
         }
         globalUndoRing.commit();
     }, 2000);
@@ -339,6 +347,7 @@ function renderAll() {
     // may be slow.
     var newTree = Tree.clone(globalTree);
     if (!_.isEqual(globalOldTree, Tree.cloneNoParentNoCursor(globalTree))) {
+        globalDataSaved = false;
         globalUndoRing.addPending(newTree);
         globalOldTree = Tree.cloneNoParentNoCursor(globalTree);
     }
@@ -352,13 +361,13 @@ function renderAllNoUndo() {
 
 function doRender(tree) {
     //console.log('rendering with', Tree.toString(tree));
-    globalDataSaved = false;
 
     // TODO should always have a zoom?
     //<TreeChildren childNodes={tree.zoom.childNodes} indexer={Tree.getPath(tree.zoom)} />
     if (tree.zoom !== undefined) {
         React.render(
           <div>
+          <DataSaved />
           <Breadcrumb node={tree} />
           <TreeNode topBullet={true} node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
           </div>,
@@ -367,6 +376,7 @@ function doRender(tree) {
     } else {
         React.render(
           <div>
+          <DataSaved />
           <Breadcrumb node={tree} />
           <TreeNode node={tree}  indexer=""/>
           </div>,

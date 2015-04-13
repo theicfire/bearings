@@ -445,6 +445,7 @@ Tree.makeSubTree = function(node, parent) {
             title: node.title,
             parent: parent,
             selected: node.selected,
+            collapsed: node.collapsed,
             caretLoc: node.caretLoc});
     if (node.childNodes) {
         me.childNodes = node.childNodes.map(function (node) {
