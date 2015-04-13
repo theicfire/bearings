@@ -272,7 +272,7 @@ render: function() {
     }
 
     var childrenStyle = {};
-    if (this.props.node.collapsed) {
+    if (!this.props.topBullet && this.props.node.collapsed) {
         childrenStyle.display = "none";
     }
 
