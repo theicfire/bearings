@@ -291,15 +291,17 @@ Tree.zoom = function(tree) {
 
 Tree.zoomOutOne = function(tree) {
     var root = Tree.getRoot(tree);
-    if (root.zoom) { // TODO this should be an invariant.. should always have root
-        if (root.zoom.collapsed) {
-            // When zooming out from a collapsed node, we need to select that node, otherwise
-            // our cursor will disappear
+    if (root.zoom) { 
+        if (root.zoom.parent) {
             var selected = Tree.findSelected(tree);
             delete selected.selected;
             root.zoom.selected = true;
+            root.zoom.caretLoc = 0;
+            Tree.zoom(root.zoom.parent);
         }
-        Tree.zoom(root.zoom.parent);
+    } else {
+        // TODO ever get hit?
+        console.assert(false, "something wrong");
     }
 };
 

@@ -97,6 +97,9 @@ handleChange: function(event) {
 },
 
 handleClick: function(event) {
+    if (globalSkipFocus) {
+        return;
+    }
     var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
     var selected = Tree.findSelected(globalTree);
     delete selected.selected;
@@ -111,7 +114,9 @@ handleClick: function(event) {
 componentDidMount: function() {
     if (this.props.node.selected) {
         var el = $(this.refs.input.getDOMNode());
+        globalSkipFocus = true;
         el.focus();
+        globalSkipFocus = false;
         Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
     }
 },
@@ -246,7 +251,9 @@ handleKeyDown: function(e) {
 componentDidUpdate: function(prevProps, prevState) {
     if (this.props.node.selected) {
         var el = $(this.refs.input.getDOMNode());
+        globalSkipFocus = true;
         el.focus();
+        globalSkipFocus = false;
         Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
     }
     if ( this.props.node.title !== this.refs.input.getDOMNode().textContent ) {
