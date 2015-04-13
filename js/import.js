@@ -35,7 +35,6 @@ var workflowyToWorkclone = function(tree) {
 };
 
 var workflowyToWorkcloneRec = function(tree) {
-    //var ret = [{title: '', selected: 'true', caretLoc: 0}];
     var ret = {title: tree.title !== undefined ? tree.title : tree.text};
     if (!tree.children) {
         return ret;
