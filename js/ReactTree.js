@@ -136,7 +136,7 @@ handleKeyDown: function(e) {
         HOME: 36,
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
-        if (e.altKey) {
+        if (e.ctrlKey) {
             Tree.zoomOutOne(globalTree);
             renderAll();
             e.preventDefault();
@@ -172,7 +172,7 @@ handleKeyDown: function(e) {
         e.preventDefault();
     } else if (e.keyCode === KEYS.RIGHT) {
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-        if (e.altKey) {
+        if (e.ctrlKey) {
             Tree.zoom(currentNode);
             renderAll();
             e.preventDefault();
