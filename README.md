@@ -10,3 +10,5 @@ $ python -m SimpleHTTPServer`
 ```sh
 $ npm test
 ```
+
+:D
