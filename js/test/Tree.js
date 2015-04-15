@@ -1035,6 +1035,6 @@ describe('breadcrumb', function() {
         */}));
 
         var root = tree;
-        assert.deepEqual(Tree.getBreadcrumb(root), ['one', 'two']);
+        assert.deepEqual(Tree.getBreadcrumb(root), ['Home', 'one', 'two']);
     });
 });
