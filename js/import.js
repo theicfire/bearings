@@ -3,11 +3,13 @@ var cheerio = require('cheerio');
 var opmlToJSON = require('opml-to-json');
 var multiline = require('multiline');
 var Tree = require('./lib/Tree');
+var Convert = require('./lib/Convert');
 var Parse = require('parse').Parse;
 
 Parse.initialize("R7ngCzUNFlUFW2jZO90HfG7Pgr8Roa0dgIsFknNJ", "hvTrWozZrInn3qmEuE2zlscYBNRwUWjkndcIwIOL");
 var TestObject = Parse.Object.extend("TestObject");
 var query = new Parse.Query(TestObject);
+
 
 var SubmitButton = React.createClass({
     getInitialState: function() {
@@ -27,9 +29,17 @@ var SubmitButton = React.createClass({
         submitOpml(this.state.value);
     },
     handleHtmlClick: function(e) {
-        console.log('html click', this.state.value);
-        $ = cheerio.load(this.state.value);
-        console.log(JSON.stringify(printAll($('ul').eq(0)), null, '   '));
+        var tree = Tree.makeTree(Convert.htmlToTree(this.state.value));
+        query.get("qJbAFzSI53", {
+            success: function (parseTree) {
+                console.log('Saving tree', Tree.toString(tree));
+                parseTree.set('tree', Tree.toString(tree));
+                parseTree.save();
+            },
+            error: function(obj, error) {
+                throw('Error loading tree' + obj + error);
+            }
+        });
     },
     handleChange: function(event) {
         this.setState({value: event.target.value});
@@ -146,3 +156,4 @@ function submitOpml(opml) {
         }
     });
 }
+
