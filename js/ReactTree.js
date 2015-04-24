@@ -10,6 +10,7 @@ var globalOldTree;
 var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = true;
+var globalSkipFocus = false;
 
 var DataSaved = React.createClass({
     render: function() {
