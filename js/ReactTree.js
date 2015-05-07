@@ -4,7 +4,7 @@ var $ = require('jquery');
 var Cursor = require('./lib/Cursor');
 var _ = require('underscore');
 var UndoRing = require('./lib/UndoRing');
-var opml = require('opml-generator2');
+var opml = require('opml-generator');
 
 var globalTree;
 var globalOldTree;
