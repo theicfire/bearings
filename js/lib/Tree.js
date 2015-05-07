@@ -496,3 +496,13 @@ Tree.fromString = function(s) {
 Tree.equals = function(one, two) {
     return Tree.toString(one) === Tree.toString(two);
 };
+
+Tree.toOutline = function(tree) {
+    var ret = {
+        text: tree.title,
+        _children: tree.childNodes.map(function (node) {
+                return Tree.toOutline(node);
+    })};
+
+    return ret;
+};

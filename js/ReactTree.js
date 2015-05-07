@@ -4,6 +4,7 @@ var $ = require('jquery');
 var Cursor = require('./lib/Cursor');
 var _ = require('underscore');
 var UndoRing = require('./lib/UndoRing');
+var opml = require('opml-generator2');
 
 var globalTree;
 var globalOldTree;
@@ -133,6 +134,7 @@ handleKeyDown: function(e) {
         Z: 90,
         Y: 89,
         S: 83,
+        C: 67,
         END: 35,
         HOME: 36,
         SPACE: 32};
@@ -243,6 +245,15 @@ handleKeyDown: function(e) {
     } else if (e.keyCode === KEYS.S && e.ctrlKey) {
         console.log('ctrl s');
         console.log(JSON.stringify(Tree.cloneNoParentClean(globalTree), null, 4));
+        e.preventDefault();
+    } else if (e.keyCode === KEYS.C && e.ctrlKey) {
+        console.log('ctrl c');
+        // Find the tree starting at the cursor..
+        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+
+        var header = {};
+        var outlines = Tree.toOutline(currentNode);
+        window.prompt('OPML to copy', opml(header, [outlines]));
         e.preventDefault();
     } else {
         console.log(e.keyCode);
