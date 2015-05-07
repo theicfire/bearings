@@ -15,7 +15,7 @@ var sample2 = multiline(function(){/*
 
 it('html string conversion love', function(){
     var res = Convert.htmlToTree(sampleHtml);
-    var expect = Tree.makeTree([{title: 'one', childNodes: [
+    var expect = Tree.makeTree([{title: 'one', selected: true, childNodes: [
             {title: 'two'},
             {title: 'three', childNodes: [
                     {title: 'four', childNodes: [
@@ -26,7 +26,7 @@ it('html string conversion love', function(){
 
 it('another test', function(){
     var res = Convert.htmlToTree(sample2);
-    var expect = Tree.makeTree([{title: 'one', childNodes: [
+    var expect = Tree.makeTree([{title: 'one', selected: true, childNodes: [
             {title: 'two', childNodes: [
                     {title: 'three'}]}]},
             {title: 'four'}]);
