@@ -331,7 +331,13 @@ render: function() {
 },
 
 toggle: function() {
-    console.assert(false);
+    console.log(this.props);
+    var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+    var selected = Tree.findSelected(globalTree);
+    delete selected.selected;
+    currentNode.selected = true;
+    Tree.collapseCurrent(globalTree);
+    renderAll();
 }
 });
 
