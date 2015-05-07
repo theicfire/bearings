@@ -247,13 +247,9 @@ handleKeyDown: function(e) {
         console.log(JSON.stringify(Tree.cloneNoParentClean(globalTree), null, 4));
         e.preventDefault();
     } else if (e.keyCode === KEYS.C && e.ctrlKey) {
-        console.log('ctrl c');
-        // Find the tree starting at the cursor..
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-
-        var header = {};
         var outlines = Tree.toOutline(currentNode);
-        window.prompt('OPML to copy', opml(header, [outlines]));
+        window.prompt('OPML to copy', opml({}, [outlines]));
         e.preventDefault();
     } else {
         console.log(e.keyCode);
