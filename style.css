@@ -32,6 +32,10 @@ div.editable {
     color: red;
 }
 
+.completed {
+    text-decoration: line-through;
+}
+
 .text {
     cursor: text;
     overflow: auto;

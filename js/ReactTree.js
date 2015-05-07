@@ -201,6 +201,11 @@ handleKeyDown: function(e) {
         }
         renderAll();
         e.preventDefault();
+    } else if (e.keyCode === KEYS.ENTER && e.ctrlKey) {
+        console.log('complete current');
+        Tree.completeCurrent(globalTree);
+        renderAll();
+        e.preventDefault();
     } else if (e.keyCode === KEYS.ENTER) {
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
@@ -234,6 +239,7 @@ handleKeyDown: function(e) {
     } else if (e.keyCode === KEYS.SPACE && e.ctrlKey) {
         Tree.collapseCurrent(globalTree);
         renderAll();
+        e.preventDefault();
     } else if (e.keyCode === KEYS.Z && e.ctrlKey) {
         globalTree = Tree.clone(globalUndoRing.undo());
         renderAllNoUndo();
@@ -304,6 +310,9 @@ render: function() {
     var contentClassName = "editable";
     if (this.props.topBullet) {
         contentClassName = "editable topBullet";
+    }
+    if (this.props.node.completed) {
+        contentClassName += " completed";
     }
 
     var bulletPoint = '';

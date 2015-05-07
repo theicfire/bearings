@@ -111,6 +111,7 @@ Tree.makeNode = function(args) {
     Tree.setIfReal(ret, args, 'caretLoc');
     Tree.setIfReal(ret, args, 'selected');
     Tree.setIfReal(ret, args, 'collapsed');
+    Tree.setIfReal(ret, args, 'completed');
     Tree.setIfReal(ret, args, 'zoom');
     return ret;
 };
@@ -137,7 +138,8 @@ Tree.cloneGeneral = function(tree, parent, options) {
             parent: !!options.noparent ? undefined : parent,
             caretLoc: (!!options.nomouse || !!options.clean) ? undefined : tree.caretLoc,
             selected: !!options.nomouse ? undefined : tree.selected,
-            collapsed: tree.collapsed});
+            collapsed: tree.collapsed,
+            completed: tree.completed});
     if (tree.childNodes.length > 0 || !options.clean) {
         me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
     } else {
@@ -393,6 +395,11 @@ Tree.collapseCurrent = function(tree) {
     }
 };
 
+Tree.completeCurrent = function(tree) {
+    var selected = Tree.findSelected(tree);
+    selected.completed = !selected.completed;
+};
+
 Tree.findPreviousNode = function(tree) {
     if (!tree || !tree.parent) {
         return null;
@@ -450,6 +457,7 @@ Tree.makeSubTree = function(node, parent) {
             parent: parent,
             selected: node.selected,
             collapsed: node.collapsed,
+            completed: node.completed,
             caretLoc: node.caretLoc});
     if (node.childNodes) {
         me.childNodes = node.childNodes.map(function (node) {
