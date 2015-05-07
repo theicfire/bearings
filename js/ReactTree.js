@@ -311,8 +311,10 @@ render: function() {
     if (this.props.topBullet) {
         contentClassName = "editable topBullet";
     }
+
+    var wrapperClassName = 'node-wrapper';
     if (this.props.node.completed) {
-        contentClassName += " completed";
+        wrapperClassName += " completed";
     }
 
     var bulletPoint = '';
@@ -322,7 +324,7 @@ render: function() {
 
 
     return (
-        <div className="node-wrapper">
+        <div className={wrapperClassName}>
         <div className="node-direct-wrapper">
         {bulletPoint}
         <div className={contentClassName} contentEditable
