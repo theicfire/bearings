@@ -26,6 +26,7 @@
     "cheerio": "^0.19.0",
     "jquery": "^2.1.3",
     "multiline": "^1.0.2",
+    "opml-generator2": "^1.0.4",
     "opml-to-json": "0.0.3",
     "parse": "^1.3.5",
     "react": "^0.12.2",
