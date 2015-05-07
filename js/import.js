@@ -19,8 +19,8 @@ var SubmitButton = React.createClass({
       var value = this.state.value;
         return (<div>
       <div><textarea id="text" onChange={this.handleChange} rows="20" cols="100"></textarea></div>
-        <button value={value} onClick={this.handleClick}>Import!</button>
-        <button value={value} onClick={this.handleHtmlClick}>Convert html!</button>
+        <button value={value} onClick={this.handleClick}>Import opml</button>
+        <button value={value} onClick={this.handleHtmlClick}>Import html</button>
       </div>
         );
     },
