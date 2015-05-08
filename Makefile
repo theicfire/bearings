@@ -9,3 +9,5 @@ mac_copy:
 	osascript -e 'the clipboard as "HTML"'|perl -ne 'print chr foreach unpack("C*",pack("H*",substr($$_,11,-3)))' | pbcopy
 linux_copy:
 	xclip -selection clipboard -o -t text/html
+decrypt_config:
+	gpg --decrypt js/config.js.gpg > js/config.js
