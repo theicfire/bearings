@@ -1,7 +1,9 @@
 # Installation
 ```sh
 $ npm install
-$ npm start
+$ make index
+(Open a new terminal)
+$ make import
 (Open a new terminal)
 $ python -m SimpleHTTPServer`
 ```
