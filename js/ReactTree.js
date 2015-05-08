@@ -38,23 +38,7 @@ var ResetButton = React.createClass({
     },
     handleClick: function(e) {
         console.log('reset');
-        var rawStartTree =
-          [{title: "howdy", selected: "true", caretLoc: 0,
-              childNodes: [
-                {title: "billy"},
-                {title: "suzie", childNodes: [
-                  {title: "puppy", childNodes: [
-                    {title: "dog house"}
-                  ]},
-                  {title: "cherry thing"}
-                ]}
-            ]}];
-        //for (var i = 0; i < 10000; i++) {
-          //startTree.push({title: "oh baby"});
-        //}
-        rawStartTree.push({title: "the end"});
-
-        globalTree = Tree.makeTree(rawStartTree);
+        globalTree = Tree.makeDefaultTree();
         renderAll();
         e.preventDefault();
     }

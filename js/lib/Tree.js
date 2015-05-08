@@ -451,6 +451,22 @@ Tree.makeTree = function(nodes) {
     return ret;
 };
 
+Tree.makeDefaultTree = function() {
+    var rawStartTree =
+        [{title: "howdy", selected: "true", caretLoc: 0,
+                childNodes: [
+                    {title: "billy"},
+                    {title: "suzie", childNodes: [
+                            {title: "puppy", childNodes: [
+                                    {title: "dog house"}
+                                ]},
+                            {title: "cherry thing"}
+                        ]}
+                ]}];
+    rawStartTree.push({title: "the end"});
+    return Tree.makeTree(rawStartTree);
+}
+
 Tree.makeSubTree = function(node, parent) {
     var me = Tree.makeNode({
             title: node.title,
