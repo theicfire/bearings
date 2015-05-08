@@ -1,6 +1,7 @@
 # Installation
 ```sh
 $ npm install
+$ make init_config
 $ make index
 (Open a new terminal)
 $ make import
