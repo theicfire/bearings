@@ -6,6 +6,7 @@ $ make index
 $ make import
 (Open a new terminal)
 $ python -m SimpleHTTPServer`
+Visit localhost:8000
 ```
 
 # Running tests
