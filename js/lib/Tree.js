@@ -405,6 +405,15 @@ Tree.collapseCurrent = function(tree) {
 Tree.completeCurrent = function(tree) {
     var selected = Tree.findSelected(tree);
     selected.completed = !selected.completed;
+
+    // Make sure to get off the current node. Particularly necessary if completion turns the node hidden.
+    if (selected.completed) {
+        var backup = Tree.isCompletedHidden(tree);
+        Tree.selectPreviousNode(tree);
+        Tree.setCompletedHidden(tree, true);
+        Tree.selectNextNode(tree);
+        Tree.setCompletedHidden(tree, backup);
+    }
 };
 
 Tree.findPreviousNode = function(tree) {
