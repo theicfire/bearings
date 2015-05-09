@@ -1,5 +1,3 @@
-bundle.js
-bundleimport.js
 node_modules
 *.swp
 js/config.js
