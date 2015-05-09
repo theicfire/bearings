@@ -5,18 +5,18 @@ A workflowy clone.
 [http://theicfire.github.io/bearings](http://theicfire.github.io/bearings)
 This is still in active development, so I have yet to provide instructions on how to use the demo. Here's some brief things that'll be useful.
 
-## Keymap:
-- ctrl+shift up/down: Move items up/down
-- ctrl+end/home: go to start/end
-- ctrl right/left: Zoom in/out
-- ctrl + enter: Complete item
-- ctrl + space: expand/contract
-- ctrl + s: Output a dialog of the OPML of the bullet and its children. Can be pasted directly to workflowy.
-- ctrl + shift + backspace: Delete item and children
-- ctrl z/y: undo/redo (Notice not cmd at the moment)
-- tab / shift-tab: indent/unindent
+### Keymap:
+- **ctrl+shift up/down** Move items up/down
+- **ctrl+end/home** go to start/end
+- **ctrl right/left** Zoom in/out
+- **ctrl + enter** Complete item
+- **ctrl + space** expand/contract
+- **ctrl + s** Output a dialog of the OPML of the bullet and its children. Can be pasted directly to workflowy.
+- **ctrl + shift + backspace** Delete item and children
+- **ctrl z/y** undo/redo (Notice not cmd at the moment)
+- **tab / shift-tab** indent/unindent
 
-## Import and Saving
+### Import and Saving
 Currently, I have Parse set up to persist my data. The demo does not have this set up. Instructions coming soon. This means that the "import" link won't be useful, because the data has no where to be imported to.
 
 
