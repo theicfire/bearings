@@ -36,6 +36,10 @@ div.editable {
     text-decoration: line-through;
 }
 
+.completed-hidden {
+    display: none;
+}
+
 .text {
     cursor: text;
     overflow: auto;

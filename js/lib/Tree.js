@@ -402,8 +402,35 @@ Tree.collapseCurrent = function(tree) {
     }
 };
 
+Tree.countVisibleChildren = function(tree) {
+    return tree.childNodes.filter(function (n) {
+        return !n.completed;
+    }).length;
+};
+
 Tree.completeCurrent = function(tree) {
     var selected = Tree.findSelected(tree);
+    var root = Tree.getRoot(tree);
+    if (root.zoom === selected) {
+        return;
+    }
+    if (!selected.completed && selected.parent.title === 'special_root_title') {
+        if (Tree.countVisibleChildren(selected.parent) <= 1) {
+            console.log('noooop');
+            console.log(selected.parent.childNodes);
+            return; // Can't select the only element left on the page..
+        } else if (Tree.findChildNum(selected) === 0) {
+            console.log('yeah, complete', selected);
+            selected.completed = true;
+            var backup = Tree.isCompletedHidden(tree);
+            Tree.setCompletedHidden(tree, true);
+            var next = Tree.findNextNode(selected.parent);
+            Tree.setCompletedHidden(tree, backup);
+            delete selected.selected;
+            next.selected = true;
+            return;
+        }
+    }
     selected.completed = !selected.completed;
 
     // Make sure to get off the current node. Particularly necessary if completion turns the node hidden.

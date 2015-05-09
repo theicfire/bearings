@@ -12,7 +12,7 @@ var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = true;
 var globalSkipFocus = false;
-var globalCompletedHidden = true;
+var globalCompletedHidden = false;
 
 var DataSaved = React.createClass({
     render: function() {
@@ -315,6 +315,11 @@ render: function() {
         contentClassName += " completed";
     }
 
+    var wrapperClassName = 'node-wrapper';
+    if (this.props.node.completed && globalCompletedHidden) {
+        wrapperClassName += " completed-hidden";
+    }
+
     var bulletPoint = '';
     if (!this.props.topBullet) {
         bulletPoint = <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
@@ -322,7 +327,7 @@ render: function() {
 
 
     return (
-        <div className='node-wrapper'>
+        <div className={wrapperClassName}>
         <div className="node-direct-wrapper">
         {bulletPoint}
         <div className={contentClassName} contentEditable
