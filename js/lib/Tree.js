@@ -112,6 +112,7 @@ Tree.makeNode = function(args) {
     Tree.setIfReal(ret, args, 'selected');
     Tree.setIfReal(ret, args, 'collapsed');
     Tree.setIfReal(ret, args, 'completed');
+    Tree.setIfReal(ret, args, 'completedHidden');
     Tree.setIfReal(ret, args, 'zoom');
     return ret;
 };
@@ -139,7 +140,8 @@ Tree.cloneGeneral = function(tree, parent, options) {
             caretLoc: (!!options.nomouse || !!options.clean) ? undefined : tree.caretLoc,
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed,
-            completed: tree.completed});
+            completed: tree.completed,
+            completedHidden: tree.completedHidden});
     if (tree.childNodes.length > 0 || !options.clean) {
         me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
     } else {
@@ -506,7 +508,7 @@ Tree.makeTree = function(nodes) {
 
 Tree.makeDefaultTree = function() {
     var rawStartTree =
-        [{title: "howdy", selected: "true", caretLoc: 0,
+        [{title: "goody", selected: "true", caretLoc: 0,
                 childNodes: [
                     {title: "billy"},
                     {title: "suzie", childNodes: [
@@ -517,7 +519,9 @@ Tree.makeDefaultTree = function() {
                         ]}
                 ]}];
     rawStartTree.push({title: "the end"});
-    return Tree.makeTree(rawStartTree);
+    var ret = Tree.makeTree(rawStartTree);
+    ret.completedHidden = true;
+    return ret;
 }
 
 Tree.makeSubTree = function(node, parent) {
@@ -527,6 +531,7 @@ Tree.makeSubTree = function(node, parent) {
             selected: node.selected,
             collapsed: node.collapsed,
             completed: node.completed,
+            completedHidden: node.completedHidden,
             caretLoc: node.caretLoc});
     if (node.childNodes) {
         me.childNodes = node.childNodes.map(function (node) {

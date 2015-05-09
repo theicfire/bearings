@@ -12,7 +12,7 @@ var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = true;
 var globalSkipFocus = false;
-var globalCompletedHidden = false;
+var globalCompletedHidden;
 
 var DataSaved = React.createClass({
     render: function() {
@@ -357,7 +357,9 @@ toggle: function() {
 
 var startRender = function(parseTree) {
     globalTree = Tree.fromString(parseTree.get('tree'));
-    Tree.setCompletedHidden(globalTree, globalCompletedHidden);
+    console.log(globalTree);
+    console.log('hidden is', Tree.isCompletedHidden(globalTree));
+    globalCompletedHidden = Tree.isCompletedHidden(globalTree);
     globalParseTree = parseTree;
     var newTree = Tree.clone(globalTree);
     globalUndoRing = new UndoRing(newTree, 50);
