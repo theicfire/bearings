@@ -13,3 +13,5 @@ init_config:
 	cp js/config.default.js js/config.js
 init_encrypted_config:
 	gpg --decrypt js/config.js.gpg > js/config.js
+encrypt_config:
+	cat js/config.js | gpg -e -r chase > js/config.js.gpg
