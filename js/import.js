@@ -5,10 +5,12 @@ var multiline = require('multiline');
 var Tree = require('./lib/Tree');
 var Convert = require('./lib/Convert');
 var Parse = require('parse').Parse;
+var config = require('./config');
 
-Parse.initialize("R7ngCzUNFlUFW2jZO90HfG7Pgr8Roa0dgIsFknNJ", "hvTrWozZrInn3qmEuE2zlscYBNRwUWjkndcIwIOL");
-var TestObject = Parse.Object.extend("TestObject");
-var query = new Parse.Query(TestObject);
+Parse.initialize(config.parse_app_id,config.parse_js_key);
+
+var First = Parse.Object.extend("first");
+var query = new Parse.Query(First);
 
 
 var SubmitButton = React.createClass({
@@ -30,13 +32,15 @@ var SubmitButton = React.createClass({
     },
     handleHtmlClick: function(e) {
         var tree = Tree.makeTree(Convert.htmlToTree(this.state.value));
-        query.get("qJbAFzSI53", {
+        console.log('go get', config.parse_id);
+        query.get(config.parse_id, {
             success: function (parseTree) {
                 console.log('Saving tree', Tree.toString(tree));
                 parseTree.set('tree', Tree.toString(tree));
                 parseTree.save();
             },
             error: function(obj, error) {
+                console.log(error);
                 throw('Error loading tree' + obj + error);
             }
         });
@@ -142,7 +146,7 @@ function printAll(objs) {
 
 function submitOpml(opml) {
     console.log('submit', opml);
-    query.get("qJbAFzSI53", {
+    query.get(config.parse_id, {
         success: function (parseTree) {
             opmlToJSON(opml, function (error, json) {
                 var tree = Tree.makeTree(workflowyToWorkclone(json));

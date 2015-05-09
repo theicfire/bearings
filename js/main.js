@@ -8,9 +8,9 @@ var FakeParseTree = require('./lib/FakeParseTree');
 if (config.use_parse) {
     var Parse = require('parse').Parse;
     Parse.initialize(config.parse_app_id,config.parse_js_key);
-    var TestObject = Parse.Object.extend("first");
-    var query = new Parse.Query(TestObject);
-    query.get("emh8hVrhnC", {
+    var First = Parse.Object.extend("first");
+    var query = new Parse.Query(First);
+    query.get(config.parse_id, {
         success: function (parseTree) {
             StartRender(parseTree);
         },
