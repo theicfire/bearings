@@ -12,6 +12,7 @@ var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = true;
 var globalSkipFocus = false;
+var globalCompletedHidden = true;
 
 var DataSaved = React.createClass({
     render: function() {
@@ -29,6 +30,20 @@ var Breadcrumb = React.createClass({
             return titles.join(' > ') + ' >';
         }
         return '';
+    }
+});
+
+var CompleteHiddenButton = React.createClass({
+    render: function() {
+        console.log('go and render', globalCompletedHidden);
+        var text = globalCompletedHidden ? 'Show completed' : 'Hide completed';
+        return (<a href="#" onClick={this.handleClick}>{text}</a>);
+    },
+    handleClick: function(e) {
+        globalCompletedHidden = !globalCompletedHidden;
+        Tree.setCompletedHidden(globalTree, globalCompletedHidden);
+        renderAll();
+        e.preventDefault();
     }
 });
 
@@ -296,9 +311,8 @@ render: function() {
         contentClassName = "editable topBullet";
     }
 
-    var wrapperClassName = 'node-wrapper';
     if (this.props.node.completed) {
-        wrapperClassName += " completed";
+        contentClassName += " completed";
     }
 
     var bulletPoint = '';
@@ -308,7 +322,7 @@ render: function() {
 
 
     return (
-        <div className={wrapperClassName}>
+        <div className='node-wrapper'>
         <div className="node-direct-wrapper">
         {bulletPoint}
         <div className={contentClassName} contentEditable
@@ -338,6 +352,7 @@ toggle: function() {
 
 var startRender = function(parseTree) {
     globalTree = Tree.fromString(parseTree.get('tree'));
+    Tree.setCompletedHidden(globalTree, globalCompletedHidden);
     globalParseTree = parseTree;
     var newTree = Tree.clone(globalTree);
     globalUndoRing = new UndoRing(newTree, 50);
@@ -382,7 +397,7 @@ function doRender(tree) {
     if (tree.zoom !== undefined) {
         React.render(
           <div>
-          <ResetButton/> | <a href="import.html">Import</a> | <DataSaved />
+          <ResetButton/> | <a href="import.html">Import</a> | <DataSaved /> | <CompleteHiddenButton />
           <div><Breadcrumb node={tree} /></div>
           <TreeNode topBullet={true} node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
           </div>,

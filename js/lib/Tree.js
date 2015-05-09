@@ -368,8 +368,15 @@ Tree.setChildNodes = function(tree, childNodes) {
 }
 
 Tree.findDeepest = function(tree) {
-    if (tree.childNodes && tree.childNodes.length > 0 && !tree.collapsed) {
-        return Tree.findDeepest(tree.childNodes[tree.childNodes.length - 1]);
+    var completedHidden = Tree.isCompletedHidden(tree);
+    if (tree.childNodes && !tree.collapsed) {
+        for (var i = tree.childNodes.length - 1; i >= 0; i--) {
+            console.log('search over', i, tree.childNodes[i]);
+            if (!completedHidden || !tree.childNodes[i].completed) {
+                return Tree.findDeepest(tree.childNodes[i]);
+            }
+
+        }
     }
     return tree;
 };
@@ -408,10 +415,13 @@ Tree.findPreviousNode = function(tree) {
     if (root.zoom === tree) {
         return;
     }
-    var childNum = Tree.findChildNum(tree);
-    if (childNum - 1 >= 0) {
-        return Tree.findDeepest(tree.parent.childNodes[childNum - 1]);
+    var completedHidden = Tree.isCompletedHidden(tree);
+    for (var childNum = Tree.findChildNum(tree) - 1; childNum >= 0; childNum--) {
+        if (!completedHidden || !tree.parent.childNodes[childNum].completed) {
+            return Tree.findDeepest(tree.parent.childNodes[childNum]);
+        }
     }
+
     if (tree.parent.title === 'special_root_title') {
         return null;
     }
@@ -420,8 +430,13 @@ Tree.findPreviousNode = function(tree) {
 
 Tree.findNextNode = function(tree) {
     var root = Tree.getRoot(tree);
+    var completedHidden = Tree.isCompletedHidden(tree);
     if (tree.childNodes && tree.childNodes.length > 0 && (!tree.collapsed || root.zoom === tree)) {
-        return tree.childNodes[0];
+        for (var i = 0; i < tree.childNodes.length; i++) {
+            if (!completedHidden || !tree.childNodes[i].completed) {
+                return tree.childNodes[i];
+            }
+        }
     }
     return Tree.findNextNodeRec(tree, root.zoom);
 };
@@ -433,10 +448,12 @@ Tree.findNextNodeRec = function(tree, zoom) {
     if (tree === zoom) {
         return null;
     }
-    var i = 0;
     var childNum = Tree.findChildNum(tree);
-    if (childNum + 1 < tree.parent.childNodes.length) {
-        return tree.parent.childNodes[childNum + 1];
+    var completedHidden = Tree.isCompletedHidden(tree);
+    for (var childNum = Tree.findChildNum(tree) + 1; childNum < tree.parent.childNodes.length; childNum++) {
+        if (!completedHidden || !tree.parent.childNodes[childNum].completed) {
+            return tree.parent.childNodes[childNum];
+        }
     }
     return Tree.findNextNodeRec(tree.parent, zoom);
 };
@@ -529,4 +546,15 @@ Tree.toOutline = function(tree) {
     })};
 
     return ret;
+};
+
+Tree.setCompletedHidden = function(tree, isHidden) {
+    var root = Tree.getRoot(tree);
+    // TODO or assert (tree == root)
+    root.completedHidden = isHidden;
+};
+
+Tree.isCompletedHidden = function(tree) {
+    var root = Tree.getRoot(tree);
+    return root.completedHidden;
 };
