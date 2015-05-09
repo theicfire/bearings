@@ -316,7 +316,7 @@ render: function() {
     }
 
     var wrapperClassName = 'node-wrapper';
-    if (this.props.node.completed && globalCompletedHidden) {
+    if (this.props.node.completed && globalCompletedHidden && !this.props.topBullet) {
         wrapperClassName += " completed-hidden";
     }
 
