@@ -7,7 +7,7 @@ This is still in active development, so I have yet to provide instructions on ho
 
 ### Keymap:
 - *ctrl+shift up/down* Move items up/down
-- ctrl+end/home: go to start/end
+- **ctrl+end/home** go to start/end
 - ctrl right/left: Zoom in/out
 - ctrl + enter: Complete item
 - ctrl + space: expand/contract
