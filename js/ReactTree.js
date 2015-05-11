@@ -269,7 +269,7 @@ componentDidUpdate: function(prevProps, prevState) {
         globalSkipFocus = false;
         Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
     }
-    if ( this.props.node.title !== this.refs.input.getDOMNode().textContent ) {
+    if ( this.refs.input && this.props.node.title !== this.refs.input.getDOMNode().textContent ) {
         // Need this because of: http://stackoverflow.com/questions/22677931/react-js-onchange-event-for-contenteditable/27255103#27255103
         // An example he was mentioning is that the virtual dom thinks that the div is empty, but if
         // you type something and then press "clear", or specifically set the text, the VDOM will
@@ -310,11 +310,6 @@ render: function() {
         contentClassName += " completed";
     }
 
-    var wrapperClassName = 'node-wrapper';
-    if (this.props.node.completed && globalCompletedHidden && !this.props.topBullet) {
-        wrapperClassName += " completed-hidden";
-    }
-
     var bulletPoint = '';
     if (!this.props.topBullet) {
         bulletPoint = (<span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>);
@@ -325,8 +320,12 @@ render: function() {
         children = (<TreeChildren childNodes={this.props.node.childNodes} indexer={this.props.indexer} />);
     }
 
+    if (this.props.node.completed && globalCompletedHidden && !this.props.topBullet) {
+        return false;
+    }
+
     return (
-        <div className={wrapperClassName}>
+        <div className='node-wrapper'>
         <div className="node-direct-wrapper">
         {bulletPoint}
         <div className={contentClassName} contentEditable
