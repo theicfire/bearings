@@ -301,11 +301,6 @@ render: function() {
         }
     }
 
-    var childrenStyle = {};
-    if (!this.props.topBullet && this.props.node.collapsed) {
-        childrenStyle.display = "none";
-    }
-
     var contentClassName = "editable";
     if (this.props.topBullet) {
         contentClassName = "editable topBullet";
@@ -322,9 +317,13 @@ render: function() {
 
     var bulletPoint = '';
     if (!this.props.topBullet) {
-        bulletPoint = <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
+        bulletPoint = (<span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>);
     }
 
+    var children = '';
+    if (this.props.topBullet || !this.props.node.collapsed) {
+        children = (<TreeChildren childNodes={this.props.node.childNodes} indexer={this.props.indexer} />);
+    }
 
     return (
         <div className={wrapperClassName}>
@@ -339,7 +338,7 @@ render: function() {
             dangerouslySetInnerHTML={{__html: _.escape(this.props.node.title)}}>
         </div>
         </div>
-        <TreeChildren style={childrenStyle} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
+        {children}
         </div>
     );
 },
