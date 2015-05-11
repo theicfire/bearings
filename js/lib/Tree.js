@@ -503,6 +503,7 @@ Tree.makeTree = function(nodes) {
     });
     ret.zoom = ret;
     ret.zoomPath = Tree.getPath(ret);
+    ret.completedHidden = true;
     return ret;
 };
 
@@ -520,7 +521,6 @@ Tree.makeDefaultTree = function() {
                 ]}];
     rawStartTree.push({title: "the end"});
     var ret = Tree.makeTree(rawStartTree);
-    ret.completedHidden = true;
     return ret;
 }
 
