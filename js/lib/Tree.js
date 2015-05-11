@@ -167,6 +167,7 @@ Tree.indent = function(tree) {
         return;
     }
     var newParent = selected.parent.childNodes[childNum - 1];
+    newParent.collapsed = false;
     newParent.childNodes.push(selected);
     selected.parent.childNodes.splice(childNum, 1);
     selected.parent = newParent;
