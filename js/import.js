@@ -6,6 +6,7 @@ var Tree = require('./lib/Tree');
 var Convert = require('./lib/Convert');
 var Parse = require('parse').Parse;
 var config = require('./config');
+var _ = require('underscore');
 
 Parse.initialize(config.parse_app_id,config.parse_js_key);
 
@@ -57,7 +58,8 @@ var workflowyToWorkclone = function(tree) {
 };
 
 var workflowyToWorkcloneRec = function(tree) {
-    var ret = {title: tree.title !== undefined ? tree.title : tree.text};
+    // TODO why are there both of these? Should there not just be one? Artifact from before?
+    var ret = {title: tree.title !== undefined ? _.unescape(tree.title) : _.unescape(tree.text)};
     if (!tree.children) {
         return ret;
     }

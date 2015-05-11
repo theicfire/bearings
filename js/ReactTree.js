@@ -336,7 +336,7 @@ render: function() {
             onInput={this.handleChange}
             onFocus={this.handleClick}
             onClick={this.handleClick}
-            dangerouslySetInnerHTML={{__html: this.props.node.title}}>
+            dangerouslySetInnerHTML={{__html: _.escape(this.props.node.title)}}>
         </div>
         </div>
         <TreeChildren style={childrenStyle} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
