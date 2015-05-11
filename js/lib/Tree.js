@@ -323,6 +323,8 @@ Tree.deleteSelected = function(tree) {
             selected.childNodes = [];
             selected.selected = true;
             selected.caretLoc = 0;
+            delete selected.collapsed;
+            delete selected.completed;
             return;
         }
     }
