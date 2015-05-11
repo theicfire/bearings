@@ -8,6 +8,8 @@ var Parse = require('parse').Parse;
 var config = require('./config');
 var _ = require('underscore');
 
+var defaultCompletedHidden = true;
+
 Parse.initialize(config.parse_app_id,config.parse_js_key);
 
 var First = Parse.Object.extend("first");
@@ -33,6 +35,7 @@ var SubmitButton = React.createClass({
     },
     handleHtmlClick: function(e) {
         var tree = Tree.makeTree(Convert.htmlToTree(this.state.value));
+        tree.completedHidden = defaultCompletedHidden;
         console.log('go get', config.parse_id);
         query.get(config.parse_id, {
             success: function (parseTree) {
@@ -152,6 +155,7 @@ function submitOpml(opml) {
         success: function (parseTree) {
             opmlToJSON(opml, function (error, json) {
                 var tree = Tree.makeTree(workflowyToWorkclone(json));
+                tree.completedHidden = defaultCompletedHidden;
                 console.log('tree', Tree.toString(tree));
                 parseTree.set('tree', Tree.toString(tree));
                 parseTree.save();
