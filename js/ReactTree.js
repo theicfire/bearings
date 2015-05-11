@@ -254,7 +254,7 @@ handleKeyDown: function(e) {
     } else if (e.keyCode === KEYS.C && e.ctrlKey) {
         var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         var outlines = Tree.toOutline(currentNode);
-        window.prompt('OPML to copy', opml({}, [outlines]));
+        console.log(opml({}, [outlines]));
         e.preventDefault();
     } else {
         console.log(e.keyCode);
