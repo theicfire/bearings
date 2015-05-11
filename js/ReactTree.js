@@ -239,11 +239,11 @@ handleKeyDown: function(e) {
         Tree.collapseCurrent(globalTree);
         renderAll();
         e.preventDefault();
-    } else if (e.keyCode === KEYS.Z && e.ctrlKey) {
+    } else if (e.keyCode === KEYS.Z && (e.ctrlKey || e.metaKey)) {
         globalTree = Tree.clone(globalUndoRing.undo());
         renderAllNoUndo();
         e.preventDefault();
-    } else if (e.keyCode === KEYS.Y && e.ctrlKey) {
+    } else if (e.keyCode === KEYS.Y && (e.ctrlKey || e.metaKey)) {
         globalTree = Tree.clone(globalUndoRing.redo());
         renderAllNoUndo();
         e.preventDefault();
