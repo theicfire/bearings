@@ -560,6 +560,11 @@ Tree.toString = function(tree) {
     return JSON.stringify(tree);
 };
 
+Tree.toStringPretty = function(tree) {
+    tree = Tree.cloneNoParent(tree);
+    return JSON.stringify(tree, null, 2);
+};
+
 Tree.toStringClean = function(tree) {
     tree = Tree.cloneNoParentClean(tree);
     return JSON.stringify(tree);
@@ -601,4 +606,44 @@ Tree.setCompletedHidden = function(tree, isHidden) {
 Tree.isCompletedHidden = function(tree) {
     var root = Tree.getRoot(tree);
     return root.completedHidden;
+};
+
+Tree.recSearch = function(tree, query) {
+    var newTree = {title: tree.title, childNodes: []};
+    for (var i = 0; i < tree.childNodes.length; i++) {
+        if (Tree.recSearch(tree.childNodes[i], query)) {
+            //console.log('push on', tree.childNodes[i].title);
+            newTree.childNodes.push(Tree.recSearch(tree.childNodes[i], query));
+        }
+    }
+    if (newTree.childNodes.length === 0) {
+        if (tree.title.indexOf(query) > -1) {
+            //console.log('yeahh', tree.title, query);
+            return {title: tree.title, childNodes: []};
+        }
+        return null;
+    }
+    return newTree;
+};
+
+Tree.search = function(tree, query) {
+    var ret = Tree.recSearch(tree, query);
+    var root = Tree.getRoot(ret);
+    root.childNodes[0].selected = true;
+    return Tree.makeTree(ret.childNodes);
+};
+
+Tree.yamlObjToTree = function(obj) {
+    var ret = [];
+    for (var i = 0; i < obj.length; i++) {
+        if (obj[i + 1] instanceof Array) {
+            ret.push({title: obj[i], childNodes: Tree.yamlObjToTree(obj[i + 1])});
+            i += 1;
+        } else if (typeof(obj[i]) === 'object' && obj[i].hasOwnProperty('title')) {
+            ret.push(obj[i]);
+        } else {
+            ret.push({title: obj[i]});
+        }
+    }
+    return ret;
 };
