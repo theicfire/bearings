@@ -59,6 +59,17 @@ var ResetButton = React.createClass({
     }
 });
 
+var SearchBox = React.createClass({
+    render: function() {
+        return (<input type="text" onChange={this.handleChange} onKeyDown={this.handleKeyDown} />);
+    },
+    handleKeyDown: function(e) {
+        if (e.which === 13) {
+            console.log('search for', e.target.value);
+        }
+    }
+});
+
 var TreeChildren = React.createClass({
 render: function() {
     var childNodes;
@@ -402,7 +413,7 @@ function doRender(tree) {
     if (tree.zoom !== undefined) {
         React.render(
           <div>
-          <ResetButton/> | <a href="import.html">Import</a> | <DataSaved /> | <CompleteHiddenButton />
+          <ResetButton/> | <a href="import.html">Import</a> | <DataSaved /> | <CompleteHiddenButton /> | <SearchBox />
           <div><Breadcrumb node={tree} /></div>
           <TreeNode topBullet={true} node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
           </div>,
