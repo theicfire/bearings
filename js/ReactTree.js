@@ -66,6 +66,10 @@ var SearchBox = React.createClass({
     handleKeyDown: function(e) {
         if (e.which === 13) {
             console.log('search for', e.target.value);
+            globalTree = Tree.search(globalTree, e.target.value);
+            renderAllNoUndo();
+            e.preventDefault();
+            return false;
         }
     }
 });
