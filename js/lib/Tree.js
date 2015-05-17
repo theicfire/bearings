@@ -1,6 +1,16 @@
 var Tree = {};
 module.exports = exports = Tree;
 
+function generateUUID(){
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+};
+
 Tree.selectNextNode = function(tree) {
     var selected = Tree.findSelected(tree);
     var next = Tree.findNextNode(selected);
@@ -113,6 +123,7 @@ Tree.makeNode = function(args) {
     Tree.setIfReal(ret, args, 'collapsed');
     Tree.setIfReal(ret, args, 'completed');
     Tree.setIfReal(ret, args, 'completedHidden');
+    Tree.setIfReal(ret, args, 'uuid');
     Tree.setIfReal(ret, args, 'zoom');
     return ret;
 };
@@ -141,6 +152,7 @@ Tree.cloneGeneral = function(tree, parent, options) {
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed,
             completed: tree.completed,
+            uuid: tree.uuid,
             completedHidden: tree.completedHidden});
     if (tree.childNodes.length > 0 || !options.clean) {
         me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
@@ -535,6 +547,7 @@ Tree.makeSubTree = function(node, parent) {
             collapsed: node.collapsed,
             completed: node.completed,
             completedHidden: node.completedHidden,
+            uuid: node.uuid ? node.uuid : generateUUID(),
             caretLoc: node.caretLoc});
     if (node.childNodes) {
         me.childNodes = node.childNodes.map(function (node) {
