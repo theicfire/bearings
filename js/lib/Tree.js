@@ -107,8 +107,14 @@ Tree.newLineAtCursor = function(tree) {
 
 Tree.addUUIDPointer = function(tree) {
     var root = Tree.getRoot(tree);
-    console.log('roooot', root);
     root.uuidMap[tree.uuid] = tree;
+};
+
+Tree.addUUIDPointers = function(tree) {
+    Tree.addUUIDPointer(tree);
+    tree.childNodes.map(function(child) {
+        Tree.addUUIDPointers(child);
+    });
 };
 
 Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
@@ -132,7 +138,6 @@ Tree.makeNode = function(args, options) {
     Tree.setIfReal(ret, args, 'completed');
     Tree.setIfReal(ret, args, 'completedHidden');
     if (!(options && options.clean)) {
-        Tree.setIfReal(ret, args, 'uuidMap');
         Tree.setIfReal(ret, args, 'uuid', Tree.generateUUID());
     }
     Tree.setIfReal(ret, args, 'zoom');
@@ -140,7 +145,10 @@ Tree.makeNode = function(args, options) {
 };
 
 Tree.clone = function(tree) {
-    return Tree.cloneGeneral(tree, null, {noparent: false, nomouse: false});
+    var ret = Tree.cloneGeneral(tree, null, {noparent: false, nomouse: false});
+    ret.uuidMap = {};
+    Tree.addUUIDPointers(ret);
+    return ret;
 };
 
 Tree.cloneNoParent = function(tree) {
@@ -173,13 +181,14 @@ Tree.cloneGeneral = function(tree, parent, options) {
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed,
             completed: tree.completed,
-            uuidMap: tree.uuidMap  && !options.clean ? Tree.killPointers(tree.uuidMap) : undefined,
             uuid: !!options.clean ? undefined : tree.uuid,
             completedHidden: tree.completedHidden}, {clean: options.clean});
-    if (tree.childNodes.length > 0 || !options.clean) {
-        me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
-    } else {
-        me.childNodes = undefined;
+    if (tree.childNodes && (tree.childNodes.length > 0 || !options.clean)) {
+        me.childNodes = tree.childNodes.map(function (node) {
+            return Tree.cloneGeneral(node, me, options)
+        });
+    } else if (!options.clean) {
+        me.childNodes = [];
     }
     if (!options.noparent) {
         if (tree.zoom) { // TODO should be an invariant
@@ -187,9 +196,6 @@ Tree.cloneGeneral = function(tree, parent, options) {
         }
     }
     me.zoomPath = tree.zoomPath;
-    if (!options.noparent) {
-        Tree.addUUIDPointer(me);
-    }
     return me;
 };
 
@@ -270,8 +276,7 @@ Tree.findChildNum = function(tree) {
         }
     }
     console.assert(false);
-}
-
+};
 
 Tree.getPath = function(tree) {
     if (tree.title === 'special_root_title') {
@@ -537,13 +542,8 @@ Tree.findNextNodeRec = function(tree, zoom) {
 };
 
 Tree.makeTree = function(nodes) {
-    var ret = {title: 'special_root_title', parent: null};
-    ret.uuid = Tree.generateUUID();
-    ret.uuidMap = {};
-    ret.uuidMap[ret.uuid] = ret;
-    ret.childNodes = nodes.map(function (node) {
-        return Tree.makeSubTree(node, ret);
-    });
+    var ret = {title: 'special_root_title', parent: null, childNodes: nodes};
+    ret = Tree.clone(ret);
     ret.zoom = ret;
     ret.zoomPath = Tree.getPath(ret);
     ret.completedHidden = true;
@@ -566,30 +566,6 @@ Tree.makeDefaultTree = function() {
     var ret = Tree.makeTree(rawStartTree);
     return ret;
 }
-
-Tree.makeSubTree = function(node, parent) {
-    var me = Tree.makeNode({
-            title: node.title,
-            parent: parent,
-            selected: node.selected,
-            collapsed: node.collapsed,
-            completed: node.completed,
-            completedHidden: node.completedHidden,
-            uuid: node.uuid,
-            caretLoc: node.caretLoc});
-    if (parent) {
-        Tree.addUUIDPointer(me);
-    } else {
-        me.uuidMap = {};
-        me.uuidMap[me.uuid] = me;
-    }
-    if (node.childNodes) {
-        me.childNodes = node.childNodes.map(function (node) {
-            return Tree.makeSubTree(node, me);
-        });
-    }
-    return me;
-};
 
 Tree.findFromIndexer = function(tree, indexer) {
     if (indexer.length <= 1) {
@@ -619,7 +595,7 @@ Tree.toStringClean = function(tree) {
 
 Tree.fromString = function(s) {
     var obj = JSON.parse(s);
-    var ret = Tree.makeSubTree(obj, null);
+    var ret = Tree.clone(obj);
     // TODO there should always be a zoomPath
     ret.zoomPath = obj.zoomPath;
     if (!ret.zoomPath) {
