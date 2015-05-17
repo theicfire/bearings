@@ -137,9 +137,7 @@ Tree.makeNode = function(args, options) {
     Tree.setIfReal(ret, args, 'collapsed');
     Tree.setIfReal(ret, args, 'completed');
     Tree.setIfReal(ret, args, 'completedHidden');
-    if (!(options && options.clean)) {
-        Tree.setIfReal(ret, args, 'uuid', Tree.generateUUID());
-    }
+    Tree.setIfReal(ret, args, 'uuid', Tree.generateUUID());
     Tree.setIfReal(ret, args, 'uuidMap');
     Tree.setIfReal(ret, args, 'zoom');
     return ret;
@@ -175,15 +173,15 @@ Tree.cloneGeneral = function(tree, parent, options) {
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed,
             completed: tree.completed,
-            uuid: !!options.clean ? undefined : tree.uuid,
+            uuid: tree.uuid,
             uuidMap: options.noparent ? undefined : {},
             completedHidden: tree.completedHidden}, {clean: options.clean});
-    if (tree.childNodes && (tree.childNodes.length > 0 || !options.clean)) {
+    if (tree.childNodes && tree.childNodes.length > 0) {
         me.childNodes = tree.childNodes.map(function (node) {
             return Tree.cloneGeneral(node, me, options)
         });
-    } else if (!options.clean) {
-        me.childNodes = [];
+    } else if (options.clean) {
+        me.childNodes = undefined;
     }
     me.zoomUUID = tree.zoomUUID;
     return me;

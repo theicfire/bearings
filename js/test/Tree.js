@@ -815,19 +815,25 @@ describe('selectNextNode', function() {
             "title": "one",
             "childNodes": [
                 {
-                    "title": "two"
+                    "title": "two",
+                    "uuid": "8f62b509-cb07-4812-9cb0-7a61feeb4aec"
                 },
                 {
                     "title": "three",
-                    "selected": true
+                    "selected": true,
+                    "uuid": "0c299b0f-f79a-4a7b-8f53-18a9bfacdcfe"
                 }
-            ]
+            ],
+            "uuid": "76406524-3bee-4a12-8423-83421d964b25"
         },
         {
-            "title": "four"
+            "title": "four",
+            "uuid": "b7e0cadd-8cad-454e-a1ac-72b9c20f5b8a"
         }
     ],
-    "zoomPath": "-0"
+    "completedHidden": true,
+    "uuid": "0703016f-cdc1-4a09-b311-29c120b56ca0",
+    "zoomUUID": "76406524-3bee-4a12-8423-83421d964b25"
 }
         */}));
 
@@ -839,19 +845,25 @@ describe('selectNextNode', function() {
             "title": "one",
             "childNodes": [
                 {
-                    "title": "two"
+                    "title": "two",
+                    "uuid": "8f62b509-cb07-4812-9cb0-7a61feeb4aec"
                 },
                 {
                     "title": "three",
-                    "selected": true
+                    "selected": true,
+                    "uuid": "0c299b0f-f79a-4a7b-8f53-18a9bfacdcfe"
                 }
-            ]
+            ],
+            "uuid": "76406524-3bee-4a12-8423-83421d964b25"
         },
         {
-            "title": "four"
+            "title": "four",
+            "uuid": "b7e0cadd-8cad-454e-a1ac-72b9c20f5b8a"
         }
     ],
-    "zoomPath": "-0"
+    "completedHidden": true,
+    "uuid": "0703016f-cdc1-4a09-b311-29c120b56ca0",
+    "zoomUUID": "76406524-3bee-4a12-8423-83421d964b25"
 }
         */}));
         Tree.selectNextNode(before);
@@ -870,18 +882,24 @@ describe('selectLastNode', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "selected": true
+                    "selected": true,
+                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
                 },
                 {
-                    "title": "three"
+                    "title": "three",
+                    "uuid": "bdda8a40-f554-4dfd-aa37-229d6f7c45c9"
                 }
-            ]
+            ],
+            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
         },
         {
-            "title": "four"
+            "title": "four",
+            "uuid": "08dfd68b-0491-402c-b762-e2d37c8e14c0"
         }
     ],
-    "zoomPath": "-0"
+    "completedHidden": true,
+    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
+    "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
 }
         */}));
 
@@ -893,19 +911,25 @@ describe('selectLastNode', function() {
             "title": "one",
             "childNodes": [
                 {
-                    "title": "two"
+                    "title": "two",
+                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
                 },
                 {
                     "title": "three",
-                    "selected": true
+                    "selected": true,
+                    "uuid": "bdda8a40-f554-4dfd-aa37-229d6f7c45c9"
                 }
-            ]
+            ],
+            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
         },
         {
-            "title": "four"
+            "title": "four",
+            "uuid": "08dfd68b-0491-402c-b762-e2d37c8e14c0"
         }
     ],
-    "zoomPath": "-0"
+    "completedHidden": true,
+    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
+    "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
 }
         */}));
         Tree.selectLastNode(before);
@@ -927,14 +951,19 @@ describe('selectFirstNode', function() {
                     "childNodes": [
                         {
                             "title": "three",
-                            "selected": true
+                            "selected": true,
+                            "uuid": "bdda8a40-f554-4dfd-aa37-229d6f7c45c9"
                         }
-                    ]
+                    ],
+                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
                 }
-            ]
+            ],
+            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
         }
     ],
-    "zoomPath": "-0-0"
+    "completedHidden": true,
+    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
+    "zoomUUID": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
 }
         */}));
 
@@ -949,15 +978,20 @@ describe('selectFirstNode', function() {
                     "title": "two",
                     "childNodes": [
                         {
-                            "title": "three"
+                            "title": "three",
+                            "uuid": "bdda8a40-f554-4dfd-aa37-229d6f7c45c9"
                         }
                     ],
-                    "selected": true
+                    "selected": true,
+                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
                 }
-            ]
+            ],
+            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
         }
     ],
-    "zoomPath": "-0-0"
+    "completedHidden": true,
+    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
+    "zoomUUID": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
 }
         */}));
         Tree.selectFirstNode(before);
@@ -976,12 +1010,16 @@ describe('unindent', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "selected": true
+                    "selected": true,
+                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
                 }
-            ]
+            ],
+            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
         }
     ],
-    "zoomPath": "-0"
+    "completedHidden": true,
+    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
+    "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
 }
         */}));
 
@@ -994,12 +1032,16 @@ describe('unindent', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "selected": true
+                    "selected": true,
+                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
                 }
-            ]
+            ],
+            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
         }
     ],
-    "zoomPath": "-0"
+    "completedHidden": true,
+    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
+    "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
 }
         */}));
         Tree.unindent(before);
@@ -1022,14 +1064,19 @@ describe('breadcrumb', function() {
                     "childNodes": [
                         {
                             "title": "three",
-                            "selected": true
+                            "selected": true,
+                            "uuid": "527127c4-2143-4e55-95e9-b39c9625fbb7"
                         }
-                    ]
+                    ],
+                    "uuid": "7aba66e3-7fc8-46be-a856-6d85a575e4ef"
                 }
-            ]
+            ],
+            "uuid": "62cfae37-c3d8-40f8-bd2f-3ef979ed8ddf"
         }
     ],
-    "zoomPath": "-0-0-0"
+    "completedHidden": true,
+    "uuid": "03f56f45-19a3-4f90-857f-7b4a5f169d05",
+    "zoomUUID": "527127c4-2143-4e55-95e9-b39c9625fbb7"
 }
         */}));
 
