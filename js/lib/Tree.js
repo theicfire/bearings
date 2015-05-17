@@ -148,6 +148,10 @@ Tree.clone = function(tree) {
     var ret = Tree.cloneGeneral(tree, null, {noparent: false, nomouse: false});
     ret.uuidMap = {};
     Tree.addUUIDPointers(ret);
+    if (tree.zoom) { // TODO should be an invariant
+        var root = Tree.getRoot(ret);
+        ret.zoom = root.uuidMap[tree.zoomUUID];
+    }
     return ret;
 };
 
@@ -190,12 +194,7 @@ Tree.cloneGeneral = function(tree, parent, options) {
     } else if (!options.clean) {
         me.childNodes = [];
     }
-    if (!options.noparent) {
-        if (tree.zoom) { // TODO should be an invariant
-            me.zoom = Tree.findFromIndexer(me, Tree.getPath(tree.zoom));
-        }
-    }
-    me.zoomPath = tree.zoomPath;
+    me.zoomUUID = tree.zoomUUID;
     return me;
 };
 
@@ -278,6 +277,7 @@ Tree.findChildNum = function(tree) {
     console.assert(false);
 };
 
+// TODO remove somehow... uuid stuff fixes this
 Tree.getPath = function(tree) {
     if (tree.title === 'special_root_title') {
         return ''; // TODO hacky, because of the substr in findFromIndexer
@@ -333,7 +333,7 @@ Tree.zoom = function(tree) {
     }
     var root = Tree.getRoot(tree);
     root.zoom = tree;
-    root.zoomPath = Tree.getPath(tree);
+    root.zoomUUID = tree.uuid;
 };
 
 Tree.zoomOutOne = function(tree) {
@@ -545,7 +545,7 @@ Tree.makeTree = function(nodes) {
     var ret = {title: 'special_root_title', parent: null, childNodes: nodes};
     ret = Tree.clone(ret);
     ret.zoom = ret;
-    ret.zoomPath = Tree.getPath(ret);
+    ret.zoomUUID = ret.uuid;
     ret.completedHidden = true;
     return ret;
 };
@@ -596,12 +596,10 @@ Tree.toStringClean = function(tree) {
 Tree.fromString = function(s) {
     var obj = JSON.parse(s);
     var ret = Tree.clone(obj);
-    // TODO there should always be a zoomPath
-    ret.zoomPath = obj.zoomPath;
-    if (!ret.zoomPath) {
+    if (!ret.zoomUUID) {
         ret.zoom = ret;
     } else {
-        ret.zoom = Tree.findFromIndexer(ret, ret.zoomPath);
+        ret.zoom = ret.uuidMap[ret.zoomUUID];
     }
     return ret;
 };
