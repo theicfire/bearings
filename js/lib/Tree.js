@@ -140,13 +140,13 @@ Tree.makeNode = function(args, options) {
     if (!(options && options.clean)) {
         Tree.setIfReal(ret, args, 'uuid', Tree.generateUUID());
     }
+    Tree.setIfReal(ret, args, 'uuidMap');
     Tree.setIfReal(ret, args, 'zoom');
     return ret;
 };
 
 Tree.clone = function(tree) {
     var ret = Tree.cloneGeneral(tree, null, {noparent: false, nomouse: false});
-    ret.uuidMap = {};
     Tree.addUUIDPointers(ret);
     if (tree.zoom) { // TODO should be an invariant
         var root = Tree.getRoot(ret);
@@ -167,16 +167,6 @@ Tree.cloneNoParentClean = function(tree) {
     return Tree.cloneGeneral(tree, null, {noparent: true, nomouse: false, clean: true});
 };
 
-Tree.killPointers = function(obj) {
-    var ret = {};
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-          ret[key] = 0;
-      }
-    }
-    return ret;
-};
-
 Tree.cloneGeneral = function(tree, parent, options) {
     var me = Tree.makeNode({
             title: tree.title,
@@ -186,6 +176,7 @@ Tree.cloneGeneral = function(tree, parent, options) {
             collapsed: tree.collapsed,
             completed: tree.completed,
             uuid: !!options.clean ? undefined : tree.uuid,
+            uuidMap: options.noparent ? undefined : {},
             completedHidden: tree.completedHidden}, {clean: options.clean});
     if (tree.childNodes && (tree.childNodes.length > 0 || !options.clean)) {
         me.childNodes = tree.childNodes.map(function (node) {
