@@ -356,25 +356,6 @@ it('testSelectNext', function() {
     assert.equal(next.title, 'cherry');
 });
 
-it('testPath', function() {
-    var tree =
-          [{title: "howdy",
-          childNodes: [
-            {title: "bobby"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog", selected: true}
-              ]},
-              {title: "cherry"}
-            ]}
-          ]
-    }];
-    var innerTree = Tree.makeTree(tree).childNodes[0].childNodes[1].childNodes[0].childNodes[0];
-    var innerTree2 = Tree.makeTree(tree).childNodes[0];
-    assert.equal(Tree.getPath(innerTree), '-0-1-0-0');
-    assert.equal(Tree.getPath(innerTree2), '-0');
-});
-
 describe('deleteSelected', function() {
     it('deleting an item with children should kill the children', function() {
         var tree = Tree.fromString(multiline(function(){/*

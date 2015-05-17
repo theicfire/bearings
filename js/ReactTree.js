@@ -80,7 +80,7 @@ render: function() {
     if (this.props.childNodes != null) {
         var that = this;
         childNodes = this.props.childNodes.map(function(node, index) {
-            return <li key={index}><TreeNode node={node} indexer={that.props.indexer + '-' + index} /></li>
+            return <li key={index}><TreeNode node={node} /></li>
         });
     }
 
@@ -102,7 +102,7 @@ getInitialState: function() {
 handleChange: function(event) {
     var html = this.refs.input.getDOMNode().textContent;
     if (html !== this.lastHtml) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         currentNode.title = event.target.textContent;
         currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
         renderAll();
@@ -116,7 +116,7 @@ handleClick: function(event) {
     if (globalSkipFocus) {
         return;
     }
-    var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+    var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
     var selected = Tree.findSelected(globalTree);
     delete selected.selected;
     currentNode.selected = true;
@@ -166,7 +166,7 @@ handleKeyDown: function(e) {
                 renderAll();
                 e.preventDefault();
             } else {
-                var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+                var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
                 currentNode.caretLoc = newCaretLoc - 1;
             }
         }
@@ -188,7 +188,7 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.RIGHT) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         if (e.ctrlKey) {
             Tree.zoom(currentNode);
             renderAll();
@@ -221,7 +221,7 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.ENTER) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
         currentNode.caretLoc = caretLoc;
         console.log('loc', caretLoc);
@@ -267,7 +267,7 @@ handleKeyDown: function(e) {
         console.log(JSON.stringify(Tree.cloneNoParentClean(globalTree), null, 4));
         e.preventDefault();
     } else if (e.keyCode === KEYS.C && e.ctrlKey) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         var outlines = Tree.toOutline(currentNode);
         console.log(opml({}, [outlines]));
         e.preventDefault();
@@ -332,7 +332,7 @@ render: function() {
 
     var children = '';
     if (this.props.topBullet || !this.props.node.collapsed) {
-        children = (<TreeChildren childNodes={this.props.node.childNodes} indexer={this.props.indexer} />);
+        children = (<TreeChildren childNodes={this.props.node.childNodes} />);
     }
 
     if (this.props.node.completed && globalCompletedHidden && !this.props.topBullet) {
@@ -359,7 +359,7 @@ render: function() {
 
 toggle: function() {
     console.log(this.props);
-    var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+    var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
     var selected = Tree.findSelected(globalTree);
     delete selected.selected;
     currentNode.selected = true;
@@ -413,13 +413,13 @@ function doRender(tree) {
     //console.log('rendering with', Tree.toString(tree));
 
     // TODO should always have a zoom?
-    //<TreeChildren childNodes={tree.zoom.childNodes} indexer={Tree.getPath(tree.zoom)} />
+    //<TreeChildren childNodes={tree.zoom.childNodes} />
     if (tree.zoom !== undefined) {
         React.render(
           <div>
           <ResetButton/> | <a href="import.html">Import</a> | <DataSaved /> | <CompleteHiddenButton /> | <SearchBox />
           <div><Breadcrumb node={tree} /></div>
-          <TreeNode topBullet={true} node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
+          <TreeNode topBullet={true} node={tree.zoom}/>
           </div>,
           document.getElementById("tree")
         );
@@ -430,7 +430,7 @@ function doRender(tree) {
           //<div>
       //<ResetButton/> | <a href="import.html">Import</a> | <DataSaved />
           //<div><Breadcrumb node={tree} /></div>
-          //<TreeNode node={tree}  indexer=""/>
+          //<TreeNode node={tree}/>
           //</div>,
           //document.getElementById("tree")
         //);

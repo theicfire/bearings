@@ -117,6 +117,11 @@ Tree.addUUIDPointers = function(tree) {
     });
 };
 
+Tree.findFromUUID = function(tree, uuid) {
+    var root = Tree.getRoot(tree);
+    return root.uuidMap[uuid];
+};
+
 Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
     if (fromObj[property] === undefined) {
         if (defaultVal !== undefined) {
@@ -264,30 +269,6 @@ Tree.findChildNum = function(tree) {
         }
     }
     console.assert(false);
-};
-
-// TODO remove somehow... uuid stuff fixes this
-Tree.getPath = function(tree) {
-    if (tree.title === 'special_root_title') {
-        return ''; // TODO hacky, because of the substr in findFromIndexer
-    }
-
-    // TODO put in some utils
-    var reverse = function(s) {
-      var o = '';
-      for (var i = s.length - 1; i >= 0; i--)
-        o += s[i];
-      return o;
-    };
-
-    var getReversePath = function(tree) {
-        if (tree.parent.title === 'special_root_title') {
-            return Tree.findChildNum(tree) + '-'; // TODO hacky. Appending this because of TreeNode.js
-        }
-        return Tree.findChildNum(tree) + '-' + getReversePath(tree.parent);
-    };
-
-    return reverse(getReversePath(tree));
 };
 
 Tree.getRoot = function(tree) {
