@@ -1,7 +1,7 @@
 var Tree = {};
 module.exports = exports = Tree;
 
-function generateUUID(){
+Tree.generateUUID = function(){
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = (d + Math.random()*16)%16 | 0;
@@ -57,12 +57,14 @@ Tree.appendSibling = function(tree, title) {
         }
     }
     var ret = Tree.makeNode({title: title, parent: tree.parent});
+    Tree.addUUIDPointer(ret);
     tree.parent.childNodes.splice(i + 1, 0, ret);
     return ret;
 };
 
 Tree.newChildAtCursor = function(selected) {
     var ret = Tree.makeNode({title: '', parent: selected});
+    Tree.addUUIDPointer(ret);
     if (selected.childNodes) {
         selected.childNodes.unshift(ret);
     } else {
@@ -103,6 +105,12 @@ Tree.newLineAtCursor = function(tree) {
     }
 };
 
+Tree.addUUIDPointer = function(tree) {
+    var root = Tree.getRoot(tree);
+    console.log('roooot', root);
+    root.uuidMap[tree.uuid] = tree;
+};
+
 Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
     if (fromObj[property] === undefined) {
         if (defaultVal !== undefined) {
@@ -113,7 +121,7 @@ Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
     toObj[property] = fromObj[property];
 };
 
-Tree.makeNode = function(args) {
+Tree.makeNode = function(args, options) {
     var ret = {};
     Tree.setIfReal(ret, args, 'title');
     Tree.setIfReal(ret, args, 'childNodes', []);
@@ -123,7 +131,10 @@ Tree.makeNode = function(args) {
     Tree.setIfReal(ret, args, 'collapsed');
     Tree.setIfReal(ret, args, 'completed');
     Tree.setIfReal(ret, args, 'completedHidden');
-    Tree.setIfReal(ret, args, 'uuid');
+    if (!(options && options.clean)) {
+        Tree.setIfReal(ret, args, 'uuidMap');
+        Tree.setIfReal(ret, args, 'uuid', Tree.generateUUID());
+    }
     Tree.setIfReal(ret, args, 'zoom');
     return ret;
 };
@@ -144,6 +155,16 @@ Tree.cloneNoParentClean = function(tree) {
     return Tree.cloneGeneral(tree, null, {noparent: true, nomouse: false, clean: true});
 };
 
+Tree.killPointers = function(obj) {
+    var ret = {};
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+          ret[key] = 0;
+      }
+    }
+    return ret;
+};
+
 Tree.cloneGeneral = function(tree, parent, options) {
     var me = Tree.makeNode({
             title: tree.title,
@@ -152,8 +173,9 @@ Tree.cloneGeneral = function(tree, parent, options) {
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed,
             completed: tree.completed,
-            uuid: tree.uuid,
-            completedHidden: tree.completedHidden});
+            uuidMap: tree.uuidMap  && !options.clean ? Tree.killPointers(tree.uuidMap) : undefined,
+            uuid: !!options.clean ? undefined : tree.uuid,
+            completedHidden: tree.completedHidden}, {clean: options.clean});
     if (tree.childNodes.length > 0 || !options.clean) {
         me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
     } else {
@@ -165,6 +187,9 @@ Tree.cloneGeneral = function(tree, parent, options) {
         }
     }
     me.zoomPath = tree.zoomPath;
+    if (!options.noparent) {
+        Tree.addUUIDPointer(me);
+    }
     return me;
 };
 
@@ -513,6 +538,9 @@ Tree.findNextNodeRec = function(tree, zoom) {
 
 Tree.makeTree = function(nodes) {
     var ret = {title: 'special_root_title', parent: null};
+    ret.uuid = Tree.generateUUID();
+    ret.uuidMap = {};
+    ret.uuidMap[ret.uuid] = ret;
     ret.childNodes = nodes.map(function (node) {
         return Tree.makeSubTree(node, ret);
     });
@@ -547,8 +575,14 @@ Tree.makeSubTree = function(node, parent) {
             collapsed: node.collapsed,
             completed: node.completed,
             completedHidden: node.completedHidden,
-            uuid: node.uuid ? node.uuid : generateUUID(),
+            uuid: node.uuid,
             caretLoc: node.caretLoc});
+    if (parent) {
+        Tree.addUUIDPointer(me);
+    } else {
+        me.uuidMap = {};
+        me.uuidMap[me.uuid] = me;
+    }
     if (node.childNodes) {
         me.childNodes = node.childNodes.map(function (node) {
             return Tree.makeSubTree(node, me);

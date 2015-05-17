@@ -3,6 +3,7 @@ var _ = require("underscore");
 var Tree = require('../lib/Tree');
 var multiline = require('multiline');
 
+Tree.generateUUID = function() {return '1'};
 it('toString and fromString should be opposites', function(){
     var startTree =
       [{title: "howdy", selected: "true", caretLoc: 0,
@@ -356,10 +357,8 @@ it('testSelectNext', function() {
 });
 
 it('testPath', function() {
-    var tree = [{
-      title: "special_root_title",
-      childNodes: [
-          {title: "howdy",
+    var tree =
+          [{title: "howdy",
           childNodes: [
             {title: "bobby"},
             {title: "suzie", childNodes: [
@@ -369,9 +368,9 @@ it('testPath', function() {
               {title: "cherry"}
             ]}
           ]
-    }]}];
-    var innerTree = Tree.makeTree(tree).childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0];
-    var innerTree2 = Tree.makeTree(tree).childNodes[0].childNodes[0];
+    }];
+    var innerTree = Tree.makeTree(tree).childNodes[0].childNodes[1].childNodes[0].childNodes[0];
+    var innerTree2 = Tree.makeTree(tree).childNodes[0];
     assert.equal(Tree.getPath(innerTree), '-0-1-0-0');
     assert.equal(Tree.getPath(innerTree2), '-0');
 });
