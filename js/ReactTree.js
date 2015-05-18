@@ -60,18 +60,20 @@ var ResetButton = React.createClass({
 });
 
 var SearchBox = React.createClass({
-    render: function() {
-        return (<input type="text" onChange={this.handleChange} onKeyDown={this.handleKeyDown} />);
-    },
-    handleKeyDown: function(e) {
-        if (e.which === 13) {
-            console.log('search for', e.target.value);
-            globalTree = Tree.search(globalTree, e.target.value);
-            renderAllNoUndo();
-            e.preventDefault();
-            return false;
-        }
-    }
+ getInitialState: function() {
+    return {value: ''};
+  },
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+    console.log('cool', event.target.value);
+    globalTree = Tree.search(globalTree, event.target.value);
+    renderAllNoUndo();
+  },
+  render: function() {
+    var value = this.state.value;
+    console.log('value', value);
+    return <input type="text" value={value} onChange={this.handleChange} />;
+  }
 });
 
 var TreeChildren = React.createClass({
