@@ -11,8 +11,9 @@ var globalOldTree;
 var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = true;
-var globalSkipFocus = false;
+var globalSkipFocus = false; // TODO remove?
 var globalCompletedHidden;
+var globalLocalState = {};
 
 var DataSaved = React.createClass({
     render: function() {
@@ -106,7 +107,7 @@ handleChange: function(event) {
     if (html !== this.lastHtml) {
         var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         currentNode.title = event.target.textContent;
-        currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+        globalLocalState.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
         renderAll();
     } else {
         console.assert(false, 'Why am I getting a change event if nothing changed?');
@@ -123,9 +124,9 @@ handleClick: function(event) {
     delete selected.selected;
     currentNode.selected = true;
     if (event.type === 'focus') {
-        currentNode.caretLoc = currentNode.title.length;
+        globalLocalState.caretLoc = currentNode.title.length;
     } else {
-        currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+        globalLocalState.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
     }
 },
 
@@ -135,7 +136,7 @@ componentDidMount: function() {
         globalSkipFocus = true;
         el.focus();
         globalSkipFocus = false;
-        Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
+        Cursor.setCursorLoc(el[0], globalLocalState.caretLoc);
     }
 },
 
@@ -156,7 +157,7 @@ handleKeyDown: function(e) {
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
         if (e.ctrlKey) {
-            Tree.zoomOutOne(globalTree);
+            Tree.zoomOutOne(globalTree, globalLocalState);
             renderAll();
             e.preventDefault();
         } else {
@@ -164,16 +165,15 @@ handleKeyDown: function(e) {
             if (newCaretLoc === 0) {
                 Tree.selectPreviousNode(globalTree);
                 var selected = Tree.findSelected(globalTree); // TODO could do this faster than two searches
-                selected.caretLoc = selected.title.length;
+                globalLocalState.caretLoc = selected.title.length;
                 renderAll();
                 e.preventDefault();
             } else {
-                var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
-                currentNode.caretLoc = newCaretLoc - 1;
+                globalLocalState.caretLoc = newCaretLoc - 1;
             }
         }
     } else if (e.keyCode === KEYS.END && e.ctrlKey) {
-        Tree.selectLastNode(globalTree);
+        Tree.selectLastNode(globalTree, globalLocalState);
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.HOME && e.ctrlKey) {
@@ -185,13 +185,13 @@ handleKeyDown: function(e) {
             Tree.shiftUp(globalTree);
         } else {
             Tree.selectPreviousNode(globalTree);
-            Tree.findSelected(globalTree).caretLoc = 0; // TODO could be faster
+            globalLocalState.caretLoc = 0;
         }
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.RIGHT) {
-        var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         if (e.ctrlKey) {
+            var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
             Tree.zoom(currentNode);
             renderAll();
             e.preventDefault();
@@ -199,12 +199,11 @@ handleKeyDown: function(e) {
             var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
             if (newCaretLoc === this.refs.input.getDOMNode().textContent.length) {
                 Tree.selectNextNode(globalTree);
-                var selected = Tree.findSelected(globalTree); // TODO could do this faster then two searches
-                selected.caretLoc = 0;
+                globalLocalState.caretLoc = 0;
                 renderAll();
                 e.preventDefault();
             } else {
-                currentNode.caretLoc = newCaretLoc + 1;
+                globalLocalState.caretLoc = newCaretLoc + 1;
             }
         }
     } else if (e.keyCode === KEYS.DOWN) {
@@ -213,7 +212,7 @@ handleKeyDown: function(e) {
         } else {
             console.log('down');
             Tree.selectNextNode(globalTree);
-            Tree.findSelected(globalTree).caretLoc = 0; // TODO could be faster
+            globalLocalState.caretLoc = 0;
         }
         renderAll();
         e.preventDefault();
@@ -223,22 +222,21 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.ENTER) {
-        var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-        currentNode.caretLoc = caretLoc;
+        globalLocalState.caretLoc = caretLoc;
         console.log('loc', caretLoc);
-        Tree.newLineAtCursor(globalTree);
+        Tree.newLineAtCursor(globalTree, globalLocalState);
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.BACKSPACE) {
         if (e.ctrlKey && e.shiftKey) {
-            Tree.deleteSelected(globalTree);
+            Tree.deleteSelected(globalTree, globalLocalState);
             renderAll();
             e.preventDefault();
         } else {
-            var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-            if (caretLoc === 0) {
-                Tree.backspaceAtBeginning(globalTree);
+            globalLocalState.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+            if (globalLocalState.caretLoc === 0) {
+                Tree.backspaceAtBeginning(globalTree, globalLocalState);
                 renderAll();
                 e.preventDefault();
             }
@@ -279,12 +277,14 @@ handleKeyDown: function(e) {
 },
 
 componentDidUpdate: function(prevProps, prevState) {
+    console.log('updated', this.props.node.title);
     if (this.props.node.selected) {
         var el = $(this.refs.input.getDOMNode());
         globalSkipFocus = true;
+        //console.log('focus on', this.props.node.title);
         el.focus();
         globalSkipFocus = false;
-        Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
+        Cursor.setCursorLoc(el[0], globalLocalState.caretLoc);
     }
     if ( this.refs.input && this.props.node.title !== this.refs.input.getDOMNode().textContent ) {
         // Need this because of: http://stackoverflow.com/questions/22677931/react-js-onchange-event-for-contenteditable/27255103#27255103
@@ -380,15 +380,15 @@ var startRender = function(parseTree) {
     globalUndoRing = new UndoRing(newTree, 50);
     renderAll();
 
-    setInterval(function () {
-        if (!globalDataSaved) {
-            globalParseTree.set('tree', Tree.toString(globalTree));
-            globalParseTree.save();
-            globalDataSaved = true;
-            renderAllNoUndo();
-        }
-        globalUndoRing.commit();
-    }, 2000);
+    //setInterval(function () {
+        //if (!globalDataSaved) {
+            //globalParseTree.set('tree', Tree.toString(globalTree));
+            //globalParseTree.save();
+            //globalDataSaved = true;
+            //renderAllNoUndo();
+        //}
+        //globalUndoRing.commit();
+    //}, 2000);
 }
 
 

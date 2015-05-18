@@ -32,21 +32,21 @@ Tree.selectPreviousNode = function(tree) {
 };
 
 // TODO shouldn't this be the last node of the current zoom?
-Tree.selectLastNode = function(tree) {
+Tree.selectLastNode = function(tree, localState) {
     var root = Tree.getRoot(tree);
     var last = Tree.findDeepest(root.zoom.childNodes[root.zoom.childNodes.length - 1]);
     var selected = Tree.findSelected(tree);
     delete selected.selected;
     last.selected = true;
-    last.caretLoc = last.title.length;
+    localState.caretLoc = last.title.length;
 };
 
-Tree.selectFirstNode = function(tree) {
+Tree.selectFirstNode = function(tree, localState) {
     var root = Tree.getRoot(tree);
     var selected = Tree.findSelected(tree);
     delete selected.selected;
     root.zoom.selected = true;
-    root.zoom.caretLoc = 0;
+    localState.caretLoc = 0;
 };
 
 Tree.appendSibling = function(tree, title) {
@@ -62,7 +62,7 @@ Tree.appendSibling = function(tree, title) {
     return ret;
 };
 
-Tree.newChildAtCursor = function(selected) {
+Tree.newChildAtCursor = function(selected, localState) {
     var ret = Tree.makeNode({title: '', parent: selected});
     Tree.addUUIDPointer(ret);
     if (selected.childNodes) {
@@ -71,19 +71,18 @@ Tree.newChildAtCursor = function(selected) {
         selected.childNodes = [ret];
     }
     delete selected.selected;
-    delete selected.caretLoc;
     ret.selected = true;
-    ret.caretLoc = 0;
+    localState.caretLoc = 0;
 };
 
-Tree.newLineAtCursor = function(tree) {
+Tree.newLineAtCursor = function(tree, localState) {
     var selected = Tree.findSelected(tree);
     var root = Tree.getRoot(tree);
-    var textStart = selected.title.substr(0, selected.caretLoc);
-    var textRest = selected.title.substr(selected.caretLoc);
+    var textStart = selected.title.substr(0, localState.caretLoc);
+    var textRest = selected.title.substr(localState.caretLoc);
     if (selected === root.zoom ||
               (textRest.length === 0 && selected.childNodes.length > 0 && !selected.collapsed)) {
-        Tree.newChildAtCursor(selected);
+        Tree.newChildAtCursor(selected, localState);
     } else {
         selected.title = textStart;
         var nextNode = Tree.appendSibling(selected, textRest);
@@ -97,11 +96,10 @@ Tree.newLineAtCursor = function(tree) {
         }
         if (textStart.length > 0 || (textStart.length === 0 && textRest.length === 0)) {
             delete selected.selected;
-            delete selected.caretLoc;
             nextNode.selected = true;
             selected = nextNode;
         }
-        selected.caretLoc = 0;
+        localState.caretLoc = 0;
     }
 };
 
@@ -137,7 +135,6 @@ Tree.makeNode = function(args, options) {
     Tree.setIfReal(ret, args, 'title');
     Tree.setIfReal(ret, args, 'childNodes', []);
     Tree.setIfReal(ret, args, 'parent');
-    Tree.setIfReal(ret, args, 'caretLoc');
     Tree.setIfReal(ret, args, 'selected');
     Tree.setIfReal(ret, args, 'collapsed');
     Tree.setIfReal(ret, args, 'completed');
@@ -174,7 +171,6 @@ Tree.cloneGeneral = function(tree, parent, options) {
     var me = Tree.makeNode({
             title: tree.title,
             parent: !!options.noparent ? undefined : parent,
-            caretLoc: (!!options.nomouse || !!options.clean) ? undefined : tree.caretLoc,
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed,
             completed: tree.completed,
@@ -306,14 +302,14 @@ Tree.zoom = function(tree) {
     root.zoomUUID = tree.uuid;
 };
 
-Tree.zoomOutOne = function(tree) {
+Tree.zoomOutOne = function(tree, localState) {
     var root = Tree.getRoot(tree);
     if (root.zoom) { 
         if (root.zoom.parent) {
             var selected = Tree.findSelected(tree);
             delete selected.selected;
             root.zoom.selected = true;
-            root.zoom.caretLoc = 0;
+            localState.caretLoc = 0;
             Tree.zoom(root.zoom.parent);
         }
     } else {
@@ -322,7 +318,7 @@ Tree.zoomOutOne = function(tree) {
     }
 };
 
-Tree.deleteSelected = function(tree) {
+Tree.deleteSelected = function(tree, localState) {
     // TODO think if this is the root..
     var selected = Tree.findSelected(tree);
     var nextSelection = Tree.findPreviousNode(selected);
@@ -334,7 +330,7 @@ Tree.deleteSelected = function(tree) {
             selected.title = '';
             selected.childNodes = [];
             selected.selected = true;
-            selected.caretLoc = 0;
+            localState.caretLoc = 0;
             delete selected.collapsed;
             delete selected.completed;
             return;
@@ -343,19 +339,19 @@ Tree.deleteSelected = function(tree) {
     var childNum = Tree.findChildNum(selected);
     selected.parent.childNodes.splice(childNum, 1);
     nextSelection.selected = true;
-    nextSelection.caretLoc = nextSelection.title.length;
+    localState.caretLoc = nextSelection.title.length;
 };
 
-Tree.backspaceAtBeginning = function(tree) {
+Tree.backspaceAtBeginning = function(tree, localState) {
     // TODO think if this is the root
     var selected = Tree.findSelected(tree);
-    if (selected.caretLoc !== 0) {
+    if (localState.caretLoc !== 0) {
         console.log('TODO: home/end keys do not update caretLoc, and so this invariant fails');
     }
     var previous = Tree.findPreviousNode(selected);
     if (!previous || previous === selected.parent) {
         if (selected.title.length === 0) {
-            Tree.deleteSelected(tree);
+            Tree.deleteSelected(tree, localState);
         }
         return;
     }
@@ -364,12 +360,12 @@ Tree.backspaceAtBeginning = function(tree) {
         var childNum = Tree.findChildNum(selected);
         selected.parent.childNodes.splice(childNum, 1);
         previous.selected = true;
-        previous.caretLoc = previous.title.length;
+        localState.caretLoc = previous.title.length;
         previous.title += selected.title;
         Tree.setChildNodes(previous, selected.childNodes);
         previous.collapsed = selected.collapsed;
     } else if (selected.title.length === 0) {
-        Tree.deleteSelected(tree);
+        Tree.deleteSelected(tree, localState);
     }
 }
 
@@ -522,7 +518,7 @@ Tree.makeTree = function(nodes) {
 
 Tree.makeDefaultTree = function() {
     var rawStartTree =
-        [{title: "goody", selected: "true", caretLoc: 0,
+        [{title: "goody", selected: "true",
                 childNodes: [
                     {title: "billy"},
                     {title: "suzie", childNodes: [
