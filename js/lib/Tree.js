@@ -377,7 +377,6 @@ Tree.findDeepest = function(tree) {
     var completedHidden = Tree.isCompletedHidden(tree);
     if (tree.childNodes && !tree.collapsed) {
         for (var i = tree.childNodes.length - 1; i >= 0; i--) {
-            console.log('search over', i, tree.childNodes[i]);
             if (!completedHidden || !tree.childNodes[i].completed) {
                 return Tree.findDeepest(tree.childNodes[i]);
             }
@@ -418,11 +417,8 @@ Tree.completeCurrent = function(tree) {
     }
     if (!selected.completed && selected.parent.title === 'special_root_title') {
         if (Tree.countVisibleChildren(selected.parent) <= 1) {
-            console.log('noooop');
-            console.log(selected.parent.childNodes);
             return; // Can't select the only element left on the page..
         } else if (Tree.findChildNum(selected) === 0) {
-            console.log('yeah, complete', selected);
             selected.completed = true;
             var backup = Tree.isCompletedHidden(tree);
             Tree.setCompletedHidden(tree, true);

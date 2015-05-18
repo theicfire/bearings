@@ -6,7 +6,7 @@ var multiline = require('multiline');
 Tree.generateUUID = function() {return '1'};
 it('toString and fromString should be opposites', function(){
     var startTree =
-      [{title: "howdy", selected: "true",
+      [{title: "howdy",
           childNodes: [
             {title: "billy"},
             {title: "suzie", childNodes: [
@@ -999,16 +999,16 @@ describe('unindent', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "selected": true,
-                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
+                    "uuid": "d0fa509a-788a-440b-a52d-6dc26e80a727"
                 }
             ],
-            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+            "uuid": "f504ddc1-44d7-4c25-a4c8-316e5010ed18"
         }
     ],
+    "selected": "d0fa509a-788a-440b-a52d-6dc26e80a727",
     "completedHidden": true,
-    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
-    "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+    "uuid": "7e843b82-0ed8-4211-9c70-699e8f8a9ff5",
+    "zoomUUID": "f504ddc1-44d7-4c25-a4c8-316e5010ed18"
 }
         */}));
 
@@ -1021,16 +1021,16 @@ describe('unindent', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "selected": true,
-                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
+                    "uuid": "d0fa509a-788a-440b-a52d-6dc26e80a727"
                 }
             ],
-            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+            "uuid": "f504ddc1-44d7-4c25-a4c8-316e5010ed18"
         }
     ],
+    "selected": "d0fa509a-788a-440b-a52d-6dc26e80a727",
     "completedHidden": true,
-    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
-    "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+    "uuid": "7e843b82-0ed8-4211-9c70-699e8f8a9ff5",
+    "zoomUUID": "f504ddc1-44d7-4c25-a4c8-316e5010ed18"
 }
         */}));
         Tree.unindent(before);
