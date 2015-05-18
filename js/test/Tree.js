@@ -6,7 +6,7 @@ var multiline = require('multiline');
 Tree.generateUUID = function() {return '1'};
 it('toString and fromString should be opposites', function(){
     var startTree =
-      [{title: "howdy", selected: "true", caretLoc: 0,
+      [{title: "howdy", selected: "true",
           childNodes: [
             {title: "billy"},
             {title: "suzie", childNodes: [
@@ -26,14 +26,14 @@ it('Node should not be removed if backspace is pressed at the beginning of a lin
     tree = Tree.makeTree([
         {title: "suzie", childNodes: [
           {title: "puppy", childNodes: [
-            {title: 'dog', selected: true, caretLoc: 0}
+            {title: 'dog', selected: true,}
           ]},
           {title: "cherry"}
       ]}]);
     var newTree = Tree.makeTree([
         {title: "suzie", childNodes: [
           {title: "puppy", childNodes: [
-            {title: 'dog', selected: true, caretLoc: 0}
+            {title: 'dog', selected: true,}
           ]},
           {title: "cherry"}
       ]}]);
@@ -62,7 +62,7 @@ it('clone', function() {
     var tree = Tree.makeTree([
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
-                {title: 'dog', selected: true, caretLoc: 0}
+                {title: 'dog', selected: true}
               ]},
               {title: "cherry"}
           ]}]);
@@ -76,14 +76,14 @@ describe('indent', function() {
                     {title: "puppy", childNodes: [
                             {title: 'dog'}
                         ]},
-                    {title: "cherry", selected: true, caretLoc: 0}
+                    {title: "cherry", selected: true}
                 ]}]);
 
         var nextTree = Tree.makeTree([
             {title: "suzie", childNodes: [
                     {title: "puppy", childNodes: [
                             {title: 'dog'},
-                            {title: "cherry", selected: true, caretLoc: 0}
+                            {title: "cherry", selected: true}
                         ]},
                 ]}]);
         Tree.indent(tree);
@@ -94,7 +94,7 @@ describe('indent', function() {
         var tree = Tree.makeTree([
             {title: "suzie", childNodes: [
                     {title: "puppy", childNodes: [
-                            {title: 'dog', selected: true, caretLoc: 0}
+                            {title: 'dog', selected: true}
                         ]},
                     {title: "cherry"}
                 ]}]);
@@ -103,7 +103,7 @@ describe('indent', function() {
         var nextTree = Tree.makeTree([
             {title: "suzie", childNodes: [
                     {title: "puppy", childNodes: [
-                            {title: 'dog', selected: true, caretLoc: 0}
+                            {title: 'dog', selected: true}
                         ]},
                     {title: "cherry"}
                 ]}]);
