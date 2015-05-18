@@ -37,7 +37,7 @@ it('Node should not be removed if backspace is pressed at the beginning of a lin
           ]},
           {title: "cherry"}
       ]}]);
-    Tree.backspaceAtBeginning(tree);
+    Tree.backspaceAtBeginning(tree, {caretLoc: 0});
     assert.equal(Tree.toString(tree), Tree.toString(newTree));
 });
 
@@ -46,14 +46,16 @@ it('If there is a sibling above the current line and backspace is pressed at the
     tree = Tree.makeTree([
         {title: "suzie", childNodes: [
                 {title: "puppy"},
-                {title: "cherry", selected: true, caretLoc: 0}
+                {title: "cherry", selected: true}
       ]}]);
     var newTree = Tree.makeTree([
         {title: "suzie", childNodes: [
-                {title: "puppycherry", selected: true, caretLoc: 5}
+                {title: "puppycherry", selected: true}
       ]}]);
-    Tree.backspaceAtBeginning(tree);
+    var localState = {caretLoc: 0};
+    Tree.backspaceAtBeginning(tree, localState);
     assert(Tree.equals(tree, newTree));
+    assert(localState.caretLoc === 5);
 });
 
 it('clone', function() {
@@ -117,7 +119,7 @@ describe('newLineAtCursor', function() {
         tree = Tree.makeTree([
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
-                {title: someTitle, selected: true, caretLoc: someTitle.length}
+                {title: someTitle, selected: true}
               ]},
               {title: "cherry"}
           ]}]);
@@ -125,12 +127,14 @@ describe('newLineAtCursor', function() {
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
                 {title: someTitle},
-                {title: "", selected: true, caretLoc: 0}
+                {title: "", selected: true}
               ]},
               {title: "cherry"}
           ]}]);
-        Tree.newLineAtCursor(tree);
+        var localState = {caretLoc: someTitle.length};
+        Tree.newLineAtCursor(tree, localState);
         assert(Tree.equals(tree, newTree));
+        assert(localState.caretLoc === 0);
     });
 
     it('two', function() {
@@ -139,20 +143,22 @@ describe('newLineAtCursor', function() {
         tree = Tree.makeTree([
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
-                {title: someTitle, selected: true, caretLoc: 0}
+                {title: someTitle, selected: true}
               ]},
               {title: "cherry"}
           ]}]);
         newTree = Tree.makeTree([
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
-                {title: "", selected: true, caretLoc: 0},
+                {title: "", selected: true},
                 {title: someTitle}
               ]},
               {title: "cherry"}
           ]}]);
-        Tree.newLineAtCursor(tree);
+        var localState = {caretLoc: 0};
+        Tree.newLineAtCursor(tree, localState);
         assert(Tree.equals(tree, newTree));
+        assert(localState.caretLoc === 0);
     });
 
     it('three', function() {
@@ -161,7 +167,7 @@ describe('newLineAtCursor', function() {
         tree = Tree.makeTree([
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
-                {title: someTitle, selected: true, caretLoc: 1}
+                {title: someTitle, selected: true}
               ]},
               {title: "cherry"}
           ]}]);
@@ -169,12 +175,14 @@ describe('newLineAtCursor', function() {
             {title: "suzie", childNodes: [
               {title: "puppy", childNodes: [
                 {title: 'd'},
-                {title: 'og', selected: true, caretLoc: 0}
+                {title: 'og', selected: true}
               ]},
               {title: "cherry"}
           ]}]);
-        Tree.newLineAtCursor(tree);
+        var localState = {caretLoc: 1};
+        Tree.newLineAtCursor(tree, localState);
         assert(Tree.equals(tree, newTree));
+        assert(localState.caretLoc === 0);
     });
 });
 
@@ -398,7 +406,7 @@ describe('deleteSelected', function() {
         }
         */}));
 
-        Tree.deleteSelected(tree);
+        Tree.deleteSelected(tree, {caretLoc: 0});
         assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
 
@@ -440,7 +448,7 @@ describe('deleteSelected', function() {
             ]
         }
         */}));
-        Tree.deleteSelected(tree);
+        Tree.deleteSelected(tree, {caretLoc: 0});
         assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
 });
@@ -913,7 +921,7 @@ describe('selectLastNode', function() {
     "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
 }
         */}));
-        Tree.selectLastNode(before);
+        Tree.selectLastNode(before, {caretLoc: 0});
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });
@@ -975,7 +983,7 @@ describe('selectFirstNode', function() {
     "zoomUUID": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
 }
         */}));
-        Tree.selectFirstNode(before);
+        Tree.selectFirstNode(before, {caretLoc: 0});
         assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
     });
 });
