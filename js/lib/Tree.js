@@ -13,21 +13,19 @@ Tree.generateUUID = function(){
 
 Tree.selectNextNode = function(tree) {
     var selected = Tree.findSelected(tree);
+    var root = Tree.getRoot(tree);
     var next = Tree.findNextNode(selected);
     if (next) {
-        if (selected) {
-            delete selected.selected;
-        }
-        next.selected = true;
+        root.selected = next.uuid;
     }
 };
 
 Tree.selectPreviousNode = function(tree) {
     var selected = Tree.findSelected(tree);
+    var root = Tree.getRoot(tree);
     var previous = Tree.findPreviousNode(selected);
     if (previous) {
-        delete selected.selected;
-        previous.selected = true;
+        root.selected = previous.uuid;
     }
 };
 
@@ -36,16 +34,13 @@ Tree.selectLastNode = function(tree, localState) {
     var root = Tree.getRoot(tree);
     var last = Tree.findDeepest(root.zoom.childNodes[root.zoom.childNodes.length - 1]);
     var selected = Tree.findSelected(tree);
-    delete selected.selected;
-    last.selected = true;
+    root.selected = last.uuid;
     localState.caretLoc = last.title.length;
 };
 
 Tree.selectFirstNode = function(tree, localState) {
     var root = Tree.getRoot(tree);
-    var selected = Tree.findSelected(tree);
-    delete selected.selected;
-    root.zoom.selected = true;
+    root.selected = root.zoom.uuid;
     localState.caretLoc = 0;
 };
 
@@ -64,14 +59,14 @@ Tree.appendSibling = function(tree, title) {
 
 Tree.newChildAtCursor = function(selected, localState) {
     var ret = Tree.makeNode({title: '', parent: selected});
+    var root = Tree.getRoot(selected);
     Tree.addUUIDPointer(ret);
     if (selected.childNodes) {
         selected.childNodes.unshift(ret);
     } else {
         selected.childNodes = [ret];
     }
-    delete selected.selected;
-    ret.selected = true;
+    root.selected = ret.uuid;
     localState.caretLoc = 0;
 };
 
@@ -95,9 +90,7 @@ Tree.newLineAtCursor = function(tree, localState) {
             }
         }
         if (textStart.length > 0 || (textStart.length === 0 && textRest.length === 0)) {
-            delete selected.selected;
-            nextNode.selected = true;
-            selected = nextNode;
+            root.selected = nextNode.uuid;
         }
         localState.caretLoc = 0;
     }
@@ -307,8 +300,7 @@ Tree.zoomOutOne = function(tree, localState) {
     if (root.zoom) { 
         if (root.zoom.parent) {
             var selected = Tree.findSelected(tree);
-            delete selected.selected;
-            root.zoom.selected = true;
+            root.selected = root.zoom.uuid;
             localState.caretLoc = 0;
             Tree.zoom(root.zoom.parent);
         }
@@ -322,6 +314,7 @@ Tree.deleteSelected = function(tree, localState) {
     // TODO think if this is the root..
     var selected = Tree.findSelected(tree);
     var nextSelection = Tree.findPreviousNode(selected);
+    var root = Tree.getRoot(tree);
     if (!nextSelection) {
         console.assert(selected.parent.title === 'special_root_title');
         if (selected.parent.childNodes.length > 1) {
@@ -329,16 +322,15 @@ Tree.deleteSelected = function(tree, localState) {
         } else {
             selected.title = '';
             selected.childNodes = [];
-            selected.selected = true;
             localState.caretLoc = 0;
             delete selected.collapsed;
-            delete selected.completed;
+            delete selected.completed; // TODO do I want this?
             return;
         }
     }
     var childNum = Tree.findChildNum(selected);
     selected.parent.childNodes.splice(childNum, 1);
-    nextSelection.selected = true;
+    root.selected = nextSelection.uuid;
     localState.caretLoc = nextSelection.title.length;
 };
 
@@ -359,7 +351,8 @@ Tree.backspaceAtBeginning = function(tree, localState) {
     if (!previous.collapsed) {
         var childNum = Tree.findChildNum(selected);
         selected.parent.childNodes.splice(childNum, 1);
-        previous.selected = true;
+        var root = Tree.getRoot(tree);
+        root.selected = previous.uuid;
         localState.caretLoc = previous.title.length;
         previous.title += selected.title;
         Tree.setChildNodes(previous, selected.childNodes);
@@ -395,16 +388,12 @@ Tree.findDeepest = function(tree) {
 };
 
 Tree.findSelected = function(node) {
-    if (node.selected) {
-        return node;
+    var root = Tree.getRoot(node);
+    console.assert(root === node);
+    if (!root.selected) {
+        return null;
     }
-    for (var i = 0; i < node.childNodes.length; i++) {
-        var found = Tree.findSelected(node.childNodes[i]);
-        if (found) {
-            return found;
-        }
-    }
-    return null;
+    return root.uuidMap[root.selected];
 };
 
 
@@ -439,8 +428,7 @@ Tree.completeCurrent = function(tree) {
             Tree.setCompletedHidden(tree, true);
             var next = Tree.findNextNode(selected.parent);
             Tree.setCompletedHidden(tree, backup);
-            delete selected.selected;
-            next.selected = true;
+            root.selected = next.uuid;
             return;
         }
     }
@@ -513,12 +501,13 @@ Tree.makeTree = function(nodes) {
     ret.zoom = ret;
     ret.zoomUUID = ret.uuid;
     ret.completedHidden = true;
+    //ret.selected = ret.childNodes[0].uuid; // TODO check if needed?
     return ret;
 };
 
 Tree.makeDefaultTree = function() {
     var rawStartTree =
-        [{title: "goody", selected: "true",
+        [{title: "goody",
                 childNodes: [
                     {title: "billy"},
                     {title: "suzie", childNodes: [
@@ -615,9 +604,10 @@ Tree.recSearch = function(tree, query) {
 
 Tree.search = function(tree, query) {
     var ret = Tree.recSearch(tree, query);
-    var root = Tree.getRoot(ret);
-    root.childNodes[0].selected = true;
-    return Tree.makeTree(ret.childNodes);
+    if (ret) {
+        return Tree.makeTree(ret.childNodes);
+    }
+    return Tree.makeTree();
 };
 
 Tree.yamlObjToTree = function(obj) {

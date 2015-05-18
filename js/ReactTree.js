@@ -7,6 +7,7 @@ var UndoRing = require('./lib/UndoRing');
 var opml = require('opml-generator');
 
 var globalTree;
+var globalTreeBak;
 var globalOldTree;
 var globalParseTree;
 var globalUndoRing;
@@ -67,13 +68,27 @@ var SearchBox = React.createClass({
   handleChange: function(event) {
     this.setState({value: event.target.value});
     console.log('cool', event.target.value);
-    globalTree = Tree.search(globalTree, event.target.value);
+    if (event.target.value.length === 0) {
+        globalTree = globalTreeBak;
+        globalTreeBak = null;
+        renderAllNoUndo();
+        return;
+    }
+    if (!globalTreeBak) {
+        globalTreeBak = globalTree;
+        globalTree = Tree.search(globalTree, event.target.value);
+    } else {
+        globalTree = Tree.search(globalTreeBak, event.target.value);
+    }
     renderAllNoUndo();
+  },
+  handleFocus: function() {
+    globalTree.selected = null;
   },
   render: function() {
     var value = this.state.value;
     console.log('value', value);
-    return <input type="text" value={value} onChange={this.handleChange} />;
+    return <input type="text" value={value} onChange={this.handleChange} onFocus={this.handleFocus} />;
   }
 });
 
@@ -120,9 +135,7 @@ handleClick: function(event) {
         return;
     }
     var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
-    var selected = Tree.findSelected(globalTree);
-    delete selected.selected;
-    currentNode.selected = true;
+    globalTree.selected = currentNode.uuid;
     if (event.type === 'focus') {
         globalLocalState.caretLoc = currentNode.title.length;
     } else {
@@ -131,7 +144,7 @@ handleClick: function(event) {
 },
 
 componentDidMount: function() {
-    if (this.props.node.selected) {
+    if (this.props.node.uuid === globalTree.selected) {
         var el = $(this.refs.input.getDOMNode());
         globalSkipFocus = true;
         el.focus();
@@ -278,7 +291,7 @@ handleKeyDown: function(e) {
 
 componentDidUpdate: function(prevProps, prevState) {
     console.log('updated', this.props.node.title);
-    if (this.props.node.selected) {
+    if (this.props.node.uuid === globalTree.selected) {
         var el = $(this.refs.input.getDOMNode());
         globalSkipFocus = true;
         //console.log('focus on', this.props.node.title);
@@ -362,9 +375,7 @@ render: function() {
 toggle: function() {
     console.log(this.props);
     var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
-    var selected = Tree.findSelected(globalTree);
-    delete selected.selected;
-    currentNode.selected = true;
+    globalTree.selected = currentNode.uuid;
     Tree.collapseCurrent(globalTree);
     renderAll();
 }
@@ -380,15 +391,15 @@ var startRender = function(parseTree) {
     globalUndoRing = new UndoRing(newTree, 50);
     renderAll();
 
-    //setInterval(function () {
-        //if (!globalDataSaved) {
-            //globalParseTree.set('tree', Tree.toString(globalTree));
-            //globalParseTree.save();
-            //globalDataSaved = true;
-            //renderAllNoUndo();
-        //}
-        //globalUndoRing.commit();
-    //}, 2000);
+    setInterval(function () {
+        if (!globalDataSaved) {
+            globalParseTree.set('tree', Tree.toString(globalTree));
+            globalParseTree.save();
+            globalDataSaved = true;
+            renderAllNoUndo();
+        }
+        globalUndoRing.commit();
+    }, 2000);
 }
 
 
