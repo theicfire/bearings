@@ -35,13 +35,13 @@ Tree.selectLastNode = function(tree, localState) {
     var last = Tree.findDeepest(root.zoom.childNodes[root.zoom.childNodes.length - 1]);
     var selected = Tree.findSelected(tree);
     root.selected = last.uuid;
-    localState.caretLoc = last.title.length;
+    root.caretLoc = last.title.length;
 };
 
 Tree.selectFirstNode = function(tree, localState) {
     var root = Tree.getRoot(tree);
     root.selected = root.zoom.uuid;
-    localState.caretLoc = 0;
+    root.caretLoc = 0;
 };
 
 Tree.appendSibling = function(tree, title) {
@@ -67,17 +67,17 @@ Tree.newChildAtCursor = function(selected, localState) {
         selected.childNodes = [ret];
     }
     root.selected = ret.uuid;
-    localState.caretLoc = 0;
+    root.caretLoc = 0;
 };
 
-Tree.newLineAtCursor = function(tree, localState) {
+Tree.newLineAtCursor = function(tree) {
     var selected = Tree.findSelected(tree);
     var root = Tree.getRoot(tree);
-    var textStart = selected.title.substr(0, localState.caretLoc);
-    var textRest = selected.title.substr(localState.caretLoc);
+    var textStart = selected.title.substr(0, root.caretLoc);
+    var textRest = selected.title.substr(root.caretLoc);
     if (selected === root.zoom ||
               (textRest.length === 0 && selected.childNodes.length > 0 && !selected.collapsed)) {
-        Tree.newChildAtCursor(selected, localState);
+        Tree.newChildAtCursor(selected, root);
     } else {
         selected.title = textStart;
         var nextNode = Tree.appendSibling(selected, textRest);
@@ -92,7 +92,7 @@ Tree.newLineAtCursor = function(tree, localState) {
         if (textStart.length > 0 || (textStart.length === 0 && textRest.length === 0)) {
             root.selected = nextNode.uuid;
         }
-        localState.caretLoc = 0;
+        root.caretLoc = 0;
     }
 };
 
@@ -132,6 +132,7 @@ Tree.makeNode = function(args, options) {
     Tree.setIfReal(ret, args, 'collapsed');
     Tree.setIfReal(ret, args, 'completed');
     Tree.setIfReal(ret, args, 'completedHidden');
+    Tree.setIfReal(ret, args, 'caretLoc');
     Tree.setIfReal(ret, args, 'uuid', Tree.generateUUID());
     Tree.setIfReal(ret, args, 'uuidMap');
     Tree.setIfReal(ret, args, 'zoom');
@@ -167,6 +168,7 @@ Tree.cloneGeneral = function(tree, parent, options) {
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed,
             completed: tree.completed,
+            caretLoc: !!options.nomouse ? undefined : tree.caretLoc,
             uuid: tree.uuid,
             uuidMap: options.noparent ? undefined : {},
             completedHidden: tree.completedHidden}, {clean: options.clean});
@@ -301,7 +303,7 @@ Tree.zoomOutOne = function(tree, localState) {
         if (root.zoom.parent) {
             var selected = Tree.findSelected(tree);
             root.selected = root.zoom.uuid;
-            localState.caretLoc = 0;
+            root.caretLoc = 0;
             Tree.zoom(root.zoom.parent);
         }
     } else {
@@ -322,7 +324,7 @@ Tree.deleteSelected = function(tree, localState) {
         } else {
             selected.title = '';
             selected.childNodes = [];
-            localState.caretLoc = 0;
+            root.caretLoc = 0;
             delete selected.collapsed;
             delete selected.completed; // TODO do I want this?
             return;
@@ -331,19 +333,20 @@ Tree.deleteSelected = function(tree, localState) {
     var childNum = Tree.findChildNum(selected);
     selected.parent.childNodes.splice(childNum, 1);
     root.selected = nextSelection.uuid;
-    localState.caretLoc = nextSelection.title.length;
+    root.caretLoc = nextSelection.title.length;
 };
 
-Tree.backspaceAtBeginning = function(tree, localState) {
+Tree.backspaceAtBeginning = function(tree) {
     // TODO think if this is the root
     var selected = Tree.findSelected(tree);
-    if (localState.caretLoc !== 0) {
+    var root = Tree.getRoot(tree);
+    if (root.caretLoc !== 0) {
         console.log('TODO: home/end keys do not update caretLoc, and so this invariant fails');
     }
     var previous = Tree.findPreviousNode(selected);
     if (!previous || previous === selected.parent) {
         if (selected.title.length === 0) {
-            Tree.deleteSelected(tree, localState);
+            Tree.deleteSelected(tree);
         }
         return;
     }
@@ -353,12 +356,12 @@ Tree.backspaceAtBeginning = function(tree, localState) {
         selected.parent.childNodes.splice(childNum, 1);
         var root = Tree.getRoot(tree);
         root.selected = previous.uuid;
-        localState.caretLoc = previous.title.length;
+        root.caretLoc = previous.title.length;
         previous.title += selected.title;
         Tree.setChildNodes(previous, selected.childNodes);
         previous.collapsed = selected.collapsed;
     } else if (selected.title.length === 0) {
-        Tree.deleteSelected(tree, localState);
+        Tree.deleteSelected(tree);
     }
 }
 

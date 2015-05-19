@@ -22,40 +22,121 @@ it('toString and fromString should be opposites', function(){
 });
 
 it('Node should not be removed if backspace is pressed at the beginning of a line and there is no sibling above the line', function(){
-    var tree;
-    tree = Tree.makeTree([
-        {title: "suzie", childNodes: [
-          {title: "puppy", childNodes: [
-            {title: 'dog', selected: true,}
-          ]},
-          {title: "cherry"}
-      ]}]);
-    var newTree = Tree.makeTree([
-        {title: "suzie", childNodes: [
-          {title: "puppy", childNodes: [
-            {title: 'dog', selected: true,}
-          ]},
-          {title: "cherry"}
-      ]}]);
-    Tree.backspaceAtBeginning(tree, {caretLoc: 0});
-    assert.equal(Tree.toString(tree), Tree.toString(newTree));
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "bab9cb24-f5f0-49f5-bde1-9103a33a1939"
+                        }
+                    ],
+                    "uuid": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854"
+                }
+            ],
+            "uuid": "a6ddf085-a7d9-4ea0-bb47-dbe71a3a595c"
+        }
+    ],
+    "selected": "bab9cb24-f5f0-49f5-bde1-9103a33a1939",
+    "completedHidden": true,
+    "caretLoc": 5,
+    "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
+    "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "bab9cb24-f5f0-49f5-bde1-9103a33a1939"
+                        }
+                    ],
+                    "uuid": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854"
+                }
+            ],
+            "uuid": "a6ddf085-a7d9-4ea0-bb47-dbe71a3a595c"
+        }
+    ],
+    "selected": "bab9cb24-f5f0-49f5-bde1-9103a33a1939",
+    "completedHidden": true,
+    "caretLoc": 5,
+    "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
+    "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
+}
+        */}));
+
+        Tree.backspaceAtBeginning(tree);
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
 });
 
 it('If there is a sibling above the current line and backspace is pressed at the beginning of the line, we delete the line and combine the two.', function() {
-    var tree;
-    tree = Tree.makeTree([
-        {title: "suzie", childNodes: [
-                {title: "puppy"},
-                {title: "cherry", selected: true}
-      ]}]);
-    var newTree = Tree.makeTree([
-        {title: "suzie", childNodes: [
-                {title: "puppycherry", selected: true}
-      ]}]);
-    var localState = {caretLoc: 0};
-    Tree.backspaceAtBeginning(tree, localState);
-    assert(Tree.equals(tree, newTree));
-    assert(localState.caretLoc === 5);
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "uuid": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854"
+                },
+                {
+                    "title": "three",
+                    "uuid": "1d5ab0d9-94c5-4ed9-bd5e-0721c8b51c44"
+                }
+            ],
+            "uuid": "a6ddf085-a7d9-4ea0-bb47-dbe71a3a595c"
+        }
+    ],
+    "selected": "1d5ab0d9-94c5-4ed9-bd5e-0721c8b51c44",
+    "completedHidden": true,
+    "caretLoc": 5,
+    "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
+    "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "twothree",
+                    "uuid": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854"
+                }
+            ],
+            "uuid": "a6ddf085-a7d9-4ea0-bb47-dbe71a3a595c"
+        }
+    ],
+    "selected": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854",
+    "completedHidden": true,
+    "caretLoc": 3,
+    "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
+    "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
+}
+        */}));
+
+        Tree.backspaceAtBeginning(tree);
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
 });
 
 it('clone', function() {
@@ -71,276 +152,552 @@ it('clone', function() {
 
 describe('indent', function() {
     it('one', function() {
-        var tree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-                    {title: "puppy", childNodes: [
-                            {title: 'dog'}
-                        ]},
-                    {title: "cherry", selected: true}
-                ]}]);
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "5ed5f33d-f451-4e75-84aa-fa0672b5feb6"
+                        }
+                    ],
+                    "uuid": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854"
+                },
+                {
+                    "title": "four",
+                    "uuid": "4ffc823c-bb9d-44cb-99ac-92c4c7cb5faf"
+                }
+            ],
+            "uuid": "a6ddf085-a7d9-4ea0-bb47-dbe71a3a595c"
+        }
+    ],
+    "selected": "4ffc823c-bb9d-44cb-99ac-92c4c7cb5faf",
+    "completedHidden": true,
+    "caretLoc": 4,
+    "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
+    "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
+}
+        */}));
 
-        var nextTree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-                    {title: "puppy", childNodes: [
-                            {title: 'dog'},
-                            {title: "cherry", selected: true}
-                        ]},
-                ]}]);
+        var after = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "5ed5f33d-f451-4e75-84aa-fa0672b5feb6"
+                        },
+                        {
+                            "title": "four",
+                            "uuid": "4ffc823c-bb9d-44cb-99ac-92c4c7cb5faf"
+                        }
+                    ],
+                    "uuid": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854"
+                }
+            ],
+            "uuid": "a6ddf085-a7d9-4ea0-bb47-dbe71a3a595c"
+        }
+    ],
+    "selected": "4ffc823c-bb9d-44cb-99ac-92c4c7cb5faf",
+    "completedHidden": true,
+    "caretLoc": 4,
+    "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
+    "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
+}
+        */}));
+
         Tree.indent(tree);
-        assert(Tree.equals(tree, nextTree));
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
 
     it('two', function() {
-        var tree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-                    {title: "puppy", childNodes: [
-                            {title: 'dog', selected: true}
-                        ]},
-                    {title: "cherry"}
-                ]}]);
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "5ed5f33d-f451-4e75-84aa-fa0672b5feb6"
+                        }
+                    ],
+                    "uuid": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854"
+                },
+                {
+                    "title": "four",
+                    "uuid": "4ffc823c-bb9d-44cb-99ac-92c4c7cb5faf"
+                }
+            ],
+            "uuid": "a6ddf085-a7d9-4ea0-bb47-dbe71a3a595c"
+        }
+    ],
+    "selected": "5ed5f33d-f451-4e75-84aa-fa0672b5feb6",
+    "completedHidden": true,
+    "caretLoc": 4,
+    "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
+    "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
+}
+        */}));
 
-        // No change
-        var nextTree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-                    {title: "puppy", childNodes: [
-                            {title: 'dog', selected: true}
-                        ]},
-                    {title: "cherry"}
-                ]}]);
+        var after = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "5ed5f33d-f451-4e75-84aa-fa0672b5feb6"
+                        }
+                    ],
+                    "uuid": "204dc0c4-6a8b-45c7-924b-0f87ee7d2854"
+                },
+                {
+                    "title": "four",
+                    "uuid": "4ffc823c-bb9d-44cb-99ac-92c4c7cb5faf"
+                }
+            ],
+            "uuid": "a6ddf085-a7d9-4ea0-bb47-dbe71a3a595c"
+        }
+    ],
+    "selected": "5ed5f33d-f451-4e75-84aa-fa0672b5feb6",
+    "completedHidden": true,
+    "caretLoc": 4,
+    "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
+    "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
+}
+        */}));
+
         Tree.indent(tree);
-        assert(Tree.equals(tree, nextTree));
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
 });
 
 describe('newLineAtCursor', function() {
     it('one', function() {
-        var tree;
-        var someTitle = 'dog';
-        tree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: someTitle, selected: true}
-              ]},
-              {title: "cherry"}
-          ]}]);
-        newTree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: someTitle},
-                {title: "", selected: true}
-              ]},
-              {title: "cherry"}
-          ]}]);
-        var localState = {caretLoc: someTitle.length};
-        Tree.newLineAtCursor(tree, localState);
-        assert(Tree.equals(tree, newTree));
-        assert(localState.caretLoc === 0);
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "2db2083d-dfef-4e5c-a01d-ccc61221a425"
+                        }
+                    ],
+                    "uuid": "e125b42d-15d6-402c-9a1f-01a465ec76c3"
+                },
+                {
+                    "title": "four",
+                    "uuid": "03b49580-4921-44f5-9a82-868fdac299ea"
+                }
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
+        }
+    ],
+    "selected": "2db2083d-dfef-4e5c-a01d-ccc61221a425",
+    "completedHidden": true,
+    "caretLoc": 5,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "2db2083d-dfef-4e5c-a01d-ccc61221a425"
+                        },
+                        {
+                            "title": "",
+                            "uuid": "1"
+                        }
+                    ],
+                    "uuid": "e125b42d-15d6-402c-9a1f-01a465ec76c3"
+                },
+                {
+                    "title": "four",
+                    "uuid": "03b49580-4921-44f5-9a82-868fdac299ea"
+                }
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
+        }
+    ],
+    "selected": "1",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
+        */}));
+
+        Tree.newLineAtCursor(tree);
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
 
     it('two', function() {
-        var tree;
-        var someTitle = 'dog';
-        tree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: someTitle, selected: true}
-              ]},
-              {title: "cherry"}
-          ]}]);
-        newTree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "", selected: true},
-                {title: someTitle}
-              ]},
-              {title: "cherry"}
-          ]}]);
-        var localState = {caretLoc: 0};
-        Tree.newLineAtCursor(tree, localState);
-        assert(Tree.equals(tree, newTree));
-        assert(localState.caretLoc === 0);
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "96d1bed0-65fb-4358-ae92-f0a648ad5673"
+                        }
+                    ],
+                    "uuid": "f1115362-6835-42b7-bceb-2d5948dc292a"
+                }
+            ],
+            "uuid": "3084a5d5-d9d8-4cae-9fe7-b12c619d452f"
+        }
+    ],
+    "selected": "f1115362-6835-42b7-bceb-2d5948dc292a",
+    "completedHidden": true,
+    "caretLoc": 3,
+    "uuid": "006f3f71-ed22-44d2-b6a3-9d98f263587a",
+    "zoomUUID": "006f3f71-ed22-44d2-b6a3-9d98f263587a"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "",
+                            "uuid": "1"
+                        },
+                        {
+                            "title": "three",
+                            "uuid": "96d1bed0-65fb-4358-ae92-f0a648ad5673"
+                        }
+                    ],
+                    "uuid": "f1115362-6835-42b7-bceb-2d5948dc292a"
+                }
+            ],
+            "uuid": "3084a5d5-d9d8-4cae-9fe7-b12c619d452f"
+        }
+    ],
+    "selected": "1",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "006f3f71-ed22-44d2-b6a3-9d98f263587a",
+    "zoomUUID": "006f3f71-ed22-44d2-b6a3-9d98f263587a"
+}
+        */}));
+
+        Tree.newLineAtCursor(tree);
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
 
     it('three', function() {
-        var tree;
-        var someTitle = 'dog';
-        tree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: someTitle, selected: true}
-              ]},
-              {title: "cherry"}
-          ]}]);
-        newTree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: 'd'},
-                {title: 'og', selected: true}
-              ]},
-              {title: "cherry"}
-          ]}]);
-        var localState = {caretLoc: 1};
-        Tree.newLineAtCursor(tree, localState);
-        assert(Tree.equals(tree, newTree));
-        assert(localState.caretLoc === 0);
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "uuid": "f1115362-6835-42b7-bceb-2d5948dc292a"
+                }
+            ],
+            "uuid": "3084a5d5-d9d8-4cae-9fe7-b12c619d452f"
+        }
+    ],
+    "selected": "f1115362-6835-42b7-bceb-2d5948dc292a",
+    "completedHidden": true,
+    "caretLoc": 2,
+    "uuid": "006f3f71-ed22-44d2-b6a3-9d98f263587a",
+    "zoomUUID": "006f3f71-ed22-44d2-b6a3-9d98f263587a"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "tw",
+                    "uuid": "f1115362-6835-42b7-bceb-2d5948dc292a"
+                },
+                {
+                    "title": "o",
+                    "uuid": "1"
+                }
+            ],
+            "uuid": "3084a5d5-d9d8-4cae-9fe7-b12c619d452f"
+        }
+    ],
+    "selected": "1",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "006f3f71-ed22-44d2-b6a3-9d98f263587a",
+    "zoomUUID": "006f3f71-ed22-44d2-b6a3-9d98f263587a"
+}
+        */}));
+
+        Tree.newLineAtCursor(tree);
+        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
     });
 });
 
 describe('findSelected and findNextNode', function() {
-    it('Sibling below you should be the next selection if you have no children', function() {
-        var selected, next;
-        var tree = [{
-          title: "howdy",
-          childNodes: [
-            {title: "bobby", selected: "true"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog house"}
-              ]},
-              {title: "cherry thing"}
-            ]}
-          ]
-        }];
-        selected = Tree.findSelected(Tree.makeTree(tree));
-        next = Tree.findNextNode(selected);
-        assert.equal(selected.title, 'bobby');
-        assert.equal(next.title, 'suzie');
-    });
+    it('Moving down through a tree', function() {
+        var tree = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "uuid": "f817f8ca-bd87-463a-ac3f-7ea9e6498d59"
+                },
+                {
+                    "title": "three",
+                    "childNodes": [
+                        {
+                            "title": "four",
+                            "childNodes": [
+                                {
+                                    "title": "five",
+                                    "uuid": "cce07751-f471-4517-a1a4-136fea91e6f8"
+                                }
+                            ],
+                            "uuid": "507bc637-ca0c-4cc4-95d8-79e5f236c2a6"
+                        },
+                        {
+                            "title": "six",
+                            "uuid": "7eef6a3f-71df-4fd6-a6d1-a2ad925c8429"
+                        }
+                    ],
+                    "uuid": "ea87543e-ff41-4562-b340-49180b8b779f"
+                }
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
+        }
+    ],
+    "selected": "f817f8ca-bd87-463a-ac3f-7ea9e6498d59",
+    "completedHidden": true,
+    "caretLoc": 3,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
+        */}));
 
-    it('If you have children, the first child should be selected in findNextNode', function() {
-        var treeNext = [{
-          title: "howdy",
-          childNodes: [
-            {title: "bobby"},
-            {title: "suzie", selected: true, childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog house"}
-              ]},
-              {title: "cherry thing"}
-            ]}
-          ]
-        }];
-        selected = Tree.findSelected(Tree.makeTree(treeNext));
-        next = Tree.findNextNode(selected);
-        assert.equal(selected.title, 'suzie');
-        assert.equal(next.title, 'puppy');
-    });
-
-    it('If you have no sibling, your parent\'s lower sibling should be selected', function() {
-        var treeNext2 = [{
-          title: "howdy",
-          childNodes: [
-            {title: "bobby"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog", selected: true}
-              ]},
-              {title: "cherry"}
-            ]}
-          ]
-        }];
-        selected = Tree.findSelected(Tree.makeTree(treeNext2));
-        next = Tree.findNextNode(selected);
-        assert.equal(selected.title, 'dog');
-        assert.equal(next.title, 'cherry');
-    });
-
-    it('If you are the last element, there is no other next element to select', function() {
-        var treeNext3 = [{
-          title: "howdy",
-          childNodes: [
-            {title: "bobby"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog"}
-              ]},
-              {title: "cherry", selected: true}
-            ]}
-          ]
-        }];
-        selected = Tree.findSelected(Tree.makeTree(treeNext3));
-        next = Tree.findNextNode(selected);
-        assert.equal(selected.title, 'cherry');
-        assert.equal(next, null);
+        assert.equal(Tree.findSelected(tree).title, 'two');
+        Tree.selectNextNode(tree);
+        assert.equal(Tree.findSelected(tree).title, 'three');
+        Tree.selectNextNode(tree);
+        assert.equal(Tree.findSelected(tree).title, 'four');
+        Tree.selectNextNode(tree);
+        assert.equal(Tree.findSelected(tree).title, 'five');
+        Tree.selectNextNode(tree);
+        assert.equal(Tree.findSelected(tree).title, 'six');
     });
 });
 
 describe('Looking for the previous node of some selected node (findPreviousNode)', function() {
     it('If you have no siblings above you, the previous node is the parent', function() {
-        var tree = [{
-          title: "howdy",
-          childNodes: [
-            {title: "bobby", selected: "true"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog house"}
-              ]},
-              {title: "cherry thing"}
-            ]}
-          ]
-        }];
-        selected = Tree.findSelected(Tree.makeTree(tree));
+        var tree = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "uuid": "dd9f1f7c-b9ea-40f7-bcac-5bd8686a6ff7"
+                },
+                {
+                    "title": "three",
+                    "uuid": "6fad8b6c-96f7-4075-8aee-b63c29d2321b"
+                }
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
+        }
+    ],
+    "selected": "dd9f1f7c-b9ea-40f7-bcac-5bd8686a6ff7",
+    "completedHidden": true,
+    "caretLoc": 3,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
+        */}));
+
+        selected = Tree.findSelected(tree);
         next = Tree.findPreviousNode(selected);
-        assert.equal(selected.title, 'bobby');
-        assert.equal(next.title, 'howdy');
+        assert.equal(selected.title, 'two');
+        assert.equal(next.title, 'one');
     });
 
     it('If you have a sibling above you, that is the previous node', function() {
-        var treeNext = [{
-          title: "howdy",
-          childNodes: [
-            {title: "bobby"},
-            {title: "suzie", selected: true, childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog house"}
-              ]},
-              {title: "cherry thing"}
-            ]}
-          ]
-        }];
-        selected = Tree.findSelected(Tree.makeTree(treeNext));
+        var tree = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "uuid": "dd9f1f7c-b9ea-40f7-bcac-5bd8686a6ff7"
+                },
+                {
+                    "title": "three",
+                    "uuid": "6fad8b6c-96f7-4075-8aee-b63c29d2321b"
+                }
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
+        }
+    ],
+    "selected": "6fad8b6c-96f7-4075-8aee-b63c29d2321b",
+    "completedHidden": true,
+    "caretLoc": 5,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
+        */}));
+
+        selected = Tree.findSelected(tree);
         next = Tree.findPreviousNode(selected);
-        assert.equal(selected.title, 'suzie');
-        assert.equal(next.title, 'bobby');
+        assert.equal(selected.title, 'three');
+        assert.equal(next.title, 'two');
     });
 
     // TODO this is not symetric with getNextNode. getNextNode never returns null.
     it('If there are no siblings above you and you have no parent, the previous node is... null', function() {
-        var treeNext2 = [{
-          title: "howdy", selected: true,
-          childNodes: [
-            {title: "bobby"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog"}
-              ]},
-              {title: "cherry"}
-            ]}
-          ]
-        }];
-        selected = Tree.findSelected(Tree.makeTree(treeNext2));
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "6fad8b6c-96f7-4075-8aee-b63c29d2321b"
+                        }
+                    ],
+                    "uuid": "dd9f1f7c-b9ea-40f7-bcac-5bd8686a6ff7"
+                },
+                {
+                    "title": "four",
+                    "uuid": "b3717c66-7e8e-459d-84e9-c61300a3dc48"
+                }
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
+        }
+    ],
+    "selected": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
+        */}));
+
+        selected = Tree.findSelected(tree);
         next = Tree.findPreviousNode(selected);
-        assert.equal(selected.title, 'howdy');
+        assert.equal(selected.title, 'one');
         assert.equal(next, null);
     });
 
     it('four', function() {
-        var treeNext3 = [{
-          title: "howdy",
-          childNodes: [
-            {title: "bobby"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog"}
-              ]},
-              {title: "cherry", selected: true,}
-            ]}
-          ]
-        }];
-        selected = Tree.findSelected(Tree.makeTree(treeNext3));
-        next = Tree.findPreviousNode(selected);
-        assert.equal(selected.title, 'cherry');
-        assert.equal(next.title, 'dog');
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "childNodes": [
+                        {
+                            "title": "three",
+                            "uuid": "6fad8b6c-96f7-4075-8aee-b63c29d2321b"
+                        }
+                    ],
+                    "uuid": "dd9f1f7c-b9ea-40f7-bcac-5bd8686a6ff7"
+                },
+                {
+                    "title": "four",
+                    "uuid": "b3717c66-7e8e-459d-84e9-c61300a3dc48"
+                }
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
+        }
+    ],
+    "selected": "b3717c66-7e8e-459d-84e9-c61300a3dc48",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
+        */}));
+
+        var selected = Tree.findSelected(tree);
+        var next = Tree.findPreviousNode(selected);
+        assert.equal(selected.title, 'four');
+        assert.equal(next.title, 'three');
     });
 });
 
@@ -368,42 +725,52 @@ describe('deleteSelected', function() {
     it('deleting an item with children should kill the children', function() {
         var tree = Tree.fromString(multiline(function(){/*
         {
-            "title": "special_root_title",
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
             "childNodes": [
                 {
-                    "title": "howdy",
+                    "title": "two",
                     "childNodes": [
                         {
-                            "title": "billy"
+                            "title": "three",
+                            "uuid": "28cb09f2-e362-4aac-ae1a-ebce5dc063f0"
                         },
                         {
-                            "title": "suzie",
-                            "childNodes": [
-                                {
-                                    "title": "cherry thing"
-                                }
-                            ]
+                            "title": "four",
+                            "uuid": "9f7308f0-6347-4f8a-b1a4-76d0386c8146"
                         }
                     ],
-                    "selected": true
-                },
-                {
-                    "title": "the end"
+                    "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
                 }
-            ]
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         }
+    ],
+    "selected": "3e86ff52-4d76-46ac-88ae-cc056a7d3034",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
         */}));
 
         var after = Tree.fromString(multiline(function() {/*
         {
-            "title": "special_root_title",
-            "childNodes": [
-                {
-                    "title": "the end",
-                    "selected": true
-                }
-            ]
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         }
+    ],
+    "selected": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09",
+    "completedHidden": true,
+    "caretLoc": 3,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
         */}));
 
         Tree.deleteSelected(tree, {caretLoc: 0});
@@ -412,41 +779,53 @@ describe('deleteSelected', function() {
 
     it('deleting the last item works', function() {
         var tree = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
         {
-            "title": "special_root_title",
+            "title": "one",
             "childNodes": [
                 {
-                    "title": "howdy",
-                    "childNodes": [
-                        {
-                            "title": "billy"
-                        }
-                    ]
-                },
-                {
-                    "title": "the end",
-                    "selected": true
+                    "title": "two",
+                    "uuid": "29b7989f-c4f0-46ec-8f0c-db95ad35b7d4"
                 }
-            ]
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
+        },
+        {
+            "title": "three",
+            "uuid": "3e812786-6b8e-439f-9c5a-56046c834d20"
         }
-
+    ],
+    "selected": "3e812786-6b8e-439f-9c5a-56046c834d20",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
         */}));
 
         var after = Tree.fromString(multiline(function(){/*
+{
+    "title": "special_root_title",
+    "childNodes": [
         {
-            "title": "special_root_title",
+            "title": "one",
             "childNodes": [
                 {
-                    "title": "howdy",
-                    "childNodes": [
-                        {
-                            "title": "billy",
-                            "selected": true
-                        }
-                    ]
+                    "title": "two",
+                    "uuid": "29b7989f-c4f0-46ec-8f0c-db95ad35b7d4"
                 }
-            ]
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         }
+    ],
+    "selected": "29b7989f-c4f0-46ec-8f0c-db95ad35b7d4",
+    "completedHidden": true,
+    "caretLoc": 3,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
+}
         */}));
         Tree.deleteSelected(tree, {caretLoc: 0});
         assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
@@ -460,13 +839,19 @@ describe('shiftUp', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "howdy"
+            "title": "one",
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         },
         {
-            "title": "billy",
-            "selected": true
+            "title": "two",
+            "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
         }
-    ]
+    ],
+    "selected": "3e86ff52-4d76-46ac-88ae-cc056a7d3034",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
 
@@ -475,13 +860,19 @@ describe('shiftUp', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "billy",
-            "selected": true
+            "title": "two",
+            "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
         },
         {
-            "title": "howdy"
+            "title": "one",
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         }
-    ]
+    ],
+    "selected": "3e86ff52-4d76-46ac-88ae-cc056a7d3034",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
         Tree.shiftUp(before);
@@ -494,13 +885,19 @@ describe('shiftUp', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "billy",
-            "selected": true
+            "title": "one",
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         },
         {
-            "title": "howdy"
+            "title": "two",
+            "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
         }
-    ]
+    ],
+    "selected": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09",
+    "completedHidden": true,
+    "caretLoc": 2,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
 
@@ -509,13 +906,19 @@ describe('shiftUp', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "billy",
-            "selected": true
+            "title": "one",
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         },
         {
-            "title": "howdy"
+            "title": "two",
+            "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
         }
-    ]
+    ],
+    "selected": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09",
+    "completedHidden": true,
+    "caretLoc": 2,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
         Tree.shiftUp(before);
@@ -528,18 +931,21 @@ describe('shiftUp', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "billy",
+            "title": "one",
             "childNodes": [
                 {
-                    "title": "cool child",
-                    "selected": true
+                    "title": "two",
+                    "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
                 }
-            ]
-        },
-        {
-            "title": "howdy"
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         }
-    ]
+    ],
+    "selected": "3e86ff52-4d76-46ac-88ae-cc056a7d3034",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
 
@@ -548,18 +954,21 @@ describe('shiftUp', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "billy",
+            "title": "one",
             "childNodes": [
                 {
-                    "title": "cool child",
-                    "selected": true
+                    "title": "two",
+                    "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
                 }
-            ]
-        },
-        {
-            "title": "howdy"
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         }
-    ]
+    ],
+    "selected": "3e86ff52-4d76-46ac-88ae-cc056a7d3034",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
         Tree.shiftUp(before);
@@ -572,18 +981,25 @@ describe('shiftUp', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "billy",
+            "title": "one",
             "childNodes": [
                 {
-                    "title": "cool child"
+                    "title": "two",
+                    "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
                 }
-            ]
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         },
         {
-            "title": "howdy",
-            "selected": true
+            "title": "three",
+            "uuid": "eb866f77-7d65-4c74-964a-b42175377ed4"
         }
-    ]
+    ],
+    "selected": "eb866f77-7d65-4c74-964a-b42175377ed4",
+    "completedHidden": true,
+    "caretLoc": 1,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
 
@@ -592,18 +1008,25 @@ describe('shiftUp', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "howdy",
-            "selected": true
+            "title": "three",
+            "uuid": "eb866f77-7d65-4c74-964a-b42175377ed4"
         },
         {
-            "title": "billy",
+            "title": "one",
             "childNodes": [
                 {
-                    "title": "cool child"
+                    "title": "two",
+                    "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
                 }
-            ]
+            ],
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         }
-    ]
+    ],
+    "selected": "eb866f77-7d65-4c74-964a-b42175377ed4",
+    "completedHidden": true,
+    "caretLoc": 1,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
         Tree.shiftUp(before);
@@ -619,13 +1042,19 @@ describe('shiftDown', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "billy",
-            "selected": true
+            "title": "one",
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         },
         {
-            "title": "howdy"
+            "title": "two",
+            "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
         }
-    ]
+    ],
+    "selected": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09",
+    "completedHidden": true,
+    "caretLoc": 1,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
 
@@ -634,13 +1063,19 @@ describe('shiftDown', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "howdy"
+            "title": "two",
+            "uuid": "3e86ff52-4d76-46ac-88ae-cc056a7d3034"
         },
         {
-            "title": "billy",
-            "selected": true
+            "title": "one",
+            "uuid": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09"
         }
-    ]
+    ],
+    "selected": "3dff6add-6444-4aac-8bb2-1ddfb6d7ec09",
+    "completedHidden": true,
+    "caretLoc": 1,
+    "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
+    "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
         */}));
         Tree.shiftDown(before);
@@ -657,13 +1092,19 @@ describe('selectPreviousNode', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "howdy"
+            "title": "one",
+            "uuid": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
         },
         {
-            "title": "billy",
-            "selected": true
+            "title": "two",
+            "uuid": "76a4b190-49d7-40f6-bc94-8c008e8b0620"
         }
-    ]
+    ],
+    "selected": "76a4b190-49d7-40f6-bc94-8c008e8b0620",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
+    "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
         */}));
 
@@ -672,13 +1113,19 @@ describe('selectPreviousNode', function() {
     "title": "special_root_title",
     "childNodes": [
         {
-            "title": "howdy",
-            "selected": true
+            "title": "one",
+            "uuid": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
         },
         {
-            "title": "billy"
+            "title": "two",
+            "uuid": "76a4b190-49d7-40f6-bc94-8c008e8b0620"
         }
-    ]
+    ],
+    "selected": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
+    "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
         */}));
         Tree.selectPreviousNode(before);
@@ -701,19 +1148,26 @@ describe('selectNextNode', function() {
             "title": "one",
             "childNodes": [
                 {
-                    "title": "two"
+                    "title": "two",
+                    "uuid": "76a4b190-49d7-40f6-bc94-8c008e8b0620"
                 },
                 {
-                    "title": "three"
+                    "title": "three",
+                    "uuid": "fed034e3-5c4d-4a36-9d77-2441c5db7660"
                 }
             ],
-            "selected": true
+            "uuid": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
         },
         {
-            "title": "four"
+            "title": "four",
+            "uuid": "656c4b03-9bd2-4fc0-83e7-e57d5af51a17"
         }
     ],
-    "zoomPath": ""
+    "selected": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
+    "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
         */}));
 
@@ -726,18 +1180,25 @@ describe('selectNextNode', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "selected": true
+                    "uuid": "76a4b190-49d7-40f6-bc94-8c008e8b0620"
                 },
                 {
-                    "title": "three"
+                    "title": "three",
+                    "uuid": "fed034e3-5c4d-4a36-9d77-2441c5db7660"
                 }
-            ]
+            ],
+            "uuid": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
         },
         {
-            "title": "four"
+            "title": "four",
+            "uuid": "656c4b03-9bd2-4fc0-83e7-e57d5af51a17"
         }
     ],
-    "zoomPath": ""
+    "selected": "76a4b190-49d7-40f6-bc94-8c008e8b0620",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
+    "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
         */}));
         Tree.selectNextNode(before);
@@ -753,18 +1214,25 @@ describe('selectNextNode', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "selected": true
+                    "uuid": "76a4b190-49d7-40f6-bc94-8c008e8b0620"
                 },
                 {
-                    "title": "three"
+                    "title": "three",
+                    "uuid": "fed034e3-5c4d-4a36-9d77-2441c5db7660"
                 }
-            ]
+            ],
+            "uuid": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
         },
         {
-            "title": "four"
+            "title": "four",
+            "uuid": "656c4b03-9bd2-4fc0-83e7-e57d5af51a17"
         }
     ],
-    "zoomPath": ""
+    "selected": "76a4b190-49d7-40f6-bc94-8c008e8b0620",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
+    "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
         */}));
 
@@ -776,19 +1244,26 @@ describe('selectNextNode', function() {
             "title": "one",
             "childNodes": [
                 {
-                    "title": "two"
+                    "title": "two",
+                    "uuid": "76a4b190-49d7-40f6-bc94-8c008e8b0620"
                 },
                 {
                     "title": "three",
-                    "selected": true
+                    "uuid": "fed034e3-5c4d-4a36-9d77-2441c5db7660"
                 }
-            ]
+            ],
+            "uuid": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
         },
         {
-            "title": "four"
+            "title": "four",
+            "uuid": "656c4b03-9bd2-4fc0-83e7-e57d5af51a17"
         }
     ],
-    "zoomPath": ""
+    "selected": "fed034e3-5c4d-4a36-9d77-2441c5db7660",
+    "completedHidden": true,
+    "caretLoc": 0,
+    "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
+    "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
         */}));
         Tree.selectNextNode(before);
@@ -805,24 +1280,25 @@ describe('selectNextNode', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "uuid": "8f62b509-cb07-4812-9cb0-7a61feeb4aec"
+                    "uuid": "76a4b190-49d7-40f6-bc94-8c008e8b0620"
                 },
                 {
                     "title": "three",
-                    "selected": true,
-                    "uuid": "0c299b0f-f79a-4a7b-8f53-18a9bfacdcfe"
+                    "uuid": "fed034e3-5c4d-4a36-9d77-2441c5db7660"
                 }
             ],
-            "uuid": "76406524-3bee-4a12-8423-83421d964b25"
+            "uuid": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
         },
         {
             "title": "four",
-            "uuid": "b7e0cadd-8cad-454e-a1ac-72b9c20f5b8a"
+            "uuid": "656c4b03-9bd2-4fc0-83e7-e57d5af51a17"
         }
     ],
+    "selected": "fed034e3-5c4d-4a36-9d77-2441c5db7660",
     "completedHidden": true,
-    "uuid": "0703016f-cdc1-4a09-b311-29c120b56ca0",
-    "zoomUUID": "76406524-3bee-4a12-8423-83421d964b25"
+    "caretLoc": 0,
+    "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
+    "zoomUUID": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
 }
         */}));
 
@@ -835,24 +1311,25 @@ describe('selectNextNode', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "uuid": "8f62b509-cb07-4812-9cb0-7a61feeb4aec"
+                    "uuid": "76a4b190-49d7-40f6-bc94-8c008e8b0620"
                 },
                 {
                     "title": "three",
-                    "selected": true,
-                    "uuid": "0c299b0f-f79a-4a7b-8f53-18a9bfacdcfe"
+                    "uuid": "fed034e3-5c4d-4a36-9d77-2441c5db7660"
                 }
             ],
-            "uuid": "76406524-3bee-4a12-8423-83421d964b25"
+            "uuid": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
         },
         {
             "title": "four",
-            "uuid": "b7e0cadd-8cad-454e-a1ac-72b9c20f5b8a"
+            "uuid": "656c4b03-9bd2-4fc0-83e7-e57d5af51a17"
         }
     ],
+    "selected": "fed034e3-5c4d-4a36-9d77-2441c5db7660",
     "completedHidden": true,
-    "uuid": "0703016f-cdc1-4a09-b311-29c120b56ca0",
-    "zoomUUID": "76406524-3bee-4a12-8423-83421d964b25"
+    "caretLoc": 0,
+    "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
+    "zoomUUID": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
 }
         */}));
         Tree.selectNextNode(before);
@@ -871,24 +1348,25 @@ describe('selectLastNode', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "selected": true,
-                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
+                    "uuid": "3398b59a-b442-408d-95ea-c3ed3010c940"
                 },
                 {
                     "title": "three",
-                    "uuid": "bdda8a40-f554-4dfd-aa37-229d6f7c45c9"
+                    "uuid": "6b749288-063b-4ba6-b31f-8dd75b9e7632"
                 }
             ],
-            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+            "uuid": "819da9dc-875f-4997-a503-368e9cc92846"
         },
         {
             "title": "four",
-            "uuid": "08dfd68b-0491-402c-b762-e2d37c8e14c0"
+            "uuid": "6a878de7-1608-4056-a325-c617ca9789b2"
         }
     ],
+    "selected": "3398b59a-b442-408d-95ea-c3ed3010c940",
     "completedHidden": true,
-    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
-    "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+    "caretLoc": 0,
+    "uuid": "aafec563-0043-4b6a-a1ed-4d5604da6eb3",
+    "zoomUUID": "819da9dc-875f-4997-a503-368e9cc92846"
 }
         */}));
 
@@ -901,24 +1379,25 @@ describe('selectLastNode', function() {
             "childNodes": [
                 {
                     "title": "two",
-                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
+                    "uuid": "3398b59a-b442-408d-95ea-c3ed3010c940"
                 },
                 {
                     "title": "three",
-                    "selected": true,
-                    "uuid": "bdda8a40-f554-4dfd-aa37-229d6f7c45c9"
+                    "uuid": "6b749288-063b-4ba6-b31f-8dd75b9e7632"
                 }
             ],
-            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+            "uuid": "819da9dc-875f-4997-a503-368e9cc92846"
         },
         {
             "title": "four",
-            "uuid": "08dfd68b-0491-402c-b762-e2d37c8e14c0"
+            "uuid": "6a878de7-1608-4056-a325-c617ca9789b2"
         }
     ],
+    "selected": "6b749288-063b-4ba6-b31f-8dd75b9e7632",
     "completedHidden": true,
-    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
-    "zoomUUID": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+    "caretLoc": 5,
+    "uuid": "aafec563-0043-4b6a-a1ed-4d5604da6eb3",
+    "zoomUUID": "819da9dc-875f-4997-a503-368e9cc92846"
 }
         */}));
         Tree.selectLastNode(before, {caretLoc: 0});
@@ -940,19 +1419,20 @@ describe('selectFirstNode', function() {
                     "childNodes": [
                         {
                             "title": "three",
-                            "selected": true,
-                            "uuid": "bdda8a40-f554-4dfd-aa37-229d6f7c45c9"
+                            "uuid": "6b749288-063b-4ba6-b31f-8dd75b9e7632"
                         }
                     ],
-                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
+                    "uuid": "3398b59a-b442-408d-95ea-c3ed3010c940"
                 }
             ],
-            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+            "uuid": "819da9dc-875f-4997-a503-368e9cc92846"
         }
     ],
+    "selected": "6b749288-063b-4ba6-b31f-8dd75b9e7632",
     "completedHidden": true,
-    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
-    "zoomUUID": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
+    "caretLoc": 0,
+    "uuid": "aafec563-0043-4b6a-a1ed-4d5604da6eb3",
+    "zoomUUID": "3398b59a-b442-408d-95ea-c3ed3010c940"
 }
         */}));
 
@@ -968,19 +1448,20 @@ describe('selectFirstNode', function() {
                     "childNodes": [
                         {
                             "title": "three",
-                            "uuid": "bdda8a40-f554-4dfd-aa37-229d6f7c45c9"
+                            "uuid": "6b749288-063b-4ba6-b31f-8dd75b9e7632"
                         }
                     ],
-                    "selected": true,
-                    "uuid": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
+                    "uuid": "3398b59a-b442-408d-95ea-c3ed3010c940"
                 }
             ],
-            "uuid": "8e1ad1f7-88f0-413d-85f1-576dd42d8244"
+            "uuid": "819da9dc-875f-4997-a503-368e9cc92846"
         }
     ],
+    "selected": "3398b59a-b442-408d-95ea-c3ed3010c940",
     "completedHidden": true,
-    "uuid": "263116c9-ffda-4597-837f-4df94fc8bc98",
-    "zoomUUID": "9f033584-4f61-4f49-9ad5-1acbc2201a12"
+    "caretLoc": 0,
+    "uuid": "aafec563-0043-4b6a-a1ed-4d5604da6eb3",
+    "zoomUUID": "3398b59a-b442-408d-95ea-c3ed3010c940"
 }
         */}));
         Tree.selectFirstNode(before, {caretLoc: 0});

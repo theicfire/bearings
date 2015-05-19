@@ -30,7 +30,6 @@ var searchYaml = multiline(function(){/*
         - children and needle
 */});
     var searchTree = Tree.makeTree(Tree.yamlObjToTree(yaml.safeLoad(searchYaml)));
-    searchTree.childNodes[0].selected = true;
     assert(Tree.equals(Tree.search(startTree, 'needle'), searchTree));
 });
 
