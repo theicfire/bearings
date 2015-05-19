@@ -85,9 +85,7 @@ var SearchBox = React.createClass({
     globalTree.selected = null;
   },
   render: function() {
-    var value = this.state.value;
-    console.log('value', value);
-    return <input type="text" value={value} onChange={this.handleChange} onFocus={this.handleFocus} />;
+    return <input type="text" value={this.state.value} onChange={this.handleChange} onFocus={this.handleFocus} />;
   }
 });
 
@@ -112,7 +110,7 @@ render: function() {
 var TreeNode = React.createClass({
 getInitialState: function() {
     return {
-      title: this.props.node.title
+      mouseOver: false
     };
 },
 
@@ -340,9 +338,17 @@ render: function() {
         contentClassName += " completed";
     }
 
+    var plus;
+    if (this.state.mouseOver) {
+        if (this.props.node.childNodes != null && this.props.node.collapsed) {
+            plus = (<div onClick={this.toggle} className='collapseButton'>+</div>);
+        } else {
+            plus = (<div onClick={this.toggle} className='collapseButton'>-</div>);
+        }
+    }
     var bulletPoint = '';
     if (!this.props.topBullet) {
-        bulletPoint = (<span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>);
+        bulletPoint = (<span onClick={this.zoom} onMouseOver={this.mouseOver} className={className}>{String.fromCharCode(8226)}</span>);
     }
 
     var children = '';
@@ -355,9 +361,9 @@ render: function() {
     }
 
     return (
-        <div className='node-wrapper'>
+        <div className='node-wrapper' onMouseLeave={this.mouseOut}>
         <div className="node-direct-wrapper">
-        {bulletPoint}
+        {bulletPoint}<div className='plus-wrapper'>{plus}</div>
         <div className={contentClassName} contentEditable
             ref="input"
             onKeyDown={this.handleKeyDown}
@@ -373,10 +379,21 @@ render: function() {
 },
 
 toggle: function() {
-    console.log(this.props);
     var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
     globalTree.selected = currentNode.uuid;
     Tree.collapseCurrent(globalTree);
+    renderAll();
+},
+mouseOver: function() {
+    this.setState({mouseOver: true});
+},
+mouseOut: function() {
+    this.setState({mouseOver: false});
+},
+zoom: function() {
+    var node = Tree.findFromUUID(globalTree, this.props.node.uuid);
+    Tree.zoom(node);
+    globalTree.selected = node.uuid;
     renderAll();
 }
 });

@@ -14,6 +14,10 @@ div.node-direct-wrapper {
     line-height: 20px;
 }
 
+div.node-wrapper {
+    padding-left: 30px;
+}
+
 div.editable {
     display: inline;
     margin-left: 5px;
@@ -47,6 +51,7 @@ div.editable {
 
 ul, li {
     list-style-type: none;
+    padding-left: 0px;
 }
 
 .topBullet {
@@ -57,4 +62,16 @@ ul, li {
 .breadcrumb {
     color: #aaa;
     font-weight: bold;
+}
+
+.collapseButton {
+    position: absolute;
+    top: -2px;
+    cursor: pointer;
+    right: 10px;
+}
+
+.plus-wrapper {
+    position: relative;
+    display: inline;
 }
