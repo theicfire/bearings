@@ -30,7 +30,7 @@ Tree.selectPreviousNode = function(tree) {
 };
 
 // TODO shouldn't this be the last node of the current zoom?
-Tree.selectLastNode = function(tree, localState) {
+Tree.selectLastNode = function(tree) {
     var root = Tree.getRoot(tree);
     var last = Tree.findDeepest(root.zoom.childNodes[root.zoom.childNodes.length - 1]);
     var selected = Tree.findSelected(tree);
@@ -38,7 +38,7 @@ Tree.selectLastNode = function(tree, localState) {
     root.caretLoc = last.title.length;
 };
 
-Tree.selectFirstNode = function(tree, localState) {
+Tree.selectFirstNode = function(tree) {
     var root = Tree.getRoot(tree);
     root.selected = root.zoom.uuid;
     root.caretLoc = 0;
@@ -57,7 +57,7 @@ Tree.appendSibling = function(tree, title) {
     return ret;
 };
 
-Tree.newChildAtCursor = function(selected, localState) {
+Tree.newChildAtCursor = function(selected) {
     var ret = Tree.makeNode({title: '', parent: selected});
     var root = Tree.getRoot(selected);
     Tree.addUUIDPointer(ret);
@@ -297,7 +297,7 @@ Tree.zoom = function(tree) {
     root.zoomUUID = tree.uuid;
 };
 
-Tree.zoomOutOne = function(tree, localState) {
+Tree.zoomOutOne = function(tree) {
     var root = Tree.getRoot(tree);
     if (root.zoom) { 
         if (root.zoom.parent) {
@@ -312,7 +312,7 @@ Tree.zoomOutOne = function(tree, localState) {
     }
 };
 
-Tree.deleteSelected = function(tree, localState) {
+Tree.deleteSelected = function(tree) {
     // TODO think if this is the root..
     var selected = Tree.findSelected(tree);
     var nextSelection = Tree.findPreviousNode(selected);

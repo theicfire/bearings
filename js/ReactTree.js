@@ -169,7 +169,7 @@ handleKeyDown: function(e) {
         SPACE: 32};
     if (e.keyCode === KEYS.LEFT) {
         if (e.ctrlKey) {
-            Tree.zoomOutOne(globalTree, globalTree);
+            Tree.zoomOutOne(globalTree);
             renderAll();
             e.preventDefault();
         } else {
@@ -185,7 +185,7 @@ handleKeyDown: function(e) {
             }
         }
     } else if (e.keyCode === KEYS.END && e.ctrlKey) {
-        Tree.selectLastNode(globalTree, globalTree);
+        Tree.selectLastNode(globalTree);
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.HOME && e.ctrlKey) {
@@ -237,18 +237,18 @@ handleKeyDown: function(e) {
         var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
         globalTree.caretLoc = caretLoc;
         console.log('loc', caretLoc);
-        Tree.newLineAtCursor(globalTree, globalTree);
+        Tree.newLineAtCursor(globalTree);
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.BACKSPACE) {
         if (e.ctrlKey && e.shiftKey) {
-            Tree.deleteSelected(globalTree, globalTree);
+            Tree.deleteSelected(globalTree);
             renderAll();
             e.preventDefault();
         } else {
             globalTree.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
             if (globalTree.caretLoc === 0) {
-                Tree.backspaceAtBeginning(globalTree, globalTree);
+                Tree.backspaceAtBeginning(globalTree);
                 renderAll();
                 e.preventDefault();
             }
