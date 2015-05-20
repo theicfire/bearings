@@ -6,10 +6,10 @@ module.exports = exports = Convert;
 Convert.htmlToTree = function(html) {
     $ = cheerio.load(html);
     var t = Convert.domToTree($('ul').eq(0));
-    console.log('t', JSON.stringify(t, null, ' '));
+    //console.log('t', JSON.stringify(t, null, ' '));
     var sl = Convert.slim(t);
     sl[0].selected = true; // TODO what if there is not sl[0]? Give user error?
-    console.log('slim', JSON.stringify(sl, null, ' '));
+    //console.log('slim', JSON.stringify(sl, null, ' '));
     return sl;
 }
 

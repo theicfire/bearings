@@ -7,11 +7,12 @@ var UndoRing = require('./lib/UndoRing');
 var opml = require('opml-generator');
 
 var globalTree;
+var globalTreeBak;
 var globalOldTree;
 var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = true;
-var globalSkipFocus = false;
+var globalSkipFocus = false; // TODO remove?
 var globalCompletedHidden;
 
 var DataSaved = React.createClass({
@@ -59,13 +60,42 @@ var ResetButton = React.createClass({
     }
 });
 
+var SearchBox = React.createClass({
+ getInitialState: function() {
+    return {value: ''};
+  },
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+    console.log('cool', event.target.value);
+    if (event.target.value.length === 0) {
+        globalTree = globalTreeBak;
+        globalTreeBak = null;
+        renderAllNoUndo();
+        return;
+    }
+    if (!globalTreeBak) {
+        globalTreeBak = globalTree;
+        globalTree = Tree.search(globalTree, event.target.value);
+    } else {
+        globalTree = Tree.search(globalTreeBak, event.target.value);
+    }
+    renderAllNoUndo();
+  },
+  handleFocus: function() {
+    globalTree.selected = null;
+  },
+  render: function() {
+    return <input type="text" value={this.state.value} onChange={this.handleChange} onFocus={this.handleFocus} />;
+  }
+});
+
 var TreeChildren = React.createClass({
 render: function() {
     var childNodes;
     if (this.props.childNodes != null) {
         var that = this;
         childNodes = this.props.childNodes.map(function(node, index) {
-            return <li key={index}><TreeNode node={node} indexer={that.props.indexer + '-' + index} /></li>
+            return <li key={index}><TreeNode node={node} /></li>
         });
     }
 
@@ -80,16 +110,16 @@ render: function() {
 var TreeNode = React.createClass({
 getInitialState: function() {
     return {
-      title: this.props.node.title
+      mouseOver: false
     };
 },
 
 handleChange: function(event) {
     var html = this.refs.input.getDOMNode().textContent;
     if (html !== this.lastHtml) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         currentNode.title = event.target.textContent;
-        currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+        globalTree.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
         renderAll();
     } else {
         console.assert(false, 'Why am I getting a change event if nothing changed?');
@@ -101,24 +131,22 @@ handleClick: function(event) {
     if (globalSkipFocus) {
         return;
     }
-    var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-    var selected = Tree.findSelected(globalTree);
-    delete selected.selected;
-    currentNode.selected = true;
+    var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
+    globalTree.selected = currentNode.uuid;
     if (event.type === 'focus') {
-        currentNode.caretLoc = currentNode.title.length;
+        globalTree.caretLoc = currentNode.title.length;
     } else {
-        currentNode.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+        globalTree.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
     }
 },
 
 componentDidMount: function() {
-    if (this.props.node.selected) {
+    if (this.props.node.uuid === globalTree.selected) {
         var el = $(this.refs.input.getDOMNode());
         globalSkipFocus = true;
         el.focus();
         globalSkipFocus = false;
-        Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
+        Cursor.setCursorLoc(el[0], globalTree.caretLoc);
     }
 },
 
@@ -147,12 +175,11 @@ handleKeyDown: function(e) {
             if (newCaretLoc === 0) {
                 Tree.selectPreviousNode(globalTree);
                 var selected = Tree.findSelected(globalTree); // TODO could do this faster than two searches
-                selected.caretLoc = selected.title.length;
+                globalTree.caretLoc = selected.title.length;
                 renderAll();
                 e.preventDefault();
             } else {
-                var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-                currentNode.caretLoc = newCaretLoc - 1;
+                globalTree.caretLoc = newCaretLoc - 1;
             }
         }
     } else if (e.keyCode === KEYS.END && e.ctrlKey) {
@@ -168,13 +195,13 @@ handleKeyDown: function(e) {
             Tree.shiftUp(globalTree);
         } else {
             Tree.selectPreviousNode(globalTree);
-            Tree.findSelected(globalTree).caretLoc = 0; // TODO could be faster
+            globalTree.caretLoc = 0;
         }
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.RIGHT) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         if (e.ctrlKey) {
+            var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
             Tree.zoom(currentNode);
             renderAll();
             e.preventDefault();
@@ -182,12 +209,11 @@ handleKeyDown: function(e) {
             var newCaretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
             if (newCaretLoc === this.refs.input.getDOMNode().textContent.length) {
                 Tree.selectNextNode(globalTree);
-                var selected = Tree.findSelected(globalTree); // TODO could do this faster then two searches
-                selected.caretLoc = 0;
+                globalTree.caretLoc = 0;
                 renderAll();
                 e.preventDefault();
             } else {
-                currentNode.caretLoc = newCaretLoc + 1;
+                globalTree.caretLoc = newCaretLoc + 1;
             }
         }
     } else if (e.keyCode === KEYS.DOWN) {
@@ -196,7 +222,7 @@ handleKeyDown: function(e) {
         } else {
             console.log('down');
             Tree.selectNextNode(globalTree);
-            Tree.findSelected(globalTree).caretLoc = 0; // TODO could be faster
+            globalTree.caretLoc = 0;
         }
         renderAll();
         e.preventDefault();
@@ -206,9 +232,8 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.ENTER) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
         var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-        currentNode.caretLoc = caretLoc;
+        globalTree.caretLoc = caretLoc;
         console.log('loc', caretLoc);
         Tree.newLineAtCursor(globalTree);
         renderAll();
@@ -219,8 +244,8 @@ handleKeyDown: function(e) {
             renderAll();
             e.preventDefault();
         } else {
-            var caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
-            if (caretLoc === 0) {
+            globalTree.caretLoc = Cursor.getCaretCharacterOffsetWithin(this.refs.input.getDOMNode());
+            if (globalTree.caretLoc === 0) {
                 Tree.backspaceAtBeginning(globalTree);
                 renderAll();
                 e.preventDefault();
@@ -239,22 +264,23 @@ handleKeyDown: function(e) {
         Tree.collapseCurrent(globalTree);
         renderAll();
         e.preventDefault();
-    } else if (e.keyCode === KEYS.Z && e.ctrlKey) {
+    } else if (e.keyCode === KEYS.Z && (e.ctrlKey || e.metaKey)) {
         globalTree = Tree.clone(globalUndoRing.undo());
         renderAllNoUndo();
         e.preventDefault();
-    } else if (e.keyCode === KEYS.Y && e.ctrlKey) {
+    } else if (e.keyCode === KEYS.Y && (e.ctrlKey || e.metaKey)) {
         globalTree = Tree.clone(globalUndoRing.redo());
         renderAllNoUndo();
         e.preventDefault();
     } else if (e.keyCode === KEYS.S && e.ctrlKey) {
         console.log('ctrl s');
         console.log(JSON.stringify(Tree.cloneNoParentClean(globalTree), null, 4));
+        window.prompt("Copy to clipboard: Ctrl+C, Enter", JSON.stringify(Tree.cloneNoParentClean(globalTree), null, 4));
         e.preventDefault();
     } else if (e.keyCode === KEYS.C && e.ctrlKey) {
-        var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
+        var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
         var outlines = Tree.toOutline(currentNode);
-        window.prompt('OPML to copy', opml({}, [outlines]));
+        console.log(opml({}, [outlines]));
         e.preventDefault();
     } else {
         console.log(e.keyCode);
@@ -262,14 +288,16 @@ handleKeyDown: function(e) {
 },
 
 componentDidUpdate: function(prevProps, prevState) {
-    if (this.props.node.selected) {
+    console.log('updated', this.props.node.title);
+    if (this.props.node.uuid === globalTree.selected) {
         var el = $(this.refs.input.getDOMNode());
         globalSkipFocus = true;
+        //console.log('focus on', this.props.node.title);
         el.focus();
         globalSkipFocus = false;
-        Cursor.setCursorLoc(el[0], this.props.node.caretLoc);
+        Cursor.setCursorLoc(el[0], globalTree.caretLoc);
     }
-    if ( this.props.node.title !== this.refs.input.getDOMNode().textContent ) {
+    if ( this.refs.input && this.props.node.title !== this.refs.input.getDOMNode().textContent ) {
         // Need this because of: http://stackoverflow.com/questions/22677931/react-js-onchange-event-for-contenteditable/27255103#27255103
         // An example he was mentioning is that the virtual dom thinks that the div is empty, but if
         // you type something and then press "clear", or specifically set the text, the VDOM will
@@ -301,11 +329,6 @@ render: function() {
         }
     }
 
-    var childrenStyle = {};
-    if (!this.props.topBullet && this.props.node.collapsed) {
-        childrenStyle.display = "none";
-    }
-
     var contentClassName = "editable";
     if (this.props.topBullet) {
         contentClassName = "editable topBullet";
@@ -315,42 +338,62 @@ render: function() {
         contentClassName += " completed";
     }
 
-    var wrapperClassName = 'node-wrapper';
-    if (this.props.node.completed && globalCompletedHidden && !this.props.topBullet) {
-        wrapperClassName += " completed-hidden";
+    var plus;
+    if (this.state.mouseOver) {
+        if (this.props.node.childNodes != null && this.props.node.collapsed) {
+            plus = (<div onClick={this.toggle} className='collapseButton'>+</div>);
+        } else {
+            plus = (<div onClick={this.toggle} className='collapseButton'>-</div>);
+        }
     }
-
     var bulletPoint = '';
     if (!this.props.topBullet) {
-        bulletPoint = <span onClick={this.toggle} className={className}>{String.fromCharCode(8226)}</span>
+        bulletPoint = (<span onClick={this.zoom} onMouseOver={this.mouseOver} className={className}>{String.fromCharCode(8226)}</span>);
     }
 
+    var children = '';
+    if (this.props.topBullet || !this.props.node.collapsed) {
+        children = (<TreeChildren childNodes={this.props.node.childNodes} />);
+    }
+
+    if (this.props.node.completed && globalCompletedHidden && !this.props.topBullet) {
+        return false;
+    }
 
     return (
-        <div className={wrapperClassName}>
+        <div className='node-wrapper' onMouseLeave={this.mouseOut}>
         <div className="node-direct-wrapper">
-        {bulletPoint}
+        {bulletPoint}<div className='plus-wrapper'>{plus}</div>
         <div className={contentClassName} contentEditable
             ref="input"
             onKeyDown={this.handleKeyDown}
             onInput={this.handleChange}
             onFocus={this.handleClick}
             onClick={this.handleClick}
-            dangerouslySetInnerHTML={{__html: this.props.node.title}}>
+            dangerouslySetInnerHTML={{__html: _.escape(this.props.node.title)}}>
         </div>
         </div>
-        <TreeChildren style={childrenStyle} childNodes={this.props.node.childNodes} indexer={this.props.indexer} />
+        {children}
         </div>
     );
 },
 
 toggle: function() {
-    console.log(this.props);
-    var currentNode = Tree.findFromIndexer(globalTree, this.props.indexer);
-    var selected = Tree.findSelected(globalTree);
-    delete selected.selected;
-    currentNode.selected = true;
+    var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
+    globalTree.selected = currentNode.uuid;
     Tree.collapseCurrent(globalTree);
+    renderAll();
+},
+mouseOver: function() {
+    this.setState({mouseOver: true});
+},
+mouseOut: function() {
+    this.setState({mouseOver: false});
+},
+zoom: function() {
+    var node = Tree.findFromUUID(globalTree, this.props.node.uuid);
+    Tree.zoom(node);
+    globalTree.selected = node.uuid;
     renderAll();
 }
 });
@@ -400,13 +443,13 @@ function doRender(tree) {
     //console.log('rendering with', Tree.toString(tree));
 
     // TODO should always have a zoom?
-    //<TreeChildren childNodes={tree.zoom.childNodes} indexer={Tree.getPath(tree.zoom)} />
+    //<TreeChildren childNodes={tree.zoom.childNodes} />
     if (tree.zoom !== undefined) {
         React.render(
           <div>
-          <ResetButton/> | <a href="import.html">Import</a> | <DataSaved /> | <CompleteHiddenButton />
+          <ResetButton/> | <a href="import.html">Import</a> | <DataSaved /> | <CompleteHiddenButton /> | <SearchBox />
           <div><Breadcrumb node={tree} /></div>
-          <TreeNode topBullet={true} node={tree.zoom}  indexer={Tree.getPath(tree.zoom)}/>
+          <TreeNode topBullet={true} node={tree.zoom}/>
           </div>,
           document.getElementById("tree")
         );
@@ -417,7 +460,7 @@ function doRender(tree) {
           //<div>
       //<ResetButton/> | <a href="import.html">Import</a> | <DataSaved />
           //<div><Breadcrumb node={tree} /></div>
-          //<TreeNode node={tree}  indexer=""/>
+          //<TreeNode node={tree}/>
           //</div>,
           //document.getElementById("tree")
         //);

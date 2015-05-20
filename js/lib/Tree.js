@@ -1,23 +1,31 @@
 var Tree = {};
 module.exports = exports = Tree;
 
+Tree.generateUUID = function(){
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+};
+
 Tree.selectNextNode = function(tree) {
     var selected = Tree.findSelected(tree);
+    var root = Tree.getRoot(tree);
     var next = Tree.findNextNode(selected);
     if (next) {
-        if (selected) {
-            delete selected.selected;
-        }
-        next.selected = true;
+        root.selected = next.uuid;
     }
 };
 
 Tree.selectPreviousNode = function(tree) {
     var selected = Tree.findSelected(tree);
+    var root = Tree.getRoot(tree);
     var previous = Tree.findPreviousNode(selected);
     if (previous) {
-        delete selected.selected;
-        previous.selected = true;
+        root.selected = previous.uuid;
     }
 };
 
@@ -26,17 +34,14 @@ Tree.selectLastNode = function(tree) {
     var root = Tree.getRoot(tree);
     var last = Tree.findDeepest(root.zoom.childNodes[root.zoom.childNodes.length - 1]);
     var selected = Tree.findSelected(tree);
-    delete selected.selected;
-    last.selected = true;
-    last.caretLoc = last.title.length;
+    root.selected = last.uuid;
+    root.caretLoc = last.title.length;
 };
 
 Tree.selectFirstNode = function(tree) {
     var root = Tree.getRoot(tree);
-    var selected = Tree.findSelected(tree);
-    delete selected.selected;
-    root.zoom.selected = true;
-    root.zoom.caretLoc = 0;
+    root.selected = root.zoom.uuid;
+    root.caretLoc = 0;
 };
 
 Tree.appendSibling = function(tree, title) {
@@ -47,31 +52,32 @@ Tree.appendSibling = function(tree, title) {
         }
     }
     var ret = Tree.makeNode({title: title, parent: tree.parent});
+    Tree.addUUIDPointer(ret);
     tree.parent.childNodes.splice(i + 1, 0, ret);
     return ret;
 };
 
 Tree.newChildAtCursor = function(selected) {
     var ret = Tree.makeNode({title: '', parent: selected});
+    var root = Tree.getRoot(selected);
+    Tree.addUUIDPointer(ret);
     if (selected.childNodes) {
         selected.childNodes.unshift(ret);
     } else {
         selected.childNodes = [ret];
     }
-    delete selected.selected;
-    delete selected.caretLoc;
-    ret.selected = true;
-    ret.caretLoc = 0;
+    root.selected = ret.uuid;
+    root.caretLoc = 0;
 };
 
 Tree.newLineAtCursor = function(tree) {
     var selected = Tree.findSelected(tree);
     var root = Tree.getRoot(tree);
-    var textStart = selected.title.substr(0, selected.caretLoc);
-    var textRest = selected.title.substr(selected.caretLoc);
+    var textStart = selected.title.substr(0, root.caretLoc);
+    var textRest = selected.title.substr(root.caretLoc);
     if (selected === root.zoom ||
               (textRest.length === 0 && selected.childNodes.length > 0 && !selected.collapsed)) {
-        Tree.newChildAtCursor(selected);
+        Tree.newChildAtCursor(selected, root);
     } else {
         selected.title = textStart;
         var nextNode = Tree.appendSibling(selected, textRest);
@@ -84,13 +90,27 @@ Tree.newLineAtCursor = function(tree) {
             }
         }
         if (textStart.length > 0 || (textStart.length === 0 && textRest.length === 0)) {
-            delete selected.selected;
-            delete selected.caretLoc;
-            nextNode.selected = true;
-            selected = nextNode;
+            root.selected = nextNode.uuid;
         }
-        selected.caretLoc = 0;
+        root.caretLoc = 0;
     }
+};
+
+Tree.addUUIDPointer = function(tree) {
+    var root = Tree.getRoot(tree);
+    root.uuidMap[tree.uuid] = tree;
+};
+
+Tree.addUUIDPointers = function(tree) {
+    Tree.addUUIDPointer(tree);
+    tree.childNodes.map(function(child) {
+        Tree.addUUIDPointers(child);
+    });
+};
+
+Tree.findFromUUID = function(tree, uuid) {
+    var root = Tree.getRoot(tree);
+    return root.uuidMap[uuid];
 };
 
 Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
@@ -103,22 +123,30 @@ Tree.setIfReal = function(toObj, fromObj, property, defaultVal) {
     toObj[property] = fromObj[property];
 };
 
-Tree.makeNode = function(args) {
+Tree.makeNode = function(args, options) {
     var ret = {};
     Tree.setIfReal(ret, args, 'title');
     Tree.setIfReal(ret, args, 'childNodes', []);
     Tree.setIfReal(ret, args, 'parent');
-    Tree.setIfReal(ret, args, 'caretLoc');
     Tree.setIfReal(ret, args, 'selected');
     Tree.setIfReal(ret, args, 'collapsed');
     Tree.setIfReal(ret, args, 'completed');
     Tree.setIfReal(ret, args, 'completedHidden');
+    Tree.setIfReal(ret, args, 'caretLoc');
+    Tree.setIfReal(ret, args, 'uuid', Tree.generateUUID());
+    Tree.setIfReal(ret, args, 'uuidMap');
     Tree.setIfReal(ret, args, 'zoom');
     return ret;
 };
 
 Tree.clone = function(tree) {
-    return Tree.cloneGeneral(tree, null, {noparent: false, nomouse: false});
+    var ret = Tree.cloneGeneral(tree, null, {noparent: false, nomouse: false});
+    Tree.addUUIDPointers(ret);
+    if (tree.zoom) { // TODO should be an invariant
+        var root = Tree.getRoot(ret);
+        ret.zoom = root.uuidMap[tree.zoomUUID];
+    }
+    return ret;
 };
 
 Tree.cloneNoParent = function(tree) {
@@ -137,22 +165,21 @@ Tree.cloneGeneral = function(tree, parent, options) {
     var me = Tree.makeNode({
             title: tree.title,
             parent: !!options.noparent ? undefined : parent,
-            caretLoc: (!!options.nomouse || !!options.clean) ? undefined : tree.caretLoc,
             selected: !!options.nomouse ? undefined : tree.selected,
             collapsed: tree.collapsed,
             completed: tree.completed,
-            completedHidden: tree.completedHidden});
-    if (tree.childNodes.length > 0 || !options.clean) {
-        me.childNodes = tree.childNodes.map(function (t) {return Tree.cloneGeneral(t, me, options)});
-    } else {
+            caretLoc: !!options.nomouse ? undefined : tree.caretLoc,
+            uuid: tree.uuid,
+            uuidMap: options.noparent ? undefined : {},
+            completedHidden: tree.completedHidden}, {clean: options.clean});
+    if (tree.childNodes && tree.childNodes.length > 0) {
+        me.childNodes = tree.childNodes.map(function (node) {
+            return Tree.cloneGeneral(node, me, options)
+        });
+    } else if (options.clean) {
         me.childNodes = undefined;
     }
-    if (!options.noparent) {
-        if (tree.zoom) { // TODO should be an invariant
-            me.zoom = Tree.findFromIndexer(me, Tree.getPath(tree.zoom));
-        }
-    }
-    me.zoomPath = tree.zoomPath;
+    me.zoomUUID = tree.zoomUUID;
     return me;
 };
 
@@ -167,6 +194,7 @@ Tree.indent = function(tree) {
         return;
     }
     var newParent = selected.parent.childNodes[childNum - 1];
+    delete newParent.collapsed;
     newParent.childNodes.push(selected);
     selected.parent.childNodes.splice(childNum, 1);
     selected.parent = newParent;
@@ -232,30 +260,6 @@ Tree.findChildNum = function(tree) {
         }
     }
     console.assert(false);
-}
-
-
-Tree.getPath = function(tree) {
-    if (tree.title === 'special_root_title') {
-        return ''; // TODO hacky, because of the substr in findFromIndexer
-    }
-
-    // TODO put in some utils
-    var reverse = function(s) {
-      var o = '';
-      for (var i = s.length - 1; i >= 0; i--)
-        o += s[i];
-      return o;
-    };
-
-    var getReversePath = function(tree) {
-        if (tree.parent.title === 'special_root_title') {
-            return Tree.findChildNum(tree) + '-'; // TODO hacky. Appending this because of TreeNode.js
-        }
-        return Tree.findChildNum(tree) + '-' + getReversePath(tree.parent);
-    };
-
-    return reverse(getReversePath(tree));
 };
 
 Tree.getRoot = function(tree) {
@@ -290,7 +294,7 @@ Tree.zoom = function(tree) {
     }
     var root = Tree.getRoot(tree);
     root.zoom = tree;
-    root.zoomPath = Tree.getPath(tree);
+    root.zoomUUID = tree.uuid;
 };
 
 Tree.zoomOutOne = function(tree) {
@@ -298,9 +302,8 @@ Tree.zoomOutOne = function(tree) {
     if (root.zoom) { 
         if (root.zoom.parent) {
             var selected = Tree.findSelected(tree);
-            delete selected.selected;
-            root.zoom.selected = true;
-            root.zoom.caretLoc = 0;
+            root.selected = root.zoom.uuid;
+            root.caretLoc = 0;
             Tree.zoom(root.zoom.parent);
         }
     } else {
@@ -313,6 +316,7 @@ Tree.deleteSelected = function(tree) {
     // TODO think if this is the root..
     var selected = Tree.findSelected(tree);
     var nextSelection = Tree.findPreviousNode(selected);
+    var root = Tree.getRoot(tree);
     if (!nextSelection) {
         console.assert(selected.parent.title === 'special_root_title');
         if (selected.parent.childNodes.length > 1) {
@@ -320,21 +324,23 @@ Tree.deleteSelected = function(tree) {
         } else {
             selected.title = '';
             selected.childNodes = [];
-            selected.selected = true;
-            selected.caretLoc = 0;
+            root.caretLoc = 0;
+            delete selected.collapsed;
+            delete selected.completed; // TODO do I want this?
             return;
         }
     }
     var childNum = Tree.findChildNum(selected);
     selected.parent.childNodes.splice(childNum, 1);
-    nextSelection.selected = true;
-    nextSelection.caretLoc = nextSelection.title.length;
+    root.selected = nextSelection.uuid;
+    root.caretLoc = nextSelection.title.length;
 };
 
 Tree.backspaceAtBeginning = function(tree) {
     // TODO think if this is the root
     var selected = Tree.findSelected(tree);
-    if (selected.caretLoc !== 0) {
+    var root = Tree.getRoot(tree);
+    if (root.caretLoc !== 0) {
         console.log('TODO: home/end keys do not update caretLoc, and so this invariant fails');
     }
     var previous = Tree.findPreviousNode(selected);
@@ -348,8 +354,9 @@ Tree.backspaceAtBeginning = function(tree) {
     if (!previous.collapsed) {
         var childNum = Tree.findChildNum(selected);
         selected.parent.childNodes.splice(childNum, 1);
-        previous.selected = true;
-        previous.caretLoc = previous.title.length;
+        var root = Tree.getRoot(tree);
+        root.selected = previous.uuid;
+        root.caretLoc = previous.title.length;
         previous.title += selected.title;
         Tree.setChildNodes(previous, selected.childNodes);
         previous.collapsed = selected.collapsed;
@@ -373,7 +380,6 @@ Tree.findDeepest = function(tree) {
     var completedHidden = Tree.isCompletedHidden(tree);
     if (tree.childNodes && !tree.collapsed) {
         for (var i = tree.childNodes.length - 1; i >= 0; i--) {
-            console.log('search over', i, tree.childNodes[i]);
             if (!completedHidden || !tree.childNodes[i].completed) {
                 return Tree.findDeepest(tree.childNodes[i]);
             }
@@ -384,16 +390,12 @@ Tree.findDeepest = function(tree) {
 };
 
 Tree.findSelected = function(node) {
-    if (node.selected) {
-        return node;
+    var root = Tree.getRoot(node);
+    console.assert(root === node);
+    if (!root.selected) {
+        return null;
     }
-    for (var i = 0; i < node.childNodes.length; i++) {
-        var found = Tree.findSelected(node.childNodes[i]);
-        if (found) {
-            return found;
-        }
-    }
-    return null;
+    return root.uuidMap[root.selected];
 };
 
 
@@ -418,18 +420,14 @@ Tree.completeCurrent = function(tree) {
     }
     if (!selected.completed && selected.parent.title === 'special_root_title') {
         if (Tree.countVisibleChildren(selected.parent) <= 1) {
-            console.log('noooop');
-            console.log(selected.parent.childNodes);
             return; // Can't select the only element left on the page..
         } else if (Tree.findChildNum(selected) === 0) {
-            console.log('yeah, complete', selected);
             selected.completed = true;
             var backup = Tree.isCompletedHidden(tree);
             Tree.setCompletedHidden(tree, true);
             var next = Tree.findNextNode(selected.parent);
             Tree.setCompletedHidden(tree, backup);
-            delete selected.selected;
-            next.selected = true;
+            root.selected = next.uuid;
             return;
         }
     }
@@ -497,18 +495,18 @@ Tree.findNextNodeRec = function(tree, zoom) {
 };
 
 Tree.makeTree = function(nodes) {
-    var ret = {title: 'special_root_title', parent: null};
-    ret.childNodes = nodes.map(function (node) {
-        return Tree.makeSubTree(node, ret);
-    });
+    var ret = {title: 'special_root_title', parent: null, childNodes: nodes};
+    ret = Tree.clone(ret);
     ret.zoom = ret;
-    ret.zoomPath = Tree.getPath(ret);
+    ret.zoomUUID = ret.uuid;
+    ret.completedHidden = true;
+    //ret.selected = ret.childNodes[0].uuid; // TODO check if needed?
     return ret;
 };
 
 Tree.makeDefaultTree = function() {
     var rawStartTree =
-        [{title: "goody", selected: "true", caretLoc: 0,
+        [{title: "goody",
                 childNodes: [
                     {title: "billy"},
                     {title: "suzie", childNodes: [
@@ -520,26 +518,8 @@ Tree.makeDefaultTree = function() {
                 ]}];
     rawStartTree.push({title: "the end"});
     var ret = Tree.makeTree(rawStartTree);
-    ret.completedHidden = true;
     return ret;
 }
-
-Tree.makeSubTree = function(node, parent) {
-    var me = Tree.makeNode({
-            title: node.title,
-            parent: parent,
-            selected: node.selected,
-            collapsed: node.collapsed,
-            completed: node.completed,
-            completedHidden: node.completedHidden,
-            caretLoc: node.caretLoc});
-    if (node.childNodes) {
-        me.childNodes = node.childNodes.map(function (node) {
-            return Tree.makeSubTree(node, me);
-        });
-    }
-    return me;
-};
 
 Tree.findFromIndexer = function(tree, indexer) {
     if (indexer.length <= 1) {
@@ -557,6 +537,11 @@ Tree.toString = function(tree) {
     return JSON.stringify(tree);
 };
 
+Tree.toStringPretty = function(tree) {
+    tree = Tree.cloneNoParent(tree);
+    return JSON.stringify(tree, null, 2);
+};
+
 Tree.toStringClean = function(tree) {
     tree = Tree.cloneNoParentClean(tree);
     return JSON.stringify(tree);
@@ -564,13 +549,11 @@ Tree.toStringClean = function(tree) {
 
 Tree.fromString = function(s) {
     var obj = JSON.parse(s);
-    var ret = Tree.makeSubTree(obj, null);
-    // TODO there should always be a zoomPath
-    ret.zoomPath = obj.zoomPath;
-    if (!ret.zoomPath) {
+    var ret = Tree.clone(obj);
+    if (!ret.zoomUUID) {
         ret.zoom = ret;
     } else {
-        ret.zoom = Tree.findFromIndexer(ret, ret.zoomPath);
+        ret.zoom = ret.uuidMap[ret.zoomUUID];
     }
     return ret;
 };
@@ -598,4 +581,45 @@ Tree.setCompletedHidden = function(tree, isHidden) {
 Tree.isCompletedHidden = function(tree) {
     var root = Tree.getRoot(tree);
     return root.completedHidden;
+};
+
+Tree.recSearch = function(tree, query) {
+    var newTree = {title: tree.title, childNodes: []};
+    for (var i = 0; i < tree.childNodes.length; i++) {
+        if (Tree.recSearch(tree.childNodes[i], query)) {
+            //console.log('push on', tree.childNodes[i].title);
+            newTree.childNodes.push(Tree.recSearch(tree.childNodes[i], query));
+        }
+    }
+    if (newTree.childNodes.length === 0) {
+        if (tree.title.indexOf(query) > -1) {
+            //console.log('yeahh', tree.title, query);
+            return {title: tree.title, childNodes: []};
+        }
+        return null;
+    }
+    return newTree;
+};
+
+Tree.search = function(tree, query) {
+    var ret = Tree.recSearch(tree, query);
+    if (ret) {
+        return Tree.makeTree(ret.childNodes);
+    }
+    return Tree.makeTree();
+};
+
+Tree.yamlObjToTree = function(obj) {
+    var ret = [];
+    for (var i = 0; i < obj.length; i++) {
+        if (obj[i + 1] instanceof Array) {
+            ret.push({title: obj[i], childNodes: Tree.yamlObjToTree(obj[i + 1])});
+            i += 1;
+        } else if (typeof(obj[i]) === 'object' && obj[i].hasOwnProperty('title')) {
+            ret.push(obj[i]);
+        } else {
+            ret.push({title: obj[i]});
+        }
+    }
+    return ret;
 };
