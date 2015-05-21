@@ -1,5 +1,9 @@
 body {
   font-family: 'Helvetica Neue', Arial, Sans-serif;
+  background-image: url('school.png');
+  background-repeat: repeat;
+  padding: 0px;
+  margin: 0px;
 }
 
 h3 {
@@ -61,7 +65,11 @@ ul, li {
 
 .breadcrumb {
     color: #aaa;
-    font-weight: bold;
+    font-weight: 500;
+}
+
+.breadcrumbs-wrapper {
+    margin-bottom: 20px;
 }
 
 .collapseButton {
@@ -74,4 +82,63 @@ ul, li {
 .plus-wrapper {
     position: relative;
     display: inline;
+}
+
+.pad-wrapper {
+    -webkit-box-shadow: 0px 0px 36px -7px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 36px -7px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 36px -7px rgba(0,0,0,0.75);
+    width: 853px;
+    margin-top: 20px;
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
+}
+
+.header {
+    background-color: #444;
+    padding: 0 15px;
+}
+
+.header-buttons {
+    float: right;
+}
+.search {
+    margin: 5px 0px;
+}
+
+.header-buttons a, .header-buttons span {
+    background-color: red;
+    margin-left: 1px;
+    line-height:29px;
+    height: 29px;
+    padding: 0 17px;
+    display: block;
+    float: right;
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    background-color: grey;
+}
+
+.saved-text {
+    width: 50px;
+    text-align: center;
+}
+
+.logo {
+    color: white;
+    margin-right: 30px;
+    font-family: 'Helvetica Neue';
+}
+
+hr { display: block; height: 1px;
+    border: 0; border-top: 1px solid #ccc;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+div.display-none {
+    display: none;
 }

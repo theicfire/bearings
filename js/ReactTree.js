@@ -18,13 +18,18 @@ var globalCompletedHidden;
 var DataSaved = React.createClass({
     render: function() {
         var text = globalDataSaved ? "Saved" : "Unsaved";
-        return (<span>{text}</span>);
+        return (<span className='saved-text'>{text}</span>);
     }
 });
 
 var Breadcrumb = React.createClass({
     render: function() {
-        return (<span className='breadcrumb'>{this.breadcrumbToText(Tree.getBreadcrumb(this.props.node))}</span>);
+        var text = this.breadcrumbToText(Tree.getBreadcrumb(this.props.node));
+        if (text.length > 0) {
+            return (<div><span className='breadcrumb'>{this.breadcrumbToText(Tree.getBreadcrumb(this.props.node))}</span><hr/></div>);
+        } else {
+            return <div></div>;
+        }
     },
     breadcrumbToText: function(titles) {
         if (titles.length > 0) {
@@ -85,7 +90,7 @@ var SearchBox = React.createClass({
     globalTree.selected = null;
   },
   render: function() {
-    return <input type="text" value={this.state.value} onChange={this.handleChange} onFocus={this.handleFocus} />;
+    return <input type="text" className='search' placeholder='Search' value={this.state.value} onChange={this.handleChange} onFocus={this.handleFocus} />;
   }
 });
 
@@ -333,6 +338,9 @@ render: function() {
     if (this.props.topBullet) {
         contentClassName = "editable topBullet";
     }
+    if (this.props.node.title == 'special_root_title') {
+        contentClassName += ' display-none';
+    }
 
     if (this.props.node.completed) {
         contentClassName += " completed";
@@ -447,9 +455,11 @@ function doRender(tree) {
     if (tree.zoom !== undefined) {
         React.render(
           <div>
-          <ResetButton/> | <a href="import.html">Import</a> | <DataSaved /> | <CompleteHiddenButton /> | <SearchBox />
-          <div><Breadcrumb node={tree} /></div>
-          <TreeNode topBullet={true} node={tree.zoom}/>
+          <div className='header'><span className='logo'>Bearings</span><SearchBox/><div className='header-buttons'><ResetButton/><a href="import.html">Import</a><DataSaved /><CompleteHiddenButton /></div> </div>
+          <div className='pad-wrapper'>
+              <div className='breadcrumbs-wrapper'><Breadcrumb node={tree} /></div>
+              <TreeNode topBullet={true} node={tree.zoom}/>
+              </div>
           </div>,
           document.getElementById("tree")
         );
