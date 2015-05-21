@@ -20,6 +20,17 @@ div.node-direct-wrapper {
 
 div.node-wrapper {
     padding-left: 30px;
+    border-left: 1px solid #eee;
+    font-size: 14px;
+}
+
+div.pad-wrapper>div.node-wrapper {
+    border-left: none;
+}
+
+div.pad-wrapper>div.node-wrapper>ul>li>div.node-wrapper {
+    border-left: none;
+    font-size:15px;
 }
 
 div.editable {
