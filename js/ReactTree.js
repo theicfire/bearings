@@ -368,10 +368,7 @@ render: function() {
         return false;
     }
 
-    return (
-        <div className='node-wrapper' onMouseLeave={this.mouseOut}>
-        <div className="node-direct-wrapper">
-        {bulletPoint}<div className='plus-wrapper'>{plus}</div>
+    var textBox = (
         <div className={contentClassName} contentEditable
             ref="input"
             onKeyDown={this.handleKeyDown}
@@ -379,7 +376,23 @@ render: function() {
             onFocus={this.handleClick}
             onClick={this.handleClick}
             dangerouslySetInnerHTML={{__html: _.escape(this.props.node.title)}}>
-        </div>
+            </div>);
+    if (globalTreeBak) {
+        textBox = (
+            <div className={contentClassName} 
+                ref="input"
+                onKeyDown={this.handleKeyDown}
+                onInput={this.handleChange}
+                onFocus={this.handleClick}
+                onClick={this.handleClick}
+                dangerouslySetInnerHTML={{__html: _.escape(this.props.node.title)}}>
+                </div>);
+    }
+    return (
+        <div className='node-wrapper' onMouseLeave={this.mouseOut}>
+        <div className="node-direct-wrapper">
+        {bulletPoint}<div className='plus-wrapper'>{plus}</div>
+        {textBox}
         </div>
         {children}
         </div>
