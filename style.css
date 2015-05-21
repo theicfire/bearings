@@ -158,3 +158,8 @@ hr { display: block; height: 1px;
 div.display-none {
     display: none;
 }
+
+.completed-hidden-button {
+    width: 100px;
+    text-align: center;
+}

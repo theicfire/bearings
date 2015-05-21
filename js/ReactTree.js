@@ -43,7 +43,7 @@ var CompleteHiddenButton = React.createClass({
     render: function() {
         console.log('go and render', globalCompletedHidden);
         var text = globalCompletedHidden ? 'Show completed' : 'Hide completed';
-        return (<a href="#" onClick={this.handleClick}>{text}</a>);
+        return (<a href="#" className='completed-hidden-button' onClick={this.handleClick}>{text}</a>);
     },
     handleClick: function(e) {
         globalCompletedHidden = !globalCompletedHidden;
