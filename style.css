@@ -47,6 +47,10 @@ div.editable {
   cursor: pointer;
 }
 
+.dot {
+    width: 0px;
+    margin-left: -11px;
+}
 .dot-collapsed {
     color: red;
 }
@@ -69,14 +73,15 @@ ul, li {
     padding-left: 0px;
 }
 
-.topBullet {
+div.topBullet {
     font-size: 18px;
-    margin-left: 0px;
+    margin-left: 16px;
 }
 
 .breadcrumb {
     color: #aaa;
     font-weight: 500;
+    margin: 0 45px;
 }
 
 .breadcrumbs-wrapper {
@@ -145,9 +150,9 @@ ul, li {
 }
 
 hr { display: block; height: 1px;
-    border: 0; border-top: 1px solid #ccc;
+    border: 0; border-top: 1px solid #eee;
     padding: 0;
-    margin: 5px 0 0 0;
+    margin: 5px 45px;
 }
 
 div.display-none {
