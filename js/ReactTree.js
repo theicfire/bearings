@@ -196,7 +196,7 @@ handleKeyDown: function(e) {
         renderAll();
         e.preventDefault();
     } else if (e.keyCode === KEYS.UP) {
-        if (e.shiftKey && e.altKey) {
+        if (e.shiftKey && e.ctrlKey) {
             Tree.shiftUp(globalTree);
         } else {
             Tree.selectPreviousNode(globalTree);
@@ -222,7 +222,7 @@ handleKeyDown: function(e) {
             }
         }
     } else if (e.keyCode === KEYS.DOWN) {
-        if (e.shiftKey && e.altKey) {
+        if (e.shiftKey && e.ctrlKey) {
             Tree.shiftDown(globalTree);
         } else {
             console.log('down');
