@@ -19,7 +19,8 @@ div.node-direct-wrapper {
 }
 
 div.node-wrapper {
-    padding-left: 30px;
+    padding-left: 40px;
+    margin-left: -10px;
     border-left: 1px solid #eee;
     font-size: 14px;
 }
