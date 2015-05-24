@@ -2,6 +2,7 @@ body {
   font-family: 'Helvetica Neue', Arial, Sans-serif;
   background-image: url('school.png');
   background-repeat: repeat;
+  background-attachment: fixed;
   padding: 0px;
   margin: 0px;
 }
