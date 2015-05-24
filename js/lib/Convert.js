@@ -31,8 +31,11 @@ Convert.domToTree = function(objs) {
 // If the first element is a string, return a {title, childNodes} object
 Convert.slim = function(t) {
     if (typeof(t[0]) === 'string') {
-        console.assert(t.length <= 2);
-        if (t.length === 2) {
+        console.assert(t.length <= 3);
+        if (t.length >= 2) {
+            if (t.length === 3) {
+                console.log('There is extra (ctrl+enter) text with the bullet point named', t[0]);
+            }
             return {title: t[0], childNodes: Convert.slim(t[1])};
         }
         return {title: t[0]};
