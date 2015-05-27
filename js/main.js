@@ -4,6 +4,8 @@ var ReactTree = require('./ReactTree');
 var Tree = require('./lib/Tree');
 var config = require('./config');
 var FakeParseTree = require('./lib/FakeParseTree');
+var FastRenderTree = require('./lib/FastRenderTree');
+console.log('ReactTree is', ReactTree);
 
 if (config.use_parse) {
     var Parse = require('parse').Parse;

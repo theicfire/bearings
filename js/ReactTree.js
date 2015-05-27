@@ -1,5 +1,5 @@
 var React = require('react/addons');
-var Tree = require('./lib/Tree');
+Tree = require('./lib/Tree');
 var $ = require('jquery');
 var Cursor = require('./lib/Cursor');
 var _ = require('underscore');
@@ -7,7 +7,7 @@ var UndoRing = require('./lib/UndoRing');
 var opml = require('opml-generator');
 
 var ReactTree = {};
-var globalTree;
+globalTree = {};
 var globalTreeBak;
 var globalOldTree;
 var globalParseTree;
@@ -390,7 +390,7 @@ render: function() {
                 </div>);
     }
     return (
-        <div className='node-wrapper' onMouseLeave={this.mouseOut}>
+        <div className='node-wrapper' onMouseLeave={this.mouseOut} id={this.props.node.uuid}>
         <div className="node-direct-wrapper">
         {bulletPoint}<div className='plus-wrapper'>{plus}</div>
         {textBox}
@@ -461,16 +461,9 @@ function renderAllNoUndo() {
     doRender(newTree);
 }
 
-ReactTree.to_react_element = function(tree) {
-  return (
-    <div>
-    <div className='header'><span className='logo'>Bearings</span><SearchBox/><div className='header-buttons'><ResetButton/><a href="import.html">Import</a><DataSaved /><CompleteHiddenButton /></div> </div>
-    <div className='pad-wrapper'>
-        <div className='breadcrumbs-wrapper'><Breadcrumb node={tree} /></div>
-        <ReactTree.TreeNode topBullet={true} node={tree.zoom}/>
-        </div>
-    </div>
-  );
+ReactTree.tree_to_html = function(tree) {
+  var el = (<ReactTree.TreeNode node={tree}/>);
+  return React.renderToString(el);
 };
 
 function doRender(tree) {
@@ -479,7 +472,14 @@ function doRender(tree) {
     // TODO should always have a zoom?
     //<ReactTree.TreeChildren childNodes={tree.zoom.childNodes} />
     if (tree.zoom !== undefined) {
-        React.render(ReactTree.to_react_element(tree),
+        React.render(
+    <div id='base-react'>
+    <div className='header'><span className='logo'>Bearings</span><SearchBox/><div className='header-buttons'><ResetButton/><a href="import.html">Import</a><DataSaved /><CompleteHiddenButton /></div> </div>
+    <div className='pad-wrapper'>
+        <div className='breadcrumbs-wrapper'><Breadcrumb node={tree} /></div>
+        <ReactTree.TreeNode topBullet={true} node={tree.zoom}/>
+        </div>
+    </div>,
           document.getElementById("tree")
         );
     } else {
