@@ -1,6 +1,6 @@
 var _ = require('underscore');
 var $ = require('jquery');
-var StartRender = require('./ReactTree');
+var ReactTree = require('./ReactTree');
 var Tree = require('./lib/Tree');
 var config = require('./config');
 var FakeParseTree = require('./lib/FakeParseTree');
@@ -12,12 +12,12 @@ if (config.use_parse) {
     var query = new Parse.Query(First);
     query.get(config.parse_id, {
         success: function (parseTree) {
-            StartRender(parseTree);
+            ReactTree.startRender(parseTree);
         },
         error: function(obj, error) {
             throw('Error loading tree' + obj + error);
         }
     });
 } else {
-    StartRender(new FakeParseTree(Tree.toString(Tree.makeDefaultTree())));
+    ReactTree.startRender(new FakeParseTree(Tree.toString(Tree.makeDefaultTree())));
 }

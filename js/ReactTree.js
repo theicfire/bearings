@@ -6,6 +6,7 @@ var _ = require('underscore');
 var UndoRing = require('./lib/UndoRing');
 var opml = require('opml-generator');
 
+var ReactTree = {};
 var globalTree;
 var globalTreeBak;
 var globalOldTree;
@@ -94,13 +95,13 @@ var SearchBox = React.createClass({
   }
 });
 
-var TreeChildren = React.createClass({
+ReactTree.TreeChildren = React.createClass({
 render: function() {
     var childNodes;
     if (this.props.childNodes != null) {
         var that = this;
         childNodes = this.props.childNodes.map(function(node, index) {
-            return <li key={index}><TreeNode node={node} /></li>
+            return <li key={index}><ReactTree.TreeNode node={node} /></li>
         });
     }
 
@@ -112,7 +113,7 @@ render: function() {
 
 }
 });
-var TreeNode = React.createClass({
+ReactTree.TreeNode = React.createClass({
 getInitialState: function() {
     return {
       mouseOver: false
@@ -361,7 +362,7 @@ render: function() {
 
     var children = '';
     if (this.props.topBullet || !this.props.node.collapsed) {
-        children = (<TreeChildren childNodes={this.props.node.childNodes} />);
+        children = (<ReactTree.TreeChildren childNodes={this.props.node.childNodes} />);
     }
 
     if (this.props.node.completed && globalCompletedHidden && !this.props.topBullet) {
@@ -419,7 +420,7 @@ zoom: function() {
 }
 });
 
-var startRender = function(parseTree) {
+ReactTree.startRender = function(parseTree) {
     globalTree = Tree.fromString(parseTree.get('tree'));
     console.log(globalTree);
     console.log('hidden is', Tree.isCompletedHidden(globalTree));
@@ -460,35 +461,38 @@ function renderAllNoUndo() {
     doRender(newTree);
 }
 
+ReactTree.to_render = (<div>
+          <div className='header'><span className='logo'>Bearings</span><SearchBox/><div className='header-buttons'><ResetButton/><a href="import.html">Import</a><DataSaved /><CompleteHiddenButton /></div> </div>
+          <div className='pad-wrapper'>
+              <div className='breadcrumbs-wrapper'><Breadcrumb node={tree} /></div>
+              <ReactTree.TreeNode topBullet={true} node={tree.zoom}/>
+              </div>
+              </div>);
 function doRender(tree) {
     //console.log('rendering with', Tree.toString(tree));
 
     // TODO should always have a zoom?
-    //<TreeChildren childNodes={tree.zoom.childNodes} />
+    //<ReactTree.TreeChildren childNodes={tree.zoom.childNodes} />
     if (tree.zoom !== undefined) {
-        React.render(
-          <div>
-          <div className='header'><span className='logo'>Bearings</span><SearchBox/><div className='header-buttons'><ResetButton/><a href="import.html">Import</a><DataSaved /><CompleteHiddenButton /></div> </div>
-          <div className='pad-wrapper'>
-              <div className='breadcrumbs-wrapper'><Breadcrumb node={tree} /></div>
-              <TreeNode topBullet={true} node={tree.zoom}/>
-              </div>
-          </div>,
+        var a = (<div></div>);
+        console.log(a);
+        React.render(ReactTree.to_render,
           document.getElementById("tree")
         );
     } else {
+        // TODO remove
         console.assert(false, 'I didn\'t think this would happen');
         //console.log('no zoom');
         //React.render(
           //<div>
       //<ResetButton/> | <a href="import.html">Import</a> | <DataSaved />
           //<div><Breadcrumb node={tree} /></div>
-          //<TreeNode node={tree}/>
+          //<ReactTree.TreeNode node={tree}/>
           //</div>,
           //document.getElementById("tree")
         //);
     }
 }
 
-module.exports = startRender;
+module.exports = ReactTree;
 
