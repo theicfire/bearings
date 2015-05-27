@@ -461,22 +461,25 @@ function renderAllNoUndo() {
     doRender(newTree);
 }
 
-ReactTree.to_render = (<div>
-          <div className='header'><span className='logo'>Bearings</span><SearchBox/><div className='header-buttons'><ResetButton/><a href="import.html">Import</a><DataSaved /><CompleteHiddenButton /></div> </div>
-          <div className='pad-wrapper'>
-              <div className='breadcrumbs-wrapper'><Breadcrumb node={tree} /></div>
-              <ReactTree.TreeNode topBullet={true} node={tree.zoom}/>
-              </div>
-              </div>);
+ReactTree.to_react_element = function(tree) {
+  return (
+    <div>
+    <div className='header'><span className='logo'>Bearings</span><SearchBox/><div className='header-buttons'><ResetButton/><a href="import.html">Import</a><DataSaved /><CompleteHiddenButton /></div> </div>
+    <div className='pad-wrapper'>
+        <div className='breadcrumbs-wrapper'><Breadcrumb node={tree} /></div>
+        <ReactTree.TreeNode topBullet={true} node={tree.zoom}/>
+        </div>
+    </div>
+  );
+};
+
 function doRender(tree) {
     //console.log('rendering with', Tree.toString(tree));
 
     // TODO should always have a zoom?
     //<ReactTree.TreeChildren childNodes={tree.zoom.childNodes} />
     if (tree.zoom !== undefined) {
-        var a = (<div></div>);
-        console.log(a);
-        React.render(ReactTree.to_render,
+        React.render(ReactTree.to_react_element(tree),
           document.getElementById("tree")
         );
     } else {
