@@ -218,3 +218,71 @@ it('Should delete an element if it is deleted', function(){
         assert.deepEqual(FastRenderTree.diff(tree, after), {
                 delete: ['5d01db2c-c5bc-48c5-afe2-e2f13cbd7a7d']});
 });
+
+it('Moving an element should be a delete + insert', function(){
+        var tree = Tree.fromString(multiline(function(){/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "uuid": "97b37002-4af0-4dfe-bf38-7b2b4bc89b8f"
+                },
+                {
+                    "title": "three",
+                    "uuid": "39f34f0a-8822-4df0-8d53-4bef67951f6b"
+                },
+                {
+                    "title": "four",
+                    "uuid": "b0054db8-d9f5-45e8-9d3c-58cdf208cd6a"
+                }
+            ],
+            "uuid": "ee270269-693f-4ffc-8189-67a987bf8927"
+        }
+    ],
+    "selected": "b0054db8-d9f5-45e8-9d3c-58cdf208cd6a",
+    "completedHidden": true,
+    "caretLoc": 4,
+    "uuid": "9dd4037c-255f-48fe-83b4-7b2aabde2403",
+    "zoomUUID": "9dd4037c-255f-48fe-83b4-7b2aabde2403"
+}
+        */}));
+
+        var after = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "two",
+                    "uuid": "97b37002-4af0-4dfe-bf38-7b2b4bc89b8f"
+                },
+                {
+                    "title": "four",
+                    "uuid": "b0054db8-d9f5-45e8-9d3c-58cdf208cd6a"
+                },
+                {
+                    "title": "three",
+                    "uuid": "39f34f0a-8822-4df0-8d53-4bef67951f6b"
+                }
+            ],
+            "uuid": "ee270269-693f-4ffc-8189-67a987bf8927"
+        }
+    ],
+    "selected": "b0054db8-d9f5-45e8-9d3c-58cdf208cd6a",
+    "completedHidden": true,
+    "caretLoc": 4,
+    "uuid": "9dd4037c-255f-48fe-83b4-7b2aabde2403",
+    "zoomUUID": "9dd4037c-255f-48fe-83b4-7b2aabde2403"
+}
+        */}));
+
+        assert.deepEqual(FastRenderTree.diff(tree, after), {
+                insert: ['b0054db8-d9f5-45e8-9d3c-58cdf208cd6a'],
+                delete: ['b0054db8-d9f5-45e8-9d3c-58cdf208cd6a']});
+});
