@@ -11,10 +11,10 @@ var FastRenderTree = {};
 FastRenderTree.diff = function(oldTree, newTree) {
     var ret = {};
     if (!FastRenderTree.nodeEquals(newTree.uuidMap[newTree.selected], oldTree.uuidMap[newTree.selected])) {
-        ret.insert = [newTree.selected];
+        ret.insert = newTree.selected;
     }
     if (!FastRenderTree.nodeEquals(newTree.uuidMap[oldTree.selected], oldTree.uuidMap[oldTree.selected])) {
-        ret['delete'] = [oldTree.selected];
+        ret['delete'] = oldTree.selected;
     }
     return ret;
 };
@@ -56,11 +56,27 @@ FastRenderTree.getPath = function(tree) {
 };
 
 FastRenderTree.operations = function(oldTree, newTree, diff) {
-    return [
-        {del: 'uuid1'},
-        {at: 'uuid2', insertAfter: 'uuid3'},
-        {at: 'uuid2', insertBefore: 'uuid3'}
-    ];
+    var ret = [];
+    if (diff.hasOwnProperty('delete')) {
+        ret.push({del: diff['delete']});
+    }
+    if (diff.hasOwnProperty('insert')) {
+        var insertTree = newTree.uuidMap[diff['insert']];
+        var childNum = Tree.findChildNum(insertTree);
+        if (childNum === 0) {
+            console.assert(insertTree.parent.childNodes.length > 0);
+            if (insertTree.parent.childNodes.length === 1) {
+                // Need to return a "insertChild" thing...
+                ret.push({insertChild: insertTree.parent.uuid, newUUID: diff['insert']});
+            } else {
+                var nextUUID = insertTree.parent.childNodes[1].uuid;
+                ret.push({insertBefore: nextUUID, newUUID: diff['insert']});
+            }
+        } else {
+            ret.push({insertAfter: insertTree.parent.childNodes[0].uuid, newUUID: diff['insert']});
+        }
+    }
+    return ret;
 };
 
 FastRenderTree.applyOperations = function(oldTree, newTree, operations) {
@@ -68,12 +84,12 @@ FastRenderTree.applyOperations = function(oldTree, newTree, operations) {
         if (operation.hasOwnProperty('del')) {
             $('#' + operation.del).remove();
         } else if (operation.hasOwnProperty('insertAfter')) {
-            var newEl = FastRenderTree.makeDom(newTree, operation.insertAfter);
-            $('#' + operation.at).insertAfter(newEl);
+            var newEl = FastRenderTree.makeDom(newTree, operation.newUUID);
+            $('#' + operation.insertAfter).insertAfter(newEl);
         } else if (operation.hasOwnProperty('insertBefore')) {
-            var newEl = $(FastRenderTree.makeDom(newTree, operation.insertBefore));
-            console.log('adding', newEl, 'before', $('#' + operation.at));
-            newEl.insertBefore('#' + operation.at);
+            var newEl = $(FastRenderTree.makeDom(newTree, operation.newUUID));
+            console.log('adding', newEl, 'before', $('#' + operation.insertBefore));
+            newEl.insertBefore('#' + operation.insertBefore);
         }
     });
 };

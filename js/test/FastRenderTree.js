@@ -55,7 +55,12 @@ it('Should return a single insert if one node is inserted between the two trees'
 }
         */}));
 
-        assert.deepEqual(FastRenderTree.diff(tree, after), {insert: ['5316505c-8eae-448e-9d05-2092e4d92061']});
+        var diff = FastRenderTree.diff(tree, after);
+        var operations = FastRenderTree.operations(tree, after, diff);
+        assert.deepEqual(diff, {insert: '5316505c-8eae-448e-9d05-2092e4d92061'});
+        assert.deepEqual(operations, [
+                {newUUID: '5316505c-8eae-448e-9d05-2092e4d92061', insertAfter: '88b3c739-56be-45cc-9072-0b2e7fc7b430'}
+        ]);
 });
 
 
@@ -107,9 +112,15 @@ it('Should return a delete and an insert of the same element if it is changed', 
 }
         */}));
 
-        assert.deepEqual(FastRenderTree.diff(tree, after), {
-                insert: ['88b3c739-56be-45cc-9072-0b2e7fc7b430'],
-                delete: ['88b3c739-56be-45cc-9072-0b2e7fc7b430']});
+        var diff = FastRenderTree.diff(tree, after);
+        var operations = FastRenderTree.operations(tree, after, diff);
+        assert.deepEqual(diff, {
+                insert: '88b3c739-56be-45cc-9072-0b2e7fc7b430',
+                delete: '88b3c739-56be-45cc-9072-0b2e7fc7b430'});
+        assert.deepEqual(operations, [
+                {del: '88b3c739-56be-45cc-9072-0b2e7fc7b430'},
+                {newUUID: '88b3c739-56be-45cc-9072-0b2e7fc7b430', insertChild: 'ac36af0b-b35a-4d5e-8bf5-e4aea9d070ee'}
+        ]);
 });
 
 
@@ -159,9 +170,15 @@ it('Should return a delete and insert of the same element if it is unindented', 
 }
         */}));
 
-        assert.deepEqual(FastRenderTree.diff(tree, after), {
-                insert: ['88b3c739-56be-45cc-9072-0b2e7fc7b430'], 
-                delete: ['88b3c739-56be-45cc-9072-0b2e7fc7b430']});
+        var diff = FastRenderTree.diff(tree, after);
+        var operations = FastRenderTree.operations(tree, after, diff);
+        assert.deepEqual(diff, {
+                insert: '88b3c739-56be-45cc-9072-0b2e7fc7b430', 
+                delete: '88b3c739-56be-45cc-9072-0b2e7fc7b430'});
+        assert.deepEqual(operations, [
+                {del: '88b3c739-56be-45cc-9072-0b2e7fc7b430'},
+                {newUUID: '88b3c739-56be-45cc-9072-0b2e7fc7b430', insertAfter: 'ac36af0b-b35a-4d5e-8bf5-e4aea9d070ee'}
+        ]);
 });
 
 it('Should delete an element if it is deleted', function(){
@@ -215,8 +232,13 @@ it('Should delete an element if it is deleted', function(){
 }
         */}));
 
-        assert.deepEqual(FastRenderTree.diff(tree, after), {
-                delete: ['5d01db2c-c5bc-48c5-afe2-e2f13cbd7a7d']});
+        var diff = FastRenderTree.diff(tree, after);
+        var operations = FastRenderTree.operations(tree, after, diff);
+        assert.deepEqual(diff, {
+                delete: '5d01db2c-c5bc-48c5-afe2-e2f13cbd7a7d'});
+        assert.deepEqual(operations, [
+                {del: '5d01db2c-c5bc-48c5-afe2-e2f13cbd7a7d'}
+        ]);
 });
 
 it('Moving an element should be a delete + insert', function(){
@@ -281,8 +303,51 @@ it('Moving an element should be a delete + insert', function(){
     "zoomUUID": "9dd4037c-255f-48fe-83b4-7b2aabde2403"
 }
         */}));
+        var third = Tree.fromString(multiline(function() {/*
+        {
+    "title": "special_root_title",
+    "childNodes": [
+        {
+            "title": "one",
+            "childNodes": [
+                {
+                    "title": "four",
+                    "uuid": "b0054db8-d9f5-45e8-9d3c-58cdf208cd6a"
+                },
+                {
+                    "title": "two",
+                    "uuid": "97b37002-4af0-4dfe-bf38-7b2b4bc89b8f"
+                },
+                {
+                    "title": "three",
+                    "uuid": "39f34f0a-8822-4df0-8d53-4bef67951f6b"
+                }
+            ],
+            "uuid": "ee270269-693f-4ffc-8189-67a987bf8927"
+        }
+    ],
+    "selected": "b0054db8-d9f5-45e8-9d3c-58cdf208cd6a",
+    "completedHidden": true,
+    "caretLoc": 4,
+    "uuid": "9dd4037c-255f-48fe-83b4-7b2aabde2403",
+    "zoomUUID": "9dd4037c-255f-48fe-83b4-7b2aabde2403"
+}
+        */}));
 
-        assert.deepEqual(FastRenderTree.diff(tree, after), {
-                insert: ['b0054db8-d9f5-45e8-9d3c-58cdf208cd6a'],
-                delete: ['b0054db8-d9f5-45e8-9d3c-58cdf208cd6a']});
+        var diff = FastRenderTree.diff(tree, after);
+        var diff2 = FastRenderTree.diff(after, third);
+        var operations = FastRenderTree.operations(tree, after, diff);
+        var operations2 = FastRenderTree.operations(after, third, diff2);
+        assert.deepEqual(diff, {
+                insert: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a',
+                delete: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a'});
+        assert.deepEqual(operations, [
+                {del: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a'},
+                {newUUID: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a', insertAfter: '97b37002-4af0-4dfe-bf38-7b2b4bc89b8f'}
+        ]);
+
+        assert.deepEqual(operations2, [
+                {del: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a'},
+                {newUUID: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a', insertBefore: '97b37002-4af0-4dfe-bf38-7b2b4bc89b8f'}
+        ]);
 });
