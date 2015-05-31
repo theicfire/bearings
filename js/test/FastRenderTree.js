@@ -174,17 +174,21 @@ it('Should delete an element if it is deleted', function(){
             "childNodes": [
                 {
                     "title": "two",
-                    "uuid": "88b3c739-56be-45cc-9072-0b2e7fc7b430"
+                    "uuid": "97b37002-4af0-4dfe-bf38-7b2b4bc89b8f"
+                },
+                {
+                    "title": "three",
+                    "uuid": "5d01db2c-c5bc-48c5-afe2-e2f13cbd7a7d"
                 }
             ],
-            "uuid": "ac36af0b-b35a-4d5e-8bf5-e4aea9d070ee"
+            "uuid": "ee270269-693f-4ffc-8189-67a987bf8927"
         }
     ],
-    "selected": "88b3c739-56be-45cc-9072-0b2e7fc7b430",
+    "selected": "5d01db2c-c5bc-48c5-afe2-e2f13cbd7a7d",
     "completedHidden": true,
-    "caretLoc": 3,
-    "uuid": "ee5e83c0-c825-415a-9da6-53f4204ed597",
-    "zoomUUID": "ee5e83c0-c825-415a-9da6-53f4204ed597"
+    "caretLoc": 5,
+    "uuid": "9dd4037c-255f-48fe-83b4-7b2aabde2403",
+    "zoomUUID": "9dd4037c-255f-48fe-83b4-7b2aabde2403"
 }
         */}));
 
@@ -194,17 +198,23 @@ it('Should delete an element if it is deleted', function(){
     "childNodes": [
         {
             "title": "one",
-            "uuid": "ac36af0b-b35a-4d5e-8bf5-e4aea9d070ee"
+            "childNodes": [
+                {
+                    "title": "two",
+                    "uuid": "97b37002-4af0-4dfe-bf38-7b2b4bc89b8f"
+                }
+            ],
+            "uuid": "ee270269-693f-4ffc-8189-67a987bf8927"
         }
     ],
-    "selected": "88b3c739-56be-45cc-9072-0b2e7fc7b430",
+    "selected": "97b37002-4af0-4dfe-bf38-7b2b4bc89b8f",
     "completedHidden": true,
     "caretLoc": 3,
-    "uuid": "ee5e83c0-c825-415a-9da6-53f4204ed597",
-    "zoomUUID": "ee5e83c0-c825-415a-9da6-53f4204ed597"
+    "uuid": "9dd4037c-255f-48fe-83b4-7b2aabde2403",
+    "zoomUUID": "9dd4037c-255f-48fe-83b4-7b2aabde2403"
 }
         */}));
 
         assert.deepEqual(FastRenderTree.diff(tree, after), {
-                delete: ['88b3c739-56be-45cc-9072-0b2e7fc7b430']});
+                delete: ['5d01db2c-c5bc-48c5-afe2-e2f13cbd7a7d']});
 });
