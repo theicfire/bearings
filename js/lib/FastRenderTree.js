@@ -8,9 +8,17 @@ var FastRenderTree = {};
  * Insert references the newTree's uuids.
  */
 FastRenderTree.diff = function(oldTree, newTree) {
-    return {
-        insert: ['5316505c-8eae-448e-9d05-2092e4d92061']
+    if (newTree.uuidMap.hasOwnProperty(newTree.selected) &&
+        !oldTree.uuidMap.hasOwnProperty(newTree.selected)) {
+        return {insert: [newTree.selected]}
     }
+};
+
+/*
+ * If the node title and location in the tree is the same, return true, else false
+ */
+FastRenderTree.nodeEquals = function(t1, t2) {
+    return t1.title === t2.title && FastRenderTree.getPath(t1) == FastRenderTree.getPath(t2);
 };
 
 FastRenderTree.operations = function(oldTree, newTree, diff) {
