@@ -497,5 +497,13 @@ function doRender(tree) {
     }
 }
 
+/*
+ * Make the dom of a given uuid for some tree.
+ */
+function makeDom(tree, uuid) {
+    var root = Tree.getRoot(tree);
+    return ReactTree.tree_to_html(root.uuidMap[uuid]);
+}
+
 module.exports = ReactTree;
 

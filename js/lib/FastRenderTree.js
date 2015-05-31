@@ -1,15 +1,6 @@
 $ = require('jquery');
-var ReactTree = require('../ReactTree');
 var React= require('React');
-/*
- * Make the dom of a given uuid for some tree.
- * Will recursively create it.
- */
 var FastRenderTree = {};
-FastRenderTree.makeDom = function(tree, uuid) {
-    var root = Tree.getRoot(tree);
-    return ReactTree.tree_to_html(root.uuidMap[uuid]);
-};
 
 /*
  * Even a change of text is a delete/insert operation
@@ -18,11 +9,9 @@ FastRenderTree.makeDom = function(tree, uuid) {
  */
 FastRenderTree.diff = function(oldTree, newTree) {
     return {
-        insert: ['uuid1', 'uuid2'],
-        delete: ['uuid3']
+        insert: ['5316505c-8eae-448e-9d05-2092e4d92061']
     }
 };
-
 
 FastRenderTree.operations = function(oldTree, newTree, diff) {
     return [
