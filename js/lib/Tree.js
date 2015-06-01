@@ -505,23 +505,24 @@ Tree.makeTree = function(nodes) {
 };
 
 Tree.makeDefaultTree = function() {
-    var rawStartTree =
-        [{title: "goody"},
-         {title: "other"}];
     //var rawStartTree =
-        //[{title: "goody",
-                //childNodes: [
-                    //{title: "billy"},
-                    //{title: "suzie", childNodes: [
-                            //{title: "puppy", childNodes: [
-                                    //{title: "dog house"}
-                                //]},
-                            //{title: "cherry thing"}
-                        //]}
-                //]}];
+        //[{title: "goody"},
+         //{title: "other"}];
+    var rawStartTree =
+        [{title: "goody",
+                childNodes: [
+                    {title: "billy"},
+                    {title: "cat"},
+                    {title: "suzie", childNodes: [
+                            {title: "puppy", childNodes: [
+                                    {title: "dog house"}
+                                ]},
+                            {title: "cherry thing"}
+                        ]}
+                ]}];
     rawStartTree.push({title: "the end"});
     var ret = Tree.makeTree(rawStartTree);
-    ret.selected = ret.childNodes[0].uuid;
+    ret.selected = ret.childNodes[0].childNodes[0].uuid;
     return ret;
 }
 

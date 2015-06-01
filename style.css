@@ -30,7 +30,7 @@ div.pad-wrapper>div.node-wrapper {
     border-left: none;
 }
 
-div.pad-wrapper>div.node-wrapper>ul>li>div.node-wrapper {
+div.pad-wrapper>div.node-wrapper>div>ul>li>div.node-wrapper {
     border-left: none;
     font-size:15px;
 }

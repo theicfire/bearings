@@ -75,7 +75,6 @@ var SearchBox = React.createClass({
   },
   handleChange: function(event) {
     this.setState({value: event.target.value});
-    console.log('cool', event.target.value);
     if (event.target.value.length === 0) {
         globalTree = globalTreeBak;
         globalTreeBak = null;
@@ -104,7 +103,7 @@ render: function() {
     if (this.props.childNodes != null) {
         var that = this;
         childNodes = this.props.childNodes.map(function(node, index) {
-            return <li key={index}><ReactTree.TreeNode node={node} /></li>
+            return <li key={index}><ReactTree.TreeNodeWrapper node={node} /></li>
         });
     }
 
@@ -116,6 +115,17 @@ render: function() {
 
 }
 });
+
+ReactTree.TreeNodeWrapper = React.createClass({
+render: function() {
+    return (
+        <div className='node-wrapper' id={this.props.node.uuid}>
+          <ReactTree.TreeNode node={this.props.node} topBullet={this.props.topBullet} />
+        </div>
+    );
+},
+});
+
 ReactTree.TreeNode = React.createClass({
 getInitialState: function() {
     return {
@@ -393,7 +403,7 @@ render: function() {
                 </div>);
     }
     return (
-        <div className='node-wrapper' onMouseLeave={this.mouseOut} id={this.props.node.uuid}>
+        <div>
         <div className="node-direct-wrapper">
         {bulletPoint}<div className='plus-wrapper'>{plus}</div>
         {textBox}
@@ -482,8 +492,10 @@ function renderAllNoUndo() {
 }
 
 ReactTree.tree_to_html = function(tree) {
-  var el = (<ReactTree.TreeNode node={tree}/>);
-  return React.renderToString(el);
+  var ret = $('<div></div>');
+  ret.attr('class', 'node-wrapper');
+  ret.attr('id', tree.uuid);
+  return ret;
 };
 
 function doRender(tree) {
@@ -497,7 +509,7 @@ function doRender(tree) {
     <div className='header'><span className='logo'>Bearings</span><SearchBox/><div className='header-buttons'><ResetButton/><a href="import.html">Import</a><DataSaved /><CompleteHiddenButton /></div> </div>
     <div className='pad-wrapper'>
         <div className='breadcrumbs-wrapper'><Breadcrumb node={tree} /></div>
-        <ReactTree.TreeNode topBullet={true} node={tree.zoom}/>
+        <ReactTree.TreeNodeWrapper topBullet={true} node={tree.zoom}/>
         </div>
     </div>,
           document.getElementById("tree")
@@ -510,7 +522,7 @@ function doRender(tree) {
           //<div>
       //<ResetButton/> | <a href="import.html">Import</a> | <DataSaved />
           //<div><Breadcrumb node={tree} /></div>
-          //<ReactTree.TreeNode node={tree}/>
+          //<ReactTree.TreeNodeWrapper node={tree}/>
           //</div>,
           //document.getElementById("tree")
         //);
@@ -534,11 +546,13 @@ function applyOperations(oldTree, newTree, operations) {
             console.log('adding', newEl, 'after', $('#' + operation.insertAfter));
             newEl.insertAfter('#' + operation.insertAfter);
             newEl.find('div.editable').focus();
+            React.render(<ReactTree.TreeNode node={newTree.uuidMap[operation.newUUID]}/>, newEl[0]);
         } else if (operation.hasOwnProperty('insertBefore')) {
-            var newEl = $(makeDom(newTree, operation.newUUID));
+            var newEl = makeDom(newTree, operation.newUUID);
             console.log('adding', newEl, 'before', $('#' + operation.insertBefore));
             newEl.insertBefore('#' + operation.insertBefore);
             newEl.find('div.editable').focus();
+            React.render(<ReactTree.TreeNode node={newTree.uuidMap[operation.newUUID]}/>, newEl[0]);
         }
     });
 };
