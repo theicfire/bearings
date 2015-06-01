@@ -401,12 +401,14 @@ it('Should handle pressing enter in the middle of an element', function(){
         */}));
 
         var diff = FastRenderTree.diff(tree, after);
-        //var operations = FastRenderTree.operations(tree, after, diff);
+        var operations = FastRenderTree.operations(tree, after, diff);
         assert.deepEqual(diff, {
                 delete: ['5c887600-f205-4743-86aa-76108e7c6052'],
                 insert: ['5c887600-f205-4743-86aa-76108e7c6052', '5a3123c3-52ba-4f13-9f2d-f031dfffefab'],
                 });
-        //assert.deepEqual(operations, [
-                //{del: '5d01db2c-c5bc-48c5-afe2-e2f13cbd7a7d'}
-        //]);
+        assert.deepEqual(operations, [
+                {del: '5c887600-f205-4743-86aa-76108e7c6052'},
+                {newUUID: '5c887600-f205-4743-86aa-76108e7c6052', insertAfter: '3c59b0f0-f61f-4eec-b393-46cfb3b14cc4'},
+                {newUUID: '5a3123c3-52ba-4f13-9f2d-f031dfffefab', insertAfter: '5c887600-f205-4743-86aa-76108e7c6052'},
+        ]);
 });
