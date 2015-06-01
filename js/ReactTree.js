@@ -1,15 +1,18 @@
 var React = require('react/addons');
-Tree = require('./lib/Tree');
+Tree = require('./lib/Tree'); // TODO put var in front
+var FastRenderTree = require('./lib/FastRenderTree');
 var $ = require('jquery');
 var Cursor = require('./lib/Cursor');
 var _ = require('underscore');
 var UndoRing = require('./lib/UndoRing');
 var opml = require('opml-generator');
 
+fastRenderOn = false; // TODO remove
 var ReactTree = {};
-globalTree = {};
-var globalTreeBak;
-var globalOldTree;
+globalTree = {}; // TODO put "var" back
+var globalTreeBak; // For search
+var globalOldTree; // For Undo/Redo
+var globalOldTree2; // For fastRender
 var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = true;
@@ -430,15 +433,15 @@ ReactTree.startRender = function(parseTree) {
     globalUndoRing = new UndoRing(newTree, 50);
     renderAll();
 
-    setInterval(function () {
-        if (!globalDataSaved) {
-            globalParseTree.set('tree', Tree.toString(globalTree));
-            globalParseTree.save();
-            globalDataSaved = true;
-            renderAllNoUndo();
-        }
-        globalUndoRing.commit();
-    }, 2000);
+    //setInterval(function () {
+        //if (!globalDataSaved) {
+            //globalParseTree.set('tree', Tree.toString(globalTree));
+            //globalParseTree.save();
+            //globalDataSaved = true;
+            //renderAllNoUndo();
+        //}
+        //globalUndoRing.commit();
+    //}, 2000);
 }
 
 
@@ -447,7 +450,14 @@ function renderAll() {
     // use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
     // changed relative to the other, and we don't have to call render. But, we have to clone, which
     // may be slow.
+    if (fastRenderOn) {
+      fastRender();
+      return;
+    }
+    console.log('renderall');
+    fastRenderOn = true;
     var newTree = Tree.clone(globalTree);
+    globalOldTree2 = newTree;
     if (!_.isEqual(globalOldTree, Tree.cloneNoParentNoCursor(globalTree))) {
         globalDataSaved = false;
         globalUndoRing.addPending(newTree);
@@ -456,7 +466,17 @@ function renderAll() {
     doRender(newTree);
 };
 
+function fastRender() {
+    var diff = FastRenderTree.diff(globalOldTree2, globalTree);
+    var operations = FastRenderTree.operations(globalOldTree2, globalTree, diff);
+    console.log('do operations', operations);
+    var newTree = Tree.clone(globalTree);
+    applyOperations(globalOldTree2, globalTree, operations);
+    globalOldTree2 = newTree;
+}
+
 function renderAllNoUndo() {
+    console.assert(false);
     var newTree = Tree.clone(globalTree);
     doRender(newTree);
 }
@@ -504,6 +524,24 @@ function makeDom(tree, uuid) {
     var root = Tree.getRoot(tree);
     return ReactTree.tree_to_html(root.uuidMap[uuid]);
 }
+function applyOperations(oldTree, newTree, operations) {
+    operations.forEach(function(operation) {
+        if (operation.hasOwnProperty('del')) {
+            console.log('deleting', $('#' + operation.del));
+            $('#' + operation.del).remove();
+        } else if (operation.hasOwnProperty('insertAfter')) {
+            var newEl = makeDom(newTree, operation.newUUID);
+            console.log('adding', newEl, 'after', $('#' + operation.insertAfter));
+            newEl.insertAfter('#' + operation.insertAfter);
+            newEl.find('div.editable').focus();
+        } else if (operation.hasOwnProperty('insertBefore')) {
+            var newEl = $(makeDom(newTree, operation.newUUID));
+            console.log('adding', newEl, 'before', $('#' + operation.insertBefore));
+            newEl.insertBefore('#' + operation.insertBefore);
+            newEl.find('div.editable').focus();
+        }
+    });
+};
 
 module.exports = ReactTree;
 

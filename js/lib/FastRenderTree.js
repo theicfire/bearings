@@ -23,6 +23,7 @@ FastRenderTree.diff = function(oldTree, newTree) {
  * If the node title and location in the tree is the same, return true, else false
  */
 FastRenderTree.nodeEquals = function(t1, t2) {
+    //console.log('nodeEquals', t1, t2);
     if (t1 === undefined && t2 !== undefined) {
         return false;
     }
@@ -55,6 +56,7 @@ FastRenderTree.getPath = function(tree) {
     return reverse(getReversePath(tree));
 };
 
+// TODO just call diff inside of this
 FastRenderTree.operations = function(oldTree, newTree, diff) {
     var ret = [];
     if (diff.hasOwnProperty('delete')) {
@@ -79,36 +81,19 @@ FastRenderTree.operations = function(oldTree, newTree, diff) {
     return ret;
 };
 
-FastRenderTree.applyOperations = function(oldTree, newTree, operations) {
-    operations.forEach(function(operation) {
-        if (operation.hasOwnProperty('del')) {
-            $('#' + operation.del).remove();
-        } else if (operation.hasOwnProperty('insertAfter')) {
-            var newEl = FastRenderTree.makeDom(newTree, operation.newUUID);
-            $('#' + operation.insertAfter).insertAfter(newEl);
-        } else if (operation.hasOwnProperty('insertBefore')) {
-            var newEl = $(FastRenderTree.makeDom(newTree, operation.newUUID));
-            console.log('adding', newEl, 'before', $('#' + operation.insertBefore));
-            newEl.insertBefore('#' + operation.insertBefore);
-        }
-    });
-};
-
-FastRenderTree.cool = function() {
-    var one = Tree.clone(globalTree);
-    one.selected = one.childNodes[0].uuid;
-    var two = Tree.clone(one);
-    two.childNodes[0].title = 'something else';
-    console.log('delete title of', one.childNodes[0].title);
-    console.log('at', two.childNodes[1].title);
-    console.log('add before', two.childNodes[0].title);
-    React.unmountComponentAtNode($('base-react'));
-    var ops = [{del: one.childNodes[0].uuid},
-        {at: two.childNodes[1].uuid, insertBefore: two.childNodes[0].uuid}];
-    FastRenderTree.applyOperations(one, two, ops);
-};
-
-
+//FastRenderTree.cool = function() {
+    //var one = Tree.clone(globalTree);
+    //one.selected = one.childNodes[0].uuid;
+    //var two = Tree.clone(one);
+    //two.childNodes[0].title = 'something else';
+    //console.log('delete title of', one.childNodes[0].title);
+    //console.log('at', two.childNodes[1].title);
+    //console.log('add before', two.childNodes[0].title);
+    //React.unmountComponentAtNode($('base-react'));
+    //var ops = [{del: one.childNodes[0].uuid},
+        //{at: two.childNodes[1].uuid, insertBefore: two.childNodes[0].uuid}];
+    //FastRenderTree.applyOperations(one, two, ops);
+//};
 
 fa = FastRenderTree; // TODO remove
 module.exports = FastRenderTree;
