@@ -77,14 +77,7 @@ FastRenderTree.operations = function(oldTree, newTree, diff) {
             console.log('loook for', insertTree);
             var childNum = Tree.findChildNum(insertTree);
             if (childNum === 0) {
-                console.assert(insertTree.parent.childNodes.length > 0);
-                if (insertTree.parent.childNodes.length === 1) {
-                    // Need to return a "insertChild" thing...
-                    ret.push({insertChild: insertTree.parent.uuid, newUUID: insertUUID});
-                } else {
-                    var nextUUID = insertTree.parent.childNodes[1].uuid;
-                    ret.push({insertBefore: nextUUID, newUUID: insertUUID});
-                }
+                ret.push({insertChild: insertTree.parent.uuid, newUUID: insertUUID});
             } else {
                 ret.push({insertAfter: insertTree.parent.childNodes[childNum - 1].uuid, newUUID: insertUUID});
             }

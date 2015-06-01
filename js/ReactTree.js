@@ -547,10 +547,10 @@ function applyOperations(oldTree, newTree, operations) {
             newEl.insertAfter('#' + operation.insertAfter);
             newEl.find('div.editable').focus();
             React.render(<ReactTree.TreeNode node={newTree.uuidMap[operation.newUUID]}/>, newEl[0]);
-        } else if (operation.hasOwnProperty('insertBefore')) {
+        } else if (operation.hasOwnProperty('insertChild')) {
             var newEl = makeDom(newTree, operation.newUUID);
-            console.log('adding', newEl, 'before', $('#' + operation.insertBefore));
-            newEl.insertBefore('#' + operation.insertBefore);
+            console.log('prepend()', newEl, 'to', $('#' + operation.insertChild));
+            newEl.prepend('#' + operation.insertChild);
             newEl.find('div.editable').focus();
             React.render(<ReactTree.TreeNode node={newTree.uuidMap[operation.newUUID]}/>, newEl[0]);
         }

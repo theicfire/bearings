@@ -348,7 +348,7 @@ it('Moving an element should be a delete + insert', function(){
 
         assert.deepEqual(operations2, [
                 {del: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a'},
-                {newUUID: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a', insertBefore: '97b37002-4af0-4dfe-bf38-7b2b4bc89b8f'}
+                {newUUID: 'b0054db8-d9f5-45e8-9d3c-58cdf208cd6a', insertChild: 'ee270269-693f-4ffc-8189-67a987bf8927'}
         ]);
 });
 
