@@ -10,11 +10,19 @@ var FastRenderTree = {};
  */
 FastRenderTree.diff = function(oldTree, newTree) {
     var ret = {};
-    if (!FastRenderTree.nodeEquals(newTree.uuidMap[newTree.selected], oldTree.uuidMap[newTree.selected])) {
-        ret.insert = newTree.selected;
-    }
+    // If old selected is not equal, delete
     if (!FastRenderTree.nodeEquals(newTree.uuidMap[oldTree.selected], oldTree.uuidMap[oldTree.selected])) {
-        ret['delete'] = oldTree.selected;
+        ret['delete'] = [oldTree.selected];
+        if (newTree.uuidMap[oldTree.selected] !== undefined) {
+            ret.insert = [oldTree.selected];
+        }
+    }
+    if (oldTree.selected !== newTree.selected &&
+        !FastRenderTree.nodeEquals(newTree.uuidMap[newTree.selected], oldTree.uuidMap[newTree.selected])) {
+        if (!ret.hasOwnProperty('insert')) {
+            ret.insert = [];
+        }
+        ret.insert.push(newTree.selected);
     }
     return ret;
 };
@@ -60,22 +68,23 @@ FastRenderTree.getPath = function(tree) {
 FastRenderTree.operations = function(oldTree, newTree, diff) {
     var ret = [];
     if (diff.hasOwnProperty('delete')) {
-        ret.push({del: diff['delete']});
+        ret.push({del: diff['delete'][0]});
     }
     if (diff.hasOwnProperty('insert')) {
-        var insertTree = newTree.uuidMap[diff['insert']];
+        var insertTree = newTree.uuidMap[diff['insert'][0]];
+        console.log('loook for', insertTree);
         var childNum = Tree.findChildNum(insertTree);
         if (childNum === 0) {
             console.assert(insertTree.parent.childNodes.length > 0);
             if (insertTree.parent.childNodes.length === 1) {
                 // Need to return a "insertChild" thing...
-                ret.push({insertChild: insertTree.parent.uuid, newUUID: diff['insert']});
+                ret.push({insertChild: insertTree.parent.uuid, newUUID: diff['insert'][0]});
             } else {
                 var nextUUID = insertTree.parent.childNodes[1].uuid;
-                ret.push({insertBefore: nextUUID, newUUID: diff['insert']});
+                ret.push({insertBefore: nextUUID, newUUID: diff['insert'][0]});
             }
         } else {
-            ret.push({insertAfter: insertTree.parent.childNodes[0].uuid, newUUID: diff['insert']});
+            ret.push({insertAfter: insertTree.parent.childNodes[0].uuid, newUUID: diff['insert'][0]});
         }
     }
     return ret;
