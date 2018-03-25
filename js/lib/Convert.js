@@ -5,7 +5,7 @@ module.exports = exports = Convert;
 
 Convert.htmlToTree = function(html) {
 	let $ = cheerio.load(html);
-	var t = Convert.domToTree($('ul').eq(0));
+	var t = Convert.domToTree($, $('ul').eq(0));
 	//console.log('t', JSON.stringify(t, null, ' '));
 	var sl = Convert.slim(t);
 	sl[0].selected = true; // TODO what if there is not sl[0]? Give user error?
@@ -13,7 +13,7 @@ Convert.htmlToTree = function(html) {
 	return sl;
 };
 
-Convert.domToTree = function(objs) {
+Convert.domToTree = function($, objs) {
 	var ret = [];
 	objs.each(function(i, el) {
 		//console.log('name', el.name, 'type', el.type);
@@ -21,7 +21,7 @@ Convert.domToTree = function(objs) {
 			ret.push($(this).text());
 		} else {
 			//console.log('el', $(this));
-			ret.push(Convert.domToTree($(this).children()));
+			ret.push(Convert.domToTree($, $(this).children()));
 		}
 	});
 	return ret;
