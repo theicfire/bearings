@@ -1,11 +1,11 @@
-var assert = require("assert");
-var _ = require("underscore");
+var assert = require('assert');
 var Tree = require('../lib/Tree');
 var multiline = require('multiline');
 var yaml = require('js-yaml');
 
-it('Tree.search', function(){
-var startYaml = multiline(function(){/*
+it('Tree.search', function() {
+	var startYaml = multiline(function() {
+		/*
 ---
 - hi
 - there
@@ -17,9 +17,11 @@ var startYaml = multiline(function(){/*
     -
         - more
         - children and needle
-*/});
-    var startTree = Tree.makeTree(Tree.yamlObjToTree(yaml.safeLoad(startYaml)));
-var searchYaml = multiline(function(){/*
+*/
+	});
+	var startTree = Tree.makeTree(Tree.yamlObjToTree(yaml.safeLoad(startYaml)));
+	var searchYaml = multiline(function() {
+		/*
 ---
 - there
 - 
@@ -28,8 +30,8 @@ var searchYaml = multiline(function(){/*
     - parent without the search term
     -
         - children and needle
-*/});
-    var searchTree = Tree.makeTree(Tree.yamlObjToTree(yaml.safeLoad(searchYaml)));
-    assert(Tree.equals(Tree.search(startTree, 'needle'), searchTree));
+*/
+	});
+	var searchTree = Tree.makeTree(Tree.yamlObjToTree(yaml.safeLoad(searchYaml)));
+	assert(Tree.equals(Tree.search(startTree, 'needle'), searchTree));
 });
-

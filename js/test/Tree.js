@@ -1,28 +1,42 @@
-var assert = require("assert");
-var _ = require("underscore");
+var assert = require('assert');
+var _ = require('underscore');
 var Tree = require('../lib/Tree');
 var multiline = require('multiline');
 
-Tree.generateUUID = function() {return '1'};
-it('toString and fromString should be opposites', function(){
-    var startTree =
-      [{title: "howdy",
-          childNodes: [
-            {title: "billy"},
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: "dog house"}
-              ]},
-              {title: "cherry thing"}
-            ]}
-        ]}];
+Tree.generateUUID = function() {
+	return '1';
+};
+it('toString and fromString should be opposites', function() {
+	var startTree = [
+		{
+			title: 'howdy',
+			childNodes: [
+				{ title: 'billy' },
+				{
+					title: 'suzie',
+					childNodes: [
+						{
+							title: 'puppy',
+							childNodes: [{ title: 'dog house' }]
+						},
+						{ title: 'cherry thing' }
+					]
+				}
+			]
+		}
+	];
 
-    var tree = Tree.makeTree(startTree);
-    assert.equal(Tree.toString(tree), Tree.toString(Tree.fromString(Tree.toString(tree))));
+	var tree = Tree.makeTree(startTree);
+	assert.equal(
+		Tree.toString(tree),
+		Tree.toString(Tree.fromString(Tree.toString(tree)))
+	);
 });
 
-it('Node should not be removed if backspace is pressed at the beginning of a line and there is no sibling above the line', function(){
-        var tree = Tree.fromString(multiline(function(){/*
+it('Node should not be removed if backspace is pressed at the beginning of a line and there is no sibling above the line', function() {
+	var tree = Tree.fromString(
+		multiline(function() {
+			/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -49,9 +63,13 @@ it('Node should not be removed if backspace is pressed at the beginning of a lin
     "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
     "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
 }
-        */}));
+        */
+		})
+	);
 
-        var after = Tree.fromString(multiline(function() {/*
+	var after = Tree.fromString(
+		multiline(function() {
+			/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -78,14 +96,18 @@ it('Node should not be removed if backspace is pressed at the beginning of a lin
     "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
     "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
 }
-        */}));
+        */
+		})
+	);
 
-        Tree.backspaceAtBeginning(tree);
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	Tree.backspaceAtBeginning(tree);
+	assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
 });
 
 it('If there is a sibling above the current line and backspace is pressed at the beginning of the line, we delete the line and combine the two.', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	var tree = Tree.fromString(
+		multiline(function() {
+			/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -110,9 +132,13 @@ it('If there is a sibling above the current line and backspace is pressed at the
     "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
     "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
 }
-        */}));
+        */
+		})
+	);
 
-        var after = Tree.fromString(multiline(function() {/*
+	var after = Tree.fromString(
+		multiline(function() {
+			/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -133,26 +159,35 @@ it('If there is a sibling above the current line and backspace is pressed at the
     "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
     "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
 }
-        */}));
+        */
+		})
+	);
 
-        Tree.backspaceAtBeginning(tree);
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	Tree.backspaceAtBeginning(tree);
+	assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
 });
 
 it('clone', function() {
-    var tree = Tree.makeTree([
-            {title: "suzie", childNodes: [
-              {title: "puppy", childNodes: [
-                {title: 'dog', selected: true}
-              ]},
-              {title: "cherry"}
-          ]}]);
-    assert(Tree.equals(tree, Tree.clone(tree)));
+	var tree = Tree.makeTree([
+		{
+			title: 'suzie',
+			childNodes: [
+				{
+					title: 'puppy',
+					childNodes: [{ title: 'dog', selected: true }]
+				},
+				{ title: 'cherry' }
+			]
+		}
+	]);
+	assert(Tree.equals(tree, Tree.clone(tree)));
 });
 
 describe('indent', function() {
-    it('one', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('one', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -183,9 +218,13 @@ describe('indent', function() {
     "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
     "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function() {/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -216,14 +255,18 @@ describe('indent', function() {
     "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
     "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
 }
-        */}));
+        */
+			})
+		);
 
-        Tree.indent(tree);
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
-    });
+		Tree.indent(tree);
+		assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	});
 
-    it('two', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('two', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -254,9 +297,13 @@ describe('indent', function() {
     "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
     "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function() {/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -287,16 +334,20 @@ describe('indent', function() {
     "uuid": "8fb219be-71c2-454d-97de-bd745c277e1e",
     "zoomUUID": "8fb219be-71c2-454d-97de-bd745c277e1e"
 }
-        */}));
+        */
+			})
+		);
 
-        Tree.indent(tree);
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
-    });
+		Tree.indent(tree);
+		assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	});
 });
 
 describe('newLineAtCursor', function() {
-    it('one', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('one', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -327,9 +378,13 @@ describe('newLineAtCursor', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function() {/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -364,14 +419,18 @@ describe('newLineAtCursor', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        Tree.newLineAtCursor(tree);
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
-    });
+		Tree.newLineAtCursor(tree);
+		assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	});
 
-    it('two', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('two', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -398,9 +457,13 @@ describe('newLineAtCursor', function() {
     "uuid": "006f3f71-ed22-44d2-b6a3-9d98f263587a",
     "zoomUUID": "006f3f71-ed22-44d2-b6a3-9d98f263587a"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function() {/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -431,14 +494,18 @@ describe('newLineAtCursor', function() {
     "uuid": "006f3f71-ed22-44d2-b6a3-9d98f263587a",
     "zoomUUID": "006f3f71-ed22-44d2-b6a3-9d98f263587a"
 }
-        */}));
+        */
+			})
+		);
 
-        Tree.newLineAtCursor(tree);
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
-    });
+		Tree.newLineAtCursor(tree);
+		assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	});
 
-    it('three', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('three', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -459,9 +526,13 @@ describe('newLineAtCursor', function() {
     "uuid": "006f3f71-ed22-44d2-b6a3-9d98f263587a",
     "zoomUUID": "006f3f71-ed22-44d2-b6a3-9d98f263587a"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function() {/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -486,16 +557,20 @@ describe('newLineAtCursor', function() {
     "uuid": "006f3f71-ed22-44d2-b6a3-9d98f263587a",
     "zoomUUID": "006f3f71-ed22-44d2-b6a3-9d98f263587a"
 }
-        */}));
+        */
+			})
+		);
 
-        Tree.newLineAtCursor(tree);
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
-    });
+		Tree.newLineAtCursor(tree);
+		assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	});
 });
 
 describe('findSelected and findNextNode', function() {
-    it('Moving down through a tree', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('Moving down through a tree', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -536,23 +611,27 @@ describe('findSelected and findNextNode', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        assert.equal(Tree.findSelected(tree).title, 'two');
-        Tree.selectNextNode(tree);
-        assert.equal(Tree.findSelected(tree).title, 'three');
-        Tree.selectNextNode(tree);
-        assert.equal(Tree.findSelected(tree).title, 'four');
-        Tree.selectNextNode(tree);
-        assert.equal(Tree.findSelected(tree).title, 'five');
-        Tree.selectNextNode(tree);
-        assert.equal(Tree.findSelected(tree).title, 'six');
-    });
+		assert.equal(Tree.findSelected(tree).title, 'two');
+		Tree.selectNextNode(tree);
+		assert.equal(Tree.findSelected(tree).title, 'three');
+		Tree.selectNextNode(tree);
+		assert.equal(Tree.findSelected(tree).title, 'four');
+		Tree.selectNextNode(tree);
+		assert.equal(Tree.findSelected(tree).title, 'five');
+		Tree.selectNextNode(tree);
+		assert.equal(Tree.findSelected(tree).title, 'six');
+	});
 });
 
 describe('Looking for the previous node of some selected node (findPreviousNode)', function() {
-    it('If you have no siblings above you, the previous node is the parent', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('If you have no siblings above you, the previous node is the parent', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -577,16 +656,20 @@ describe('Looking for the previous node of some selected node (findPreviousNode)
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        selected = Tree.findSelected(tree);
-        next = Tree.findPreviousNode(selected);
-        assert.equal(selected.title, 'two');
-        assert.equal(next.title, 'one');
-    });
+		let selected = Tree.findSelected(tree);
+		let next = Tree.findPreviousNode(selected);
+		assert.equal(selected.title, 'two');
+		assert.equal(next.title, 'one');
+	});
 
-    it('If you have a sibling above you, that is the previous node', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('If you have a sibling above you, that is the previous node', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -611,17 +694,21 @@ describe('Looking for the previous node of some selected node (findPreviousNode)
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        selected = Tree.findSelected(tree);
-        next = Tree.findPreviousNode(selected);
-        assert.equal(selected.title, 'three');
-        assert.equal(next.title, 'two');
-    });
+		let selected = Tree.findSelected(tree);
+		let next = Tree.findPreviousNode(selected);
+		assert.equal(selected.title, 'three');
+		assert.equal(next.title, 'two');
+	});
 
-    // TODO this is not symetric with getNextNode. getNextNode never returns null.
-    it('If there are no siblings above you and you have no parent, the previous node is... null', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	// TODO this is not symetric with getNextNode. getNextNode never returns null.
+	it('If there are no siblings above you and you have no parent, the previous node is... null', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -652,16 +739,20 @@ describe('Looking for the previous node of some selected node (findPreviousNode)
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        selected = Tree.findSelected(tree);
-        next = Tree.findPreviousNode(selected);
-        assert.equal(selected.title, 'one');
-        assert.equal(next, null);
-    });
+		let selected = Tree.findSelected(tree);
+		let next = Tree.findPreviousNode(selected);
+		assert.equal(selected.title, 'one');
+		assert.equal(next, null);
+	});
 
-    it('four', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('four', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -692,38 +783,49 @@ describe('Looking for the previous node of some selected node (findPreviousNode)
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var selected = Tree.findSelected(tree);
-        var next = Tree.findPreviousNode(selected);
-        assert.equal(selected.title, 'four');
-        assert.equal(next.title, 'three');
-    });
+		var selected = Tree.findSelected(tree);
+		var next = Tree.findPreviousNode(selected);
+		assert.equal(selected.title, 'four');
+		assert.equal(next.title, 'three');
+	});
 });
 
 it('testSelectNext', function() {
-    var treeNext2 = [{
-      title: "howdy",
-      childNodes: [
-        {title: "bobby"},
-        {title: "suzie", childNodes: [
-          {title: "puppy", childNodes: [
-            {title: "dog", selected: true}
-          ]},
-          {title: "cherry"}
-        ]}
-      ]
-    }];
-    // TODO make statements like this more clear about why the first call is childNodes[0]... it's because
-    // this is wrapped in some root node.
-    var tree = Tree.makeTree(treeNext2).childNodes[0].childNodes[1].childNodes[0].childNodes[0];
-    var next = Tree.findNextNode(tree);
-    assert.equal(next.title, 'cherry');
+	var treeNext2 = [
+		{
+			title: 'howdy',
+			childNodes: [
+				{ title: 'bobby' },
+				{
+					title: 'suzie',
+					childNodes: [
+						{
+							title: 'puppy',
+							childNodes: [{ title: 'dog', selected: true }]
+						},
+						{ title: 'cherry' }
+					]
+				}
+			]
+		}
+	];
+	// TODO make statements like this more clear about why the first call is childNodes[0]... it's because
+	// this is wrapped in some root node.
+	var tree = Tree.makeTree(treeNext2).childNodes[0].childNodes[1].childNodes[0]
+		.childNodes[0];
+	var next = Tree.findNextNode(tree);
+	assert.equal(next.title, 'cherry');
 });
 
 describe('deleteSelected', function() {
-    it('deleting an item with children should kill the children', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('deleting an item with children should kill the children', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -754,9 +856,13 @@ describe('deleteSelected', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function() {/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
         {
     "title": "special_root_title",
     "childNodes": [
@@ -771,14 +877,18 @@ describe('deleteSelected', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        Tree.deleteSelected(tree, {caretLoc: 0});
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
-    });
+		Tree.deleteSelected(tree, { caretLoc: 0 });
+		assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	});
 
-    it('deleting the last item works', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('deleting the last item works', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -803,9 +913,13 @@ describe('deleteSelected', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -826,15 +940,19 @@ describe('deleteSelected', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
-        Tree.deleteSelected(tree, {caretLoc: 0});
-        assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
-    });
+        */
+			})
+		);
+		Tree.deleteSelected(tree, { caretLoc: 0 });
+		assert.equal(Tree.toStringClean(tree), Tree.toStringClean(after));
+	});
 });
 
 describe('shiftUp', function() {
-    it('regular', function() {
-        var before = Tree.fromString(multiline(function(){/*
+	it('regular', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -853,9 +971,13 @@ describe('shiftUp', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -874,13 +996,17 @@ describe('shiftUp', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
-        Tree.shiftUp(before);
+        */
+			})
+		);
+		Tree.shiftUp(before);
 
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
-    it('moving an item up that\'s already at the top does nothing', function() {
-        var before = Tree.fromString(multiline(function(){/*
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
+	it('moving an item up that\'s already at the top does nothing', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -899,9 +1025,13 @@ describe('shiftUp', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -920,13 +1050,17 @@ describe('shiftUp', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
-        Tree.shiftUp(before);
+        */
+			})
+		);
+		Tree.shiftUp(before);
 
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
-    it('Moving a single child up does nothing', function() {
-        var before = Tree.fromString(multiline(function(){/*
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
+	it('Moving a single child up does nothing', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -947,9 +1081,13 @@ describe('shiftUp', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -970,13 +1108,17 @@ describe('shiftUp', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
-        Tree.shiftUp(before);
+        */
+			})
+		);
+		Tree.shiftUp(before);
 
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
-    it('Shifting up over items with children', function() {
-        var before = Tree.fromString(multiline(function(){/*
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
+	it('Shifting up over items with children', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1001,9 +1143,13 @@ describe('shiftUp', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1028,16 +1174,20 @@ describe('shiftUp', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
-        Tree.shiftUp(before);
+        */
+			})
+		);
+		Tree.shiftUp(before);
 
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
 });
 
 describe('shiftDown', function() {
-    it('regular', function() {
-        var before = Tree.fromString(multiline(function(){/*
+	it('regular', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1056,9 +1206,13 @@ describe('shiftDown', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1077,17 +1231,20 @@ describe('shiftDown', function() {
     "uuid": "7265e8c8-f59d-4088-bb4c-02c62319eb57",
     "zoomUUID": "7265e8c8-f59d-4088-bb4c-02c62319eb57"
 }
-        */}));
-        Tree.shiftDown(before);
+        */
+			})
+		);
+		Tree.shiftDown(before);
 
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
 });
-
 
 describe('selectPreviousNode', function() {
-    it('regular', function() {
-        var before = Tree.fromString(multiline(function(){/*
+	it('regular', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1106,9 +1263,13 @@ describe('selectPreviousNode', function() {
     "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
     "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1127,20 +1288,23 @@ describe('selectPreviousNode', function() {
     "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
     "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
-        */}));
-        Tree.selectPreviousNode(before);
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+        */
+			})
+		);
+		Tree.selectPreviousNode(before);
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
 
-        // Doesn't change the second time
-        Tree.selectPreviousNode(before);
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
+		// Doesn't change the second time
+		Tree.selectPreviousNode(before);
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
 });
 
-
 describe('selectNextNode', function() {
-    it('If you have a child, that is the next node', function() {
-        var before = Tree.fromString(multiline(function(){/*
+	it('If you have a child, that is the next node', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1169,9 +1333,13 @@ describe('selectNextNode', function() {
     "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
     "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1200,12 +1368,16 @@ describe('selectNextNode', function() {
     "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
     "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
-        */}));
-        Tree.selectNextNode(before);
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
-    it('If you have no children and a sibling, that is the next node', function() {
-        var before = Tree.fromString(multiline(function(){/*
+        */
+			})
+		);
+		Tree.selectNextNode(before);
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
+	it('If you have no children and a sibling, that is the next node', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1234,9 +1406,13 @@ describe('selectNextNode', function() {
     "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
     "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1265,13 +1441,17 @@ describe('selectNextNode', function() {
     "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
     "zoomUUID": "b299c16d-3bb0-4986-99b7-f801c5ceee5b"
 }
-        */}));
-        Tree.selectNextNode(before);
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
+        */
+			})
+		);
+		Tree.selectNextNode(before);
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
 
-    it('If you are zoomed in and are at the bottom of your view, do not select the next node', function() {
-        var before = Tree.fromString(multiline(function(){/*
+	it('If you are zoomed in and are at the bottom of your view, do not select the next node', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1300,9 +1480,13 @@ describe('selectNextNode', function() {
     "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
     "zoomUUID": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1331,15 +1515,19 @@ describe('selectNextNode', function() {
     "uuid": "b299c16d-3bb0-4986-99b7-f801c5ceee5b",
     "zoomUUID": "cc55b9aa-faf8-4653-a61f-3c8e341e0d22"
 }
-        */}));
-        Tree.selectNextNode(before);
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
+        */
+			})
+		);
+		Tree.selectNextNode(before);
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
 });
 
 describe('selectLastNode', function() {
-    it('When zoomed in, the last node should be the last node of the zoomed in view', function() {
-        var before = Tree.fromString(multiline(function(){/*
+	it('When zoomed in, the last node should be the last node of the zoomed in view', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1368,9 +1556,13 @@ describe('selectLastNode', function() {
     "uuid": "aafec563-0043-4b6a-a1ed-4d5604da6eb3",
     "zoomUUID": "819da9dc-875f-4997-a503-368e9cc92846"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1399,15 +1591,19 @@ describe('selectLastNode', function() {
     "uuid": "aafec563-0043-4b6a-a1ed-4d5604da6eb3",
     "zoomUUID": "819da9dc-875f-4997-a503-368e9cc92846"
 }
-        */}));
-        Tree.selectLastNode(before, {caretLoc: 0});
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
+        */
+			})
+		);
+		Tree.selectLastNode(before, { caretLoc: 0 });
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
 });
 
 describe('selectFirstNode', function() {
-    it('First node is the first node up, up to the zoom level', function() {
-        var before = Tree.fromString(multiline(function(){/*
+	it('First node is the first node up, up to the zoom level', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1434,9 +1630,13 @@ describe('selectFirstNode', function() {
     "uuid": "aafec563-0043-4b6a-a1ed-4d5604da6eb3",
     "zoomUUID": "3398b59a-b442-408d-95ea-c3ed3010c940"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1463,15 +1663,19 @@ describe('selectFirstNode', function() {
     "uuid": "aafec563-0043-4b6a-a1ed-4d5604da6eb3",
     "zoomUUID": "3398b59a-b442-408d-95ea-c3ed3010c940"
 }
-        */}));
-        Tree.selectFirstNode(before, {caretLoc: 0});
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
+        */
+			})
+		);
+		Tree.selectFirstNode(before, { caretLoc: 0 });
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
 });
 
 describe('unindent', function() {
-    it('Do not unindent outside of your current zoom', function() {
-        var before = Tree.fromString(multiline(function(){/*
+	it('Do not unindent outside of your current zoom', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1491,9 +1695,13 @@ describe('unindent', function() {
     "uuid": "7e843b82-0ed8-4211-9c70-699e8f8a9ff5",
     "zoomUUID": "f504ddc1-44d7-4c25-a4c8-316e5010ed18"
 }
-        */}));
+        */
+			})
+		);
 
-        var after = Tree.fromString(multiline(function(){/*
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1513,16 +1721,19 @@ describe('unindent', function() {
     "uuid": "7e843b82-0ed8-4211-9c70-699e8f8a9ff5",
     "zoomUUID": "f504ddc1-44d7-4c25-a4c8-316e5010ed18"
 }
-        */}));
-        Tree.unindent(before);
-        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
-    });
+        */
+			})
+		);
+		Tree.unindent(before);
+		assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+	});
 });
 
-
 describe('breadcrumb', function() {
-    it('regular', function() {
-        var tree = Tree.fromString(multiline(function(){/*
+	it('regular', function() {
+		var tree = Tree.fromString(
+			multiline(function() {
+				/*
 {
     "title": "special_root_title",
     "childNodes": [
@@ -1548,9 +1759,11 @@ describe('breadcrumb', function() {
     "uuid": "03f56f45-19a3-4f90-857f-7b4a5f169d05",
     "zoomUUID": "527127c4-2143-4e55-95e9-b39c9625fbb7"
 }
-        */}));
+        */
+			})
+		);
 
-        var root = tree;
-        assert.deepEqual(Tree.getBreadcrumb(root), ['Home', 'one', 'two']);
-    });
+		var root = tree;
+		assert.deepEqual(Tree.getBreadcrumb(root), ['Home', 'one', 'two']);
+	});
 });

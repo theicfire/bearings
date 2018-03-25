@@ -1,0 +1,5 @@
+node_modules
+*.swp
+js/config.js
+js/bundle.js
+js/bundleimport.js
