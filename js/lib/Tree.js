@@ -13,12 +13,52 @@ Tree.generateUUID = function() {
 	return uuid;
 };
 
+// Tree.getAllChildren = function(tree) {
+// 	var ret = [];
+// 	console.log('get all children of', tree.title);
+// 	var toProcess = tree.childNodes.map(function (x) {return x;});
+// 	while (toProcess.length > 0) {
+// 		console.log('popping of', toProcess);
+// 		var node = toProcess.pop();
+// 		console.log('pushing', node.title);
+// 		ret.push(node);
+// 		toProcess = toProcess.concat(node.childNodes.map(function (x) {return x;}));
+// 	}
+// 	console.log('all children is', ret.map(function (n) { return n.title; }));
+// 	return ret;
+// }
+
+Tree.addDiff = function(node) {
+	// TODO, speed this up too...
+	var chain = Tree.getParentChain(node);
+	var root = Tree.getRoot(node);
+	chain.forEach(function (n) {
+		root.diff[n.uuid] = true;
+	});
+};
+
+Tree.addAllDiff = function(node) {
+	var root = Tree.getRoot(node);
+	root.diff['run_full_diff'] = true;
+};
+
+Tree.getParentChain = function(node) {
+	var ret = [];
+	while (node.title !== 'special_root_title') {
+		ret.push(node);
+		node = node.parent;
+	}
+	ret.push(node);
+	return ret;
+};
+
 Tree.selectNextNode = function(tree) {
 	var selected = Tree.findSelected(tree);
 	var root = Tree.getRoot(tree);
 	var next = Tree.findNextNode(selected);
 	if (next) {
 		root.selected = next.uuid;
+		Tree.addDiff(next);
 	}
 };
 
@@ -28,6 +68,7 @@ Tree.selectPreviousNode = function(tree) {
 	var previous = Tree.findPreviousNode(selected);
 	if (previous) {
 		root.selected = previous.uuid;
+		Tree.addDiff(previous);
 	}
 };
 
@@ -57,11 +98,15 @@ Tree.appendSibling = function(tree, title) {
 	var ret = Tree.makeNode({ title: title, parent: tree.parent });
 	Tree.addUUIDPointer(ret);
 	tree.parent.childNodes.splice(i + 1, 0, ret);
+	Tree.addDiff(tree.parent);
 	return ret;
 };
 
 Tree.newChildAtCursor = function(selected) {
 	var ret = Tree.makeNode({ title: '', parent: selected });
+	Tree.addDiff(selected.parent);
+	Tree.addDiff(selected);
+	Tree.addDiff(ret);
 	var root = Tree.getRoot(selected);
 	Tree.addUUIDPointer(ret);
 	if (selected.childNodes) {
@@ -88,6 +133,8 @@ Tree.newLineAtCursor = function(tree) {
 	} else {
 		selected.title = textStart;
 		var nextNode = Tree.appendSibling(selected, textRest);
+		Tree.addDiff(nextNode);
+		Tree.addDiff(selected);
 		if (textRest.length > 0) {
 			Tree.setChildNodes(nextNode, selected.childNodes);
 			Tree.setChildNodes(selected, []);
@@ -146,6 +193,7 @@ Tree.makeNode = function(args) {
 	Tree.setIfReal(ret, args, 'uuid', Tree.generateUUID());
 	Tree.setIfReal(ret, args, 'uuidMap');
 	Tree.setIfReal(ret, args, 'zoom');
+	Tree.setIfReal(ret, args, 'diff');
 	return ret;
 };
 
@@ -187,7 +235,8 @@ Tree.cloneGeneral = function(tree, parent, options) {
 			caretLoc: options.nomouse ? undefined : tree.caretLoc,
 			uuid: tree.uuid,
 			uuidMap: options.noparent ? undefined : {},
-			completedHidden: tree.completedHidden
+			completedHidden: tree.completedHidden,
+			diff: tree.diff,
 		},
 		{ clean: options.clean }
 	);
@@ -213,6 +262,8 @@ Tree.indent = function(tree) {
 	newParent.childNodes.push(selected);
 	selected.parent.childNodes.splice(childNum, 1);
 	selected.parent = newParent;
+	// TODO diff is oldParent + newParent + selected + children of selected
+	Tree.addAllDiff(selected);
 };
 
 Tree.unindent = function(tree) {
@@ -230,11 +281,8 @@ Tree.unindent = function(tree) {
 	newParent.childNodes.splice(parentChildNum + 1, 0, selected);
 	selected.parent.childNodes.splice(childNum, 1);
 	selected.parent = newParent;
-};
-
-Tree.setCurrentTitle = function(tree, title) {
-	var selected = Tree.findSelected(tree);
-	selected.title = title;
+	// TODO diff is oldParent + newParent + selected + children of selected
+	Tree.addAllDiff(selected);
 };
 
 Tree.shiftUp = function(tree) {
@@ -250,6 +298,7 @@ Tree.shiftUp = function(tree) {
 	var tmp = parent.childNodes[childNum];
 	parent.childNodes[childNum] = parent.childNodes[childNum - 1];
 	parent.childNodes[childNum - 1] = tmp;
+	Tree.addDiff(parent);
 };
 
 Tree.shiftDown = function(tree) {
@@ -265,6 +314,7 @@ Tree.shiftDown = function(tree) {
 	var tmp = parent.childNodes[childNum];
 	parent.childNodes[childNum] = parent.childNodes[childNum + 1];
 	parent.childNodes[childNum + 1] = tmp;
+	Tree.addDiff(parent);
 };
 
 Tree.findChildNum = function(tree) {
@@ -310,6 +360,7 @@ Tree.zoom = function(tree) {
 	var root = Tree.getRoot(tree);
 	root.zoom = tree;
 	root.zoomUUID = tree.uuid;
+	Tree.addAllDiff(root);
 };
 
 Tree.zoomOutOne = function(tree) {
@@ -324,6 +375,7 @@ Tree.zoomOutOne = function(tree) {
 		// TODO ever get hit?
 		console.assert(false, 'something wrong');
 	}
+	Tree.addAllDiff(root);
 };
 
 Tree.deleteSelected = function(tree) {
@@ -341,6 +393,8 @@ Tree.deleteSelected = function(tree) {
 			root.caretLoc = 0;
 			delete selected.collapsed;
 			delete selected.completed; // TODO do I want this?
+			// No speed concern here, because this happens when the workflowy document is fully empty
+			Tree.addAllDiff(root);
 			return;
 		}
 	}
@@ -348,6 +402,8 @@ Tree.deleteSelected = function(tree) {
 	selected.parent.childNodes.splice(childNum, 1);
 	root.selected = nextSelection.uuid;
 	root.caretLoc = nextSelection.title.length;
+	Tree.addDiff(selected.parent);
+	Tree.addDiff(nextSelection);
 };
 
 Tree.backspaceAtBeginning = function(tree) {
@@ -379,6 +435,8 @@ Tree.backspaceAtBeginning = function(tree) {
 	} else if (selected.title.length === 0) {
 		Tree.deleteSelected(tree);
 	}
+	Tree.addDiff(selected.parent);
+	Tree.addDiff(previous);
 };
 
 Tree.setChildNodes = function(tree, childNodes) {
@@ -418,6 +476,7 @@ Tree.collapseCurrent = function(tree) {
 	if (selected.childNodes && selected.childNodes.length > 0) {
 		selected.collapsed = !selected.collapsed;
 	}
+	Tree.addAllDiff(selected);
 };
 
 Tree.countVisibleChildren = function(tree) {
@@ -455,6 +514,7 @@ Tree.completeCurrent = function(tree) {
 		Tree.selectNextNode(tree);
 		Tree.setCompletedHidden(tree, backup);
 	}
+	Tree.addAllDiff(selected);
 };
 
 Tree.findPreviousNode = function(tree) {
@@ -520,6 +580,7 @@ Tree.makeTree = function(nodes) {
 	ret = Tree.clone(ret);
 	ret.zoom = ret;
 	ret.zoomUUID = ret.uuid;
+	ret.diff = {};
 	ret.completedHidden = true;
 	//ret.selected = ret.childNodes[0].uuid; // TODO check if needed?
 	return ret;

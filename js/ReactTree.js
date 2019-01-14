@@ -23,6 +23,33 @@ var DataSaved = React.createClass({
 	}
 });
 
+var TopLevelTree = React.createClass({
+	render: function() {
+		return <div>
+			<div className="header">
+				<span className="logo">Bearings</span>
+				<SearchBox />
+				<div className="header-buttons">
+					<ResetButton />
+					<a href="import.html">Import</a>
+					<DataSaved />
+					<CompleteHiddenButton />
+				</div>{' '}
+			</div>
+			<div className="pad-wrapper">
+				<div className="breadcrumbs-wrapper">
+					<Breadcrumb node={this.props.tree} />
+				</div>
+				<ReactTree.TreeNode topBullet={true} node={this.props.tree.zoom} />
+			</div>
+		</div>;
+	},
+
+	componentDidUpdate: function() {
+		globalTree.diff = {};
+	}
+});
+
 var Breadcrumb = React.createClass({
 	render: function() {
 		var text = this.breadcrumbToText(Tree.getBreadcrumb(this.props.node));
@@ -49,7 +76,6 @@ var Breadcrumb = React.createClass({
 
 var CompleteHiddenButton = React.createClass({
 	render: function() {
-		console.log('go and render', globalCompletedHidden);
 		var text = globalCompletedHidden ? 'Show completed' : 'Hide completed';
 		return (
 			<a
@@ -129,7 +155,7 @@ ReactTree.TreeChildren = React.createClass({
 		if (this.props.childNodes != null) {
 			childNodes = this.props.childNodes.map(function(node, index) {
 				return (
-					<li key={index}>
+					<li key={node.uuid}>
 						<ReactTree.TreeNode node={node} />
 					</li>
 				);
@@ -171,8 +197,10 @@ ReactTree.TreeNode = React.createClass({
 		var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
 		globalTree.selected = currentNode.uuid;
 		if (event.type === 'focus') {
+			// clicking on the div, not the actual text. Also always fired when switching focus
 			globalTree.caretLoc = currentNode.title.length;
 		} else {
+			// clicking on the text directly
 			globalTree.caretLoc = Cursor.getCaretCharacterOffsetWithin(
 				this.refs.input.getDOMNode()
 			);
@@ -204,7 +232,7 @@ ReactTree.TreeNode = React.createClass({
 			C: 67,
 			END: 35,
 			HOME: 36,
-			SPACE: 32
+			SPACE: 32,
 		};
 		if (e.keyCode === KEYS.LEFT) {
 			if (e.ctrlKey) {
@@ -365,10 +393,15 @@ ReactTree.TreeNode = React.createClass({
 		}
 	},
 
-	// TODO good for speedups..
-	//shouldComponentUpdate: function(nextProps, nextState) {
-	//return !_.isEqual(this.props, nextProps);
-	//},
+	shouldComponentUpdate: function(nextProps, nextState) {
+		if (!_.isEqual(this.state, nextState)) {
+			return true;
+		}
+		if ('run_full_diff' in globalTree.diff) {
+			return true;
+		}
+		return this.props.node.uuid in globalTree.diff;
+	},
 	// TODO something about cursor jumps need this?
 	// See: http://stackoverflow.com/questions/22677931/react-js-onchange-event-for-contenteditable/27255103#27255103
 	// I think what "cursor jump" means is that if we set the textContent for some reason, but we are
@@ -379,6 +412,8 @@ ReactTree.TreeNode = React.createClass({
 
 	render: function() {
 		var className = 'dot';
+
+
 		if (this.props.node.childNodes != null) {
 			className = 'dot togglable';
 			if (this.props.node.collapsed) {
@@ -506,7 +541,7 @@ ReactTree.startRender = function(parseTree) {
 	globalCompletedHidden = Tree.isCompletedHidden(globalTree);
 	globalParseTree = parseTree;
 	var newTree = Tree.clone(globalTree);
-	globalUndoRing = new UndoRing(newTree, 50);
+	globalUndoRing = new UndoRing(newTree, 50); // TODO un hardcode
 	renderAll();
 
 	setInterval(function() {
@@ -525,13 +560,14 @@ function renderAll() {
 	// use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
 	// changed relative to the other, and we don't have to call render. But, we have to clone, which
 	// may be slow.
-	var newTree = Tree.clone(globalTree);
-	if (!_.isEqual(globalOldTree, Tree.cloneNoParentNoCursor(globalTree))) {
-		globalDataSaved = false;
-		globalUndoRing.addPending(newTree);
-		globalOldTree = Tree.cloneNoParentNoCursor(globalTree);
-	}
-	doRender(newTree);
+	// var newTree = Tree.clone(globalTree);
+	// if (!_.isEqual(globalOldTree, Tree.cloneNoParentNoCursor(globalTree))) {
+	// 	console.log('there was a change');
+	// 	globalDataSaved = false;
+	// 	globalUndoRing.addPending(newTree);
+	// 	globalOldTree = Tree.cloneNoParentNoCursor(globalTree);
+	// }
+	doRender(globalTree);
 }
 
 function renderAllNoUndo() {
@@ -541,24 +577,7 @@ function renderAllNoUndo() {
 
 ReactTree.to_react_element = function(tree) {
 	return (
-		<div>
-			<div className="header">
-				<span className="logo">Bearings</span>
-				<SearchBox />
-				<div className="header-buttons">
-					<ResetButton />
-					<a href="import.html">Import</a>
-					<DataSaved />
-					<CompleteHiddenButton />
-				</div>{' '}
-			</div>
-			<div className="pad-wrapper">
-				<div className="breadcrumbs-wrapper">
-					<Breadcrumb node={tree} />
-				</div>
-				<ReactTree.TreeNode topBullet={true} node={tree.zoom} />
-			</div>
-		</div>
+		<TopLevelTree tree={tree} />
 	);
 };
 
