@@ -3,6 +3,7 @@ module.exports = UndoRing;
 function UndoRing(obj, length) {
 	this.length = length;
 	this.ring = [];
+	// TODO should I remove this?
 	for (var i = 0; i < this.length; i++) {
 		this.ring.push({ childNodes: [{ title: 'nothing' }] });
 	}

@@ -9,12 +9,13 @@ var opml = require('opml-generator');
 var ReactTree = {};
 var globalTree;
 var globalTreeBak;
-var globalOldTree;
 var globalParseTree;
 var globalUndoRing;
 var globalDataSaved = true;
 var globalSkipFocus = false; // TODO remove?
 var globalCompletedHidden;
+var globalDiffUncommitted = false;
+var globalSkipNextUndo = false;
 
 var DataSaved = React.createClass({
 	render: function() {
@@ -46,6 +47,11 @@ var TopLevelTree = React.createClass({
 	},
 
 	componentDidUpdate: function() {
+		if (globalSkipNextUndo) {
+			globalSkipNextUndo = false;
+		} else if (Object.keys(globalTree.diff).length > 0) {
+			globalDiffUncommitted = true;
+		}
 		globalTree.diff = {};
 	}
 });
@@ -175,6 +181,7 @@ ReactTree.TreeNode = React.createClass({
 	handleChange: function(event) {
 		var html = this.refs.input.getDOMNode().textContent;
 		if (html !== this.lastHtml) {
+			globalDiffUncommitted = true;
 			var currentNode = Tree.findFromUUID(globalTree, this.props.node.uuid);
 			currentNode.title = event.target.textContent;
 			globalTree.caretLoc = Cursor.getCaretCharacterOffsetWithin(
@@ -362,7 +369,7 @@ ReactTree.TreeNode = React.createClass({
 			console.log(opml({}, [outlines]));
 			e.preventDefault();
 		} else {
-			console.log(e.keyCode);
+			// console.log(e.keyCode);
 		}
 	},
 
@@ -384,12 +391,8 @@ ReactTree.TreeNode = React.createClass({
 			// An example he was mentioning is that the virtual dom thinks that the div is empty, but if
 			// you type something and then press "clear", or specifically set the text, the VDOM will
 			// think the two are the same.
-			// I believe this will never happen for me though? Because I don't overtly set text.. text is only set when someone is typing, right?
-			//this.refs.input.getDOMNode().textContent = this.props.node.title;
-			console.assert(
-				false,
-				'Did not expect this to get hit. My thoughts are wrong. Check out the comments.'
-			);
+			// This is necessary when doing undo/redo. Then we'll be explicitly setting the text of the DOM
+			this.refs.input.getDOMNode().textContent = this.props.node.title;
 		}
 	},
 
@@ -545,34 +548,33 @@ ReactTree.startRender = function(parseTree) {
 	renderAll();
 
 	setInterval(function() {
-		if (!globalDataSaved) {
-			globalParseTree.set('tree', Tree.toString(globalTree));
-			globalParseTree.save();
-			globalDataSaved = true;
-			renderAllNoUndo();
+		// if (!globalDataSaved) {
+		// 	globalParseTree.set('tree', Tree.toString(globalTree));
+		// 	globalParseTree.save();
+		// 	globalDataSaved = true;
+		// 	renderAllNoUndo();
+		// }
+		if (globalDiffUncommitted) {
+			globalDiffUncommitted = false;
+			var newTree = Tree.clone(globalTree);
+			globalUndoRing.addPending(newTree);
+			globalUndoRing.commit();
 		}
-		globalUndoRing.commit();
 	}, 2000);
 };
 
 function renderAll() {
-	// TODO speedup by removing clone. I might not need to clone. What this does is allow us to
-	// use shouldComponentUpdate. If we have two versions of the tree, then we can compare if one
-	// changed relative to the other, and we don't have to call render. But, we have to clone, which
-	// may be slow.
-	// var newTree = Tree.clone(globalTree);
-	// if (!_.isEqual(globalOldTree, Tree.cloneNoParentNoCursor(globalTree))) {
-	// 	console.log('there was a change');
+	// if (globalDiffUncommitted) {
+	// 	// TODO this needs to get set to false when running undo...
 	// 	globalDataSaved = false;
-	// 	globalUndoRing.addPending(newTree);
-	// 	globalOldTree = Tree.cloneNoParentNoCursor(globalTree);
 	// }
 	doRender(globalTree);
 }
 
 function renderAllNoUndo() {
-	var newTree = Tree.clone(globalTree);
-	doRender(newTree);
+	globalTree.diff['run_full_diff'] = true;
+	globalSkipNextUndo = true;
+	doRender(globalTree);
 }
 
 ReactTree.to_react_element = function(tree) {
