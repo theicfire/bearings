@@ -75,4 +75,14 @@ describe('undoredo', function() {
 		assert.equal(0, ring.undo());
 		assert.equal(0, ring.undo());
 	});
+
+	it('Adding multiple pendings in a row only accepts the last one', function() {
+		var ring = new UndoRing(0, 4);
+		ring.addPending(1);
+		ring.addPending(2);
+		ring.addPending(3);
+		ring.commit();
+		assert.equal(ring.ring[0], 0);
+		assert.equal(ring.ring[1], 3);
+	})
 });

@@ -1,5 +1,6 @@
 var ReactTree = require('./ReactTree');
 var Tree = require('./lib/Tree');
+var ImportUtils = require('./lib/ImportUtils');
 var config = require('./config');
 var FakeParseTree = require('./lib/FakeParseTree');
 
@@ -17,7 +18,7 @@ if (config.use_parse) {
 		}
 	});
 } else {
-	ReactTree.startRender(
-		new FakeParseTree(Tree.toString(Tree.makeDefaultTree()))
-	);
+	ImportUtils.opmlToTree(ImportUtils.sampleOpml, function(tree) {
+		ReactTree.startRender(new FakeParseTree(Tree.toString(tree)));
+	});
 }

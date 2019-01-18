@@ -28,7 +28,7 @@ $ make index
 (Open a new terminal)
 $ make import
 (Open a new terminal)
-$ python -m SimpleHTTPServer`
+$ python -m SimpleHTTPServer (python -m http.server for python3)
 Visit localhost:8000
 ```
 

@@ -6,6 +6,7 @@ var Tree = require('./lib/Tree');
 var Convert = require('./lib/Convert');
 var Parse = require('parse').Parse;
 var config = require('./config');
+var ImportUtils = require('./lib/ImportUtils');
 
 Parse.initialize(config.parse_app_id, config.parse_js_key);
 
@@ -61,71 +62,8 @@ var SubmitButton = React.createClass({
 	}
 });
 
-var workflowyToWorkclone = function(tree) {
-	var ret = workflowyToWorkcloneRec(tree);
-	ret.childNodes[0].selected = true;
-	return ret.childNodes;
-};
-
-var workflowyToWorkcloneRec = function(tree) {
-	// TODO why are there both of these? Should there not just be one? Artifact from before?
-	var ret = {
-		title:
-      tree.title !== undefined ? _.unescape(tree.title) : _.unescape(tree.text)
-	};
-	if (!tree.children) {
-		return ret;
-	}
-	ret.childNodes = [];
-	for (var i = 0; i < tree.children.length; i++) {
-		ret.childNodes.push(workflowyToWorkcloneRec(tree.children[i]));
-	}
-	return ret;
-};
-
-var rawStartTree = [
-	{
-		title: 'howdy',
-		selected: 'true',
-		caretLoc: 0,
-		childNodes: [
-			{ title: 'billy' },
-			{
-				title: 'suzie',
-				childNodes: [
-					{
-						title: 'puppy',
-						childNodes: [{ title: 'dog house' }]
-					},
-					{ title: 'cherry thing' }
-				]
-			}
-		]
-	}
-];
-
-var sampleOpml = multiline(function() {
-	/*
-    <?xml version="1.0"?>
-    <opml version="2.0">
-      <head>
-        <ownerEmail>theicfire@gmail.com</ownerEmail>
-      </head>
-      <body>
-        <outline text="one" >
-          <outline text="two" >
-            <outline text="three" /></outline>
-            <outline text="four" /></outline>
-        </outline>
-        <outline text="five" >
-        </outline>
-      </body>
-    </opml>
-*/
-});
-
 var sampleHtml = multiline(function() {
-	/*
+/*
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <ul style="margin: 15px 0px 0px; padding: 0px; border: 0px; outline: 0px; font-size: 13px; vertical-align: baseline; list-style: disc; color: rgb(51, 51, 51); font-family: 'Helvetica Neue', Arial, sans-serif; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 17px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px; background: transparent;">
    <li style="margin: 4px 0px 4px 20px; padding: 0px; border: 0px; outline: 0px; font-size: 13px; vertical-align: baseline; background: transparent;">
@@ -174,7 +112,7 @@ function submitOpml(opml) {
 	query.get(config.parse_id, {
 		success: function(parseTree) {
 			opmlToJSON(opml, function(error, json) {
-				var tree = Tree.makeTree(workflowyToWorkclone(json));
+				var tree = Tree.makeTree(ImportUtils.workflowyToWorkclone(json));
 				console.log('tree', Tree.toString(tree));
 				parseTree.set('tree', Tree.toString(tree));
 				parseTree.save();
