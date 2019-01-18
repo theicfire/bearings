@@ -198,6 +198,7 @@ Tree.makeNode = function(args) {
 };
 
 Tree.clone = function(tree) {
+	// TODO this only really makes sense to use this clone for root stuff (see addUUIDPointers).. let's call it something else?
 	var ret = Tree.cloneGeneral(tree, null, { noparent: false, nomouse: false });
 	Tree.addUUIDPointers(ret);
 	if (tree.zoom) {
@@ -236,7 +237,7 @@ Tree.cloneGeneral = function(tree, parent, options) {
 			uuid: tree.uuid,
 			uuidMap: options.noparent ? undefined : {},
 			completedHidden: tree.completedHidden,
-			diff: tree.diff,
+			diff: options.noparent ? undefined : {},
 		},
 		{ clean: options.clean }
 	);
