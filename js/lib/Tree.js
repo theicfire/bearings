@@ -194,6 +194,7 @@ Tree.makeNode = function(args) {
 	Tree.setIfReal(ret, args, 'uuidMap');
 	Tree.setIfReal(ret, args, 'zoom');
 	Tree.setIfReal(ret, args, 'diff');
+	Tree.setIfReal(ret, args, 'childCount');
 	return ret;
 };
 
@@ -238,6 +239,7 @@ Tree.cloneGeneral = function(tree, parent, options) {
 			uuidMap: options.noparent ? undefined : {},
 			completedHidden: tree.completedHidden,
 			diff: options.noparent ? undefined : {},
+			childCount: tree.childCount,
 		},
 		{ clean: options.clean }
 	);
@@ -646,6 +648,21 @@ Tree.fromString = function(s) {
 		ret.zoom = ret.uuidMap[ret.zoomUUID];
 	}
 	return ret;
+};
+
+Tree.addChildCounts = function(tree) {
+	let count = 0;
+	console.log(tree['childNodes']);
+	console.log(tree);
+	console.log(Object.keys(tree));
+	console.log('first');
+	for (const child of tree['childNodes']) {
+		console.log('next');
+		count += Tree.addChildCounts(child) + 1;
+		console.log(Tree.toStringPretty(tree));
+	}
+	tree['childCount'] = count;
+	return count;
 };
 
 Tree.equals = function(one, two) {

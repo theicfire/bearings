@@ -1767,3 +1767,129 @@ describe('breadcrumb', function() {
 		assert.deepEqual(Tree.getBreadcrumb(root), ['Home', 'one', 'two']);
 	});
 });
+
+describe('childCounts', function() {
+	it('Add child counts works on a sample tree', function() {
+		var before = Tree.fromString(
+			multiline(function() {
+				/*
+{
+  "title": "special_root_title",
+  "childNodes": [
+    {
+      "title": "a",
+      "childNodes": [
+        {
+          "title": "b",
+          "childNodes": [],
+          "uuid": "0e82811c-cdc7-46ca-ab75-5ec900363e5d"
+        },
+        {
+          "title": "c",
+          "childNodes": [
+            {
+              "title": "d",
+              "childNodes": [],
+              "uuid": "6ab820de-82e2-4734-af2f-fe63adeff6ce"
+            }
+          ],
+          "uuid": "c2ed5412-aaff-4d3e-b195-c0ace4b5743c"
+        },
+        {
+          "title": "e",
+          "childNodes": [],
+          "uuid": "e1930827-2706-41e3-8204-e2c7260599ed"
+        }
+      ],
+      "selected": true,
+      "uuid": "226640d8-30c7-4c1b-9390-a9f181ca5b08"
+    },
+    {
+      "title": "f",
+      "childNodes": [],
+      "uuid": "cfac3576-0f7a-494a-96b5-235616f1deef"
+    },
+    {
+      "title": "g",
+      "childNodes": [],
+      "uuid": "8aaefdf2-d9cb-4538-980a-85bde24e09ca"
+    }
+  ],
+  "selected": "aa23dc16-9c00-4994-9f98-87d0ad3900d4",
+  "completedHidden": true,
+  "caretLoc": 0,
+  "uuid": "fc821ebd-26af-4072-8eaa-f632e16dbf63",
+  "zoomUUID": "fc821ebd-26af-4072-8eaa-f632e16dbf63"
+}
+        */
+            })
+        );
+
+
+		var after = Tree.fromString(
+			multiline(function() {
+				/*
+{
+  "title": "special_root_title",
+  "childCount": 7,
+  "childNodes": [
+    {
+      "title": "a",
+      "childCount": 4,
+      "childNodes": [
+        {
+          "title": "b",
+          "childCount": 0,
+          "childNodes": [],
+          "uuid": "0e82811c-cdc7-46ca-ab75-5ec900363e5d"
+        },
+        {
+          "title": "c",
+          "childCount": 1,
+          "childNodes": [
+            {
+              "title": "d",
+              "childCount": 0,
+              "childNodes": [],
+              "uuid": "6ab820de-82e2-4734-af2f-fe63adeff6ce"
+            }
+          ],
+          "uuid": "c2ed5412-aaff-4d3e-b195-c0ace4b5743c"
+        },
+        {
+          "title": "e",
+          "childCount": 0,
+          "childNodes": [],
+          "uuid": "e1930827-2706-41e3-8204-e2c7260599ed"
+        }
+      ],
+      "selected": true,
+      "uuid": "226640d8-30c7-4c1b-9390-a9f181ca5b08"
+    },
+    {
+      "title": "f",
+      "childCount": 0,
+      "childNodes": [],
+      "uuid": "cfac3576-0f7a-494a-96b5-235616f1deef"
+    },
+    {
+      "title": "g",
+      "childCount": 0,
+      "childNodes": [],
+      "uuid": "8aaefdf2-d9cb-4538-980a-85bde24e09ca"
+    }
+  ],
+  "selected": "aa23dc16-9c00-4994-9f98-87d0ad3900d4",
+  "completedHidden": true,
+  "caretLoc": 0,
+  "uuid": "fc821ebd-26af-4072-8eaa-f632e16dbf63",
+  "zoomUUID": "fc821ebd-26af-4072-8eaa-f632e16dbf63"
+}
+        */
+			})
+		);
+
+        Tree.addChildCounts(before);
+        assert.equal(Tree.toStringClean(before), Tree.toStringClean(after));
+    });
+});
