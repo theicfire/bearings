@@ -88,6 +88,14 @@ Tree.selectFirstNode = function(tree) {
 	root.caretLoc = 0;
 };
 
+Tree.modifyChildCounts = function(tree, num) {
+	while (tree.title !== 'special_root_title') {
+		tree.childCount += num;
+		tree = tree.parent;
+	}
+	tree.childCount += num;
+};
+
 Tree.appendSibling = function(tree, title) {
 	var i;
 	for (i = 0; i < tree.parent.childNodes.length; i++) {
@@ -130,14 +138,18 @@ Tree.newLineAtCursor = function(tree) {
       !selected.collapsed)
 	) {
 		Tree.newChildAtCursor(selected, root);
+		Tree.modifyChildCounts(selected, 1);
 	} else {
 		selected.title = textStart;
 		var nextNode = Tree.appendSibling(selected, textRest);
 		Tree.addDiff(nextNode);
 		Tree.addDiff(selected);
+		Tree.modifyChildCounts(selected.parent, 1);
 		if (textRest.length > 0) {
 			Tree.setChildNodes(nextNode, selected.childNodes);
+			nextNode.childCount = selected.childCount;
 			Tree.setChildNodes(selected, []);
+			selected.childCount = 0;
 			if (selected.collapsed) {
 				nextNode.collapsed = true;
 				delete selected.collapsed;
@@ -194,7 +206,7 @@ Tree.makeNode = function(args) {
 	Tree.setIfReal(ret, args, 'uuidMap');
 	Tree.setIfReal(ret, args, 'zoom');
 	Tree.setIfReal(ret, args, 'diff');
-	Tree.setIfReal(ret, args, 'childCount');
+	Tree.setIfReal(ret, args, 'childCount', 0);
 	return ret;
 };
 
@@ -265,6 +277,7 @@ Tree.indent = function(tree) {
 	newParent.childNodes.push(selected);
 	selected.parent.childNodes.splice(childNum, 1);
 	selected.parent = newParent;
+	selected.parent.childCount += selected.childCount + 1;
 	// TODO diff is oldParent + newParent + selected + children of selected
 	Tree.addAllDiff(selected);
 };
@@ -283,6 +296,7 @@ Tree.unindent = function(tree) {
 	var newParent = selected.parent.parent;
 	newParent.childNodes.splice(parentChildNum + 1, 0, selected);
 	selected.parent.childNodes.splice(childNum, 1);
+	selected.parent.childCount += -1 - selected.childCount;
 	selected.parent = newParent;
 	// TODO diff is oldParent + newParent + selected + children of selected
 	Tree.addAllDiff(selected);
@@ -403,6 +417,7 @@ Tree.deleteSelected = function(tree) {
 	}
 	var childNum = Tree.findChildNum(selected);
 	selected.parent.childNodes.splice(childNum, 1);
+	Tree.modifyChildCounts(selected.parent, -1 - selected.childCount);
 	root.selected = nextSelection.uuid;
 	root.caretLoc = nextSelection.title.length;
 	Tree.addDiff(selected.parent);
@@ -434,6 +449,8 @@ Tree.backspaceAtBeginning = function(tree) {
 		root.caretLoc = previous.title.length;
 		previous.title += selected.title;
 		Tree.setChildNodes(previous, selected.childNodes);
+		Tree.modifyChildCounts(selected.parent, -1 - selected.childCount);
+		Tree.modifyChildCounts(previous, selected.childCount);
 		previous.collapsed = selected.collapsed;
 	} else if (selected.title.length === 0) {
 		Tree.deleteSelected(tree);
@@ -642,6 +659,7 @@ Tree.toStringClean = function(tree) {
 Tree.fromString = function(s) {
 	var obj = JSON.parse(s);
 	var ret = Tree.clone(obj);
+	Tree.addChildCounts(ret); // TODO this breaks tests
 	if (!ret.zoomUUID) {
 		ret.zoom = ret;
 	} else {
