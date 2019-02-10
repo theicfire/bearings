@@ -273,11 +273,18 @@ Tree.indent = function(tree) {
 		return;
 	}
 	var newParent = selected.parent.childNodes[childNum - 1];
+	let didUncollapse = newParent.collapsed;
 	delete newParent.collapsed;
 	newParent.childNodes.push(selected);
 	selected.parent.childNodes.splice(childNum, 1);
 	selected.parent = newParent;
-	selected.parent.childCount += selected.childCount + 1;
+	if (didUncollapse) {
+		// Slow path
+		Tree.addChildCounts(Tree.getRoot(tree));
+	} else {
+		// Fast path
+		selected.parent.childCount += selected.childCount + 1;
+	}
 	// TODO diff is oldParent + newParent + selected + children of selected
 	Tree.addAllDiff(selected);
 };
@@ -495,6 +502,7 @@ Tree.collapseCurrent = function(tree) {
 	var selected = Tree.findSelected(tree);
 	if (selected.childNodes && selected.childNodes.length > 0) {
 		selected.collapsed = !selected.collapsed;
+		Tree.addChildCounts(Tree.getRoot(tree)); // whatever, just recalc!
 	}
 	Tree.addAllDiff(selected);
 };
@@ -659,7 +667,9 @@ Tree.toStringClean = function(tree) {
 Tree.fromString = function(s) {
 	var obj = JSON.parse(s);
 	var ret = Tree.clone(obj);
+	console.log('addChildCounts', window.performance.now());
 	Tree.addChildCounts(ret); // TODO this breaks tests
+	console.log('addChildCounts done', window.performance.now());
 	if (!ret.zoomUUID) {
 		ret.zoom = ret;
 	} else {
@@ -670,14 +680,12 @@ Tree.fromString = function(s) {
 
 Tree.addChildCounts = function(tree) {
 	let count = 0;
-	console.log(tree['childNodes']);
-	console.log(tree);
-	console.log(Object.keys(tree));
-	console.log('first');
+	if (tree.collapsed) {
+		tree['childCount'] = 0;
+		return 0;
+	}
 	for (const child of tree['childNodes']) {
-		console.log('next');
 		count += Tree.addChildCounts(child) + 1;
-		console.log(Tree.toStringPretty(tree));
 	}
 	tree['childCount'] = count;
 	return count;

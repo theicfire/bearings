@@ -26,6 +26,8 @@ var DataSaved = React.createClass({
 
 var TopLevelTree = React.createClass({
 	render: function() {
+		// TODO are these numbers ok?
+		const numToRender = window.scrollY / 20 + 500;
 		return <div>
 			<div className="header">
 				<span className="logo">Bearings</span>
@@ -41,7 +43,7 @@ var TopLevelTree = React.createClass({
 				<div className="breadcrumbs-wrapper">
 					<Breadcrumb node={this.props.tree} />
 				</div>
-				<ReactTree.TreeNode topBullet={true} node={this.props.tree.zoom} />
+				<ReactTree.TreeNode topBullet={true} node={this.props.tree.zoom} numToRender={numToRender} />
 			</div>
 		</div>;
 	},
@@ -157,20 +159,30 @@ var SearchBox = React.createClass({
 
 ReactTree.TreeChildren = React.createClass({
 	render: function() {
-		var childNodes;
+		var childNodes = [];
+		let count = this.props.numToRender;
 		if (this.props.childNodes != null) {
-			childNodes = this.props.childNodes.map(function(node, index) {
-				return (
+			this.props.childNodes.forEach(function(node, index) {
+				if (count <= 0) {
+					return;
+				}
+				let childNode = (
 					<li key={node.uuid}>
-						<ReactTree.TreeNode node={node} />
+						<ReactTree.TreeNode node={node} numToRender={count - 1} />
 					</li>
 				);
+				childNodes.push(childNode);
+				count -= 1;
+				if (!node.collapsed) {
+					count -= node.childCount;
+				}
 			});
 		}
 
 		return <ul style={this.props.style}>{childNodes}</ul>;
 	}
 });
+
 ReactTree.TreeNode = React.createClass({
 	getInitialState: function() {
 		return {
@@ -374,7 +386,7 @@ ReactTree.TreeNode = React.createClass({
 	},
 
 	componentDidUpdate: function() {
-		console.log('updated', this.props.node.title);
+		// console.log('updated', this.props.node.title);
 		if (this.props.node.uuid === globalTree.selected) {
 			var el = $(this.refs.input.getDOMNode());
 			globalSkipFocus = true;
@@ -460,7 +472,7 @@ ReactTree.TreeNode = React.createClass({
 					onMouseOver={this.mouseOver}
 					className={className}
 				>
-					{String.fromCharCode(8226)}
+					{String.fromCharCode(8226)} {this.props.node.childCount}
 				</span>
 			);
 		}
@@ -468,7 +480,7 @@ ReactTree.TreeNode = React.createClass({
 		var children = '';
 		if (this.props.topBullet || !this.props.node.collapsed) {
 			children = (
-				<ReactTree.TreeChildren childNodes={this.props.node.childNodes} />
+				<ReactTree.TreeChildren childNodes={this.props.node.childNodes} numToRender={this.props.numToRender} />
 			);
 		}
 
@@ -554,12 +566,14 @@ ReactTree.startRender = function(parseTree) {
 		// 	globalDataSaved = true;
 		// 	renderAllNoUndo();
 		// }
-		if (globalDiffUncommitted) {
-			globalDiffUncommitted = false;
-			var newTree = Tree.clone(globalTree);
-			globalUndoRing.addPending(newTree);
-			globalUndoRing.commit();
-		}
+
+		// TODO bring back undo/redo
+		// if (globalDiffUncommitted) {
+		// 	globalDiffUncommitted = false;
+		// 	var newTree = Tree.clone(globalTree);
+		// 	globalUndoRing.addPending(newTree);
+		// 	globalUndoRing.commit();
+		// }
 	}, 2000);
 };
 
@@ -607,5 +621,17 @@ function doRender(tree) {
 		//);
 	}
 }
+
+let scrollTimer = null;
+window.addEventListener('scroll', function() {
+	if (scrollTimer === null) {
+		// TODO do something better with this update rate. Only need to render if we're close to the end of the page. Also if we get close to the end of the page quickly, we shouldn't wait 300ms..
+		// Also, we could watch when we're done with rendering to render again..
+		scrollTimer = setTimeout(function () {
+			renderAll();
+			scrollTimer = null;
+		}, 300);
+	}
+});
 
 module.exports = ReactTree;
