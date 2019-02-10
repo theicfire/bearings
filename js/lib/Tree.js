@@ -680,12 +680,12 @@ Tree.fromString = function(s) {
 
 Tree.addChildCounts = function(tree) {
 	let count = 0;
+	for (const child of tree['childNodes']) {
+		count += Tree.addChildCounts(child) + 1;
+	}
 	if (tree.collapsed) {
 		tree['childCount'] = 0;
 		return 0;
-	}
-	for (const child of tree['childNodes']) {
-		count += Tree.addChildCounts(child) + 1;
 	}
 	tree['childCount'] = count;
 	return count;
