@@ -586,7 +586,7 @@ function renderAll() {
 }
 
 function renderAllNoUndo() {
-	globalTree.diff['run_full_diff'] = true;
+	Tree.addAllDiff(globalTree);
 	globalSkipNextUndo = true;
 	doRender(globalTree);
 }
@@ -628,6 +628,7 @@ window.addEventListener('scroll', function() {
 		// TODO do something better with this update rate. Only need to render if we're close to the end of the page. Also if we get close to the end of the page quickly, we shouldn't wait 300ms..
 		// Also, we could watch when we're done with rendering to render again..
 		scrollTimer = setTimeout(function () {
+			Tree.addAllDiff(globalTree);
 			renderAll();
 			scrollTimer = null;
 		}, 300);
